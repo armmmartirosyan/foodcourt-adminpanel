@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from "lodash";
+import PropTypes from "prop-types";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -31,5 +32,9 @@ function SingleImage(props) {
         </figure>
     );
 }
-
+SingleImage.propTypes = {
+    image: PropTypes.object.isRequired,
+    obj: PropTypes.object.isRequired,
+    handleChangeImage: PropTypes.func.isRequired,
+}
 export default SingleImage;

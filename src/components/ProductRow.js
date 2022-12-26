@@ -1,7 +1,9 @@
 import React, {useCallback} from 'react';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {allProductsListRequest, deleteProductRequest} from "../store/actions/products";
 import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
+import PropTypes from "prop-types";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -9,16 +11,19 @@ function ProductRow(props) {
     const {product, openCloseModal, page, products} = props;
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const admin = useSelector(state => state.admin.admin);
 
     const handleDelete = useCallback(async (e, slugName) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteProductRequest({slugName}));
+        const data = await dispatch(deleteProductRequest({slugName}));
 
-        if (payload.status === 'ok') {
-            (products.length === 1 && page > 1) ?
-                navigate(`/products?page=${page-1}`)
-                : await dispatch(allProductsListRequest({page}));
+        if (data.error) {
+            toast.error('Error in deleting');
         }
+
+        (products.length === 1 && page > 1) ?
+            navigate(`/products?page=${page-1}`)
+            : await dispatch(allProductsListRequest({page}));
     }, [page, products]);
 
     return (
@@ -41,6 +46,7 @@ function ProductRow(props) {
             <td>
                 <button
                     className="btn btn-sm btn-primary"
+                    disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, product.slugName)
                     }}
@@ -51,5 +57,10 @@ function ProductRow(props) {
         </tr>
     );
 }
-
+ProductRow.propTypes = {
+    product: PropTypes.object.isRequired,
+    page: PropTypes.number.isRequired,
+    products: PropTypes.array.isRequired,
+    openCloseModal: PropTypes.func.isRequired,
+}
 export default ProductRow;

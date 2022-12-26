@@ -1,5 +1,6 @@
 import React from 'react';
 import {useSelector} from "react-redux";
+import PropTypes from "prop-types";
 
 function AdminRow(props) {
     const {admin, openCloseModal} = props;
@@ -34,6 +35,11 @@ function AdminRow(props) {
             }
         </>
     );
+}
+
+AdminRow.propTypes = {
+    admin: PropTypes.object.isRequired,
+    openCloseModal: PropTypes.func.isRequired,
 }
 
 export default AdminRow;

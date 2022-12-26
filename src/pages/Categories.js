@@ -7,11 +7,11 @@ import {addCategoryRequest, allCategoriesListRequest, updateCategoryRequest} fro
 import CategoryRow from "../components/CategoryRow";
 import {toast} from "react-toastify";
 import moment from "moment";
-import Spinner from "react-bootstrap/Spinner";
 import TopBar from "../components/TopBar";
 import SingleImage from "../components/SingleImage";
 import qs from "query-string";
 import {useLocation, useNavigate} from "react-router-dom";
+import Validator from "../helpers/Validator";
 
 function Categories() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -23,24 +23,30 @@ function Categories() {
     const statusAdd = useSelector(state => state.status.categoriesAddStatus);
     const statusUpdate = useSelector(state => state.status.categoriesUpdateStatus);
     const statusDelete = useSelector(state => state.status.categoriesDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
-    const [searchName, setSearchName] = useState('');
+    const [searchName, setSearchName] = useState(qs.parse(location.search).name || '');
     const [name, setName] = useState('');
     const [image, setImage] = useState({});
     const [category, setCategory] = useState({});
+    const [myTimeout, setMyTimeout] = useState();
 
     useEffect(() => {
-        const name = qs.parse(location.search).name;
+        const newName = qs.parse(location.search).name;
 
         (async () => {
-            await dispatch(allCategoriesListRequest({name}));
+            await dispatch(allCategoriesListRequest({name: newName}));
         })()
     }, [location.search]);
 
     useEffect(() => {
         const query = qs.stringify({name: searchName || null}, {skipNull: true});
 
-        navigate(`/categories${query ? `?${query}` : ''}`);
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/categories${query ? `?${query}` : ''}`);
+        }, 400));
     }, [searchName]);
 
     const handleChangeName = useCallback((e) => {
@@ -74,8 +80,14 @@ function Categories() {
     }, [modalIsOpen]);
 
     const handleAddCategory = useCallback(async () => {
-        if (name.length < 2) {
-            toast.error("Field name can't contain less than 2 symbols!");
+        const validateValues = [
+            Validator.validName(name),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
         if (!image.type) {
@@ -99,8 +111,19 @@ function Categories() {
     }, [image, name]);
 
     const handleUpdateCategory = useCallback(async () => {
-        if (name.length < 2 && !image.type) {
-            toast.error("Fill name more then 2 symbols or select image!");
+        const validateValues = [
+            name ? Validator.validName(name) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!name && !image.type) {
+            toast.error("Either fill name field, either select new image!");
             return;
         }
 
@@ -122,10 +145,10 @@ function Categories() {
 
     return (
         <Wrapper
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
-            searchable={true}
+            statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
+            search={searchName}
             setSearch={setSearchName}
+            uploadProcess={uploadProcess}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -170,7 +193,13 @@ function Categories() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`${!_.isEmpty(category) ? 'Update' : 'Add'} category`}
                     </h6>
@@ -189,6 +218,7 @@ function Categories() {
                             className="form-control"
                             id="floatingInput"
                             placeholder="Name"
+                            disabled={admin && admin.possibility === 'junior'}
                             value={name}
                             onChange={handleChangeName}
                         />
@@ -200,6 +230,7 @@ function Categories() {
                             className="form-control"
                             type="file"
                             id="formFile"
+                            disabled={admin && admin.possibility === 'junior'}
                             accept="image/*"
                             onChange={handleChangeImage}
                         />
@@ -236,16 +267,9 @@ function Categories() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusAdd === 'pending' || statusUpdate === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
+                            disabled={admin && admin.possibility === 'junior'}
                             onClick={
                                 !_.isEmpty(category) ? handleUpdateCategory : handleAddCategory
                             }

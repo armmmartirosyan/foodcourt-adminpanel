@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Wrapper from "../components/Wrapper";
 import {useDispatch, useSelector} from "react-redux";
 import Modal from "react-modal";
@@ -6,13 +6,13 @@ import {addProductRequest, allProductsListRequest, updateProductRequest} from ".
 import _ from 'lodash';
 import ProductRow from "../components/ProductRow";
 import {toast} from "react-toastify";
-import Spinner from "react-bootstrap/Spinner";
 import moment from "moment/moment";
 import qs from 'query-string';
 import {useLocation, useNavigate} from "react-router-dom";
 import TopBar from "../components/TopBar";
 import PageNumbers from "../components/PageNumbers";
 import SingleImage from "../components/SingleImage";
+import Validator from "../helpers/Validator";
 
 function Products() {
     const dispatch = useDispatch();
@@ -24,12 +24,14 @@ function Products() {
     const statusAdd = useSelector(state => state.status.productsAddStatus);
     const statusUpdate = useSelector(state => state.status.productsUpdateStatus);
     const statusDelete = useSelector(state => state.status.productsDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [product, setProduct] = useState({});
     const [image, setImage] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [title, setTitle] = useState('');
+    const [myTimeout, setMyTimeout] = useState();
+    const [title, setTitle] = useState(qs.parse(location.search).title || '');
     const [values, setValues] = useState({
         title: '',
         description: '',
@@ -37,22 +39,41 @@ function Products() {
         categorySlug: '',
     });
 
+
+    // useMemo(() => {
+    //     console.log(1)
+    //     if(!qs.parse(location.search).page){
+    //         let page = 1;
+    //         let title = qs.parse(location.search).title;
+    //         const query = qs.stringify({page, title: title || null}, {skipNull: true});
+    //         navigate({
+    //             pathname:location.pathname,
+    //             search:query,
+    //         },{replace:true});
+    //         // `/products${query ? `?${query}` : ''}`
+    //     }
+    // }, []);
+
     useEffect(() => {
-        const page = qs.parse(location.search).page;
-        const title = qs.parse(location.search).title;
+        const page = qs.parse(location.search).page || 1;
+        const newTitle = qs.parse(location.search).title;
+
+        // const query = qs.stringify({page, title: newTitle || null}, {skipNull: true});
+        //
+        // navigate({
+        //     pathname:location.pathname,
+        //     search:query,
+        // },{replace:true});
+
         setCurrentPage(+page || 1);
 
         (async () => {
-            await dispatch(allProductsListRequest({page, title}));
+            await dispatch(allProductsListRequest({page, title: newTitle}));
         })()
     }, [location.search]);
 
     useEffect(() => {
-        let page = title ? 1 : qs.parse(location.search).title;
-        page = +page || 1;
-        const query = qs.stringify({page, title: title || null}, {skipNull: true});
 
-        navigate(`/products${query ? `?${query}` : ''}`);
     }, [title]);
 
     const openCloseModal = useCallback((prod) => {
@@ -81,20 +102,17 @@ function Products() {
     }, [modalIsOpen]);
 
     const handleAddProduct = useCallback(async () => {
-        if (values.title.length < 2) {
-            toast.error("Field title can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.description.length < 2) {
-            toast.error("Field description can't contain less than 2 symbols!");
-            return;
-        }
-        if (+values.price < 10) {
-            toast.error("Price can't be less than 10");
-            return;
-        }
-        if (values.categorySlug.length < 2) {
-            toast.error("Field categorySlug can't contain less than 2 symbols!");
+        const validateValues = [
+            Validator.validTitle(values.title),
+            Validator.validDesc(values.description),
+            Validator.validPrice(values.price),
+            Validator.validSlug(values.categorySlug),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
         if (!image.type) {
@@ -115,7 +133,6 @@ function Products() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allProductsListRequest({page: currentPage}));
@@ -143,12 +160,24 @@ function Products() {
     }, []);
 
     const handleUpdateProduct = useCallback(async () => {
-        if (values.title.length < 2
-            && values.description.length < 2
-            && +values.price < 10
-            && values.categorySlug.length < 2
+        const validateValues = [
+            values.title ? Validator.validTitle(values.title) : true,
+            values.description ? Validator.validDesc(values.description) : true,
+            values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
+            values.categorySlug ? Validator.validSlug(values.categorySlug) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.title && !values.categorySlug
+            && !values.description && !values.price
             && !image.type) {
-            toast.error("Fill one of fields");
+            toast.error("Fill one of fields!");
             return;
         }
 
@@ -166,7 +195,6 @@ function Products() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allProductsListRequest({page: currentPage}));
@@ -183,12 +211,26 @@ function Products() {
         navigate(`/products?${query}`);
     }, [location.search]);
 
+    const searchChange = useCallback((val)=>{
+        setTitle(val)
+        let page = val ? 1 : qs.parse(location.search).page;
+        page = +page || 1;
+        const query = qs.stringify({page, title: val || null}, {skipNull: true});
+
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/products${query ? `?${query}` : ''}`);
+        }, 400));
+    },[])
+
     return (
         <Wrapper
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
-            searchable={true}
+            statuses={{statusDelete, statusGetAll, statusAdd, statusUpdate}}
             setSearch={setTitle}
+            search={title}
+            uploadProcess={uploadProcess}
+            searchChang={(val)=>searchChange(val)}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -246,7 +288,13 @@ function Products() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`${!_.isEmpty(product) ? 'Update' : 'Add'} product`}
                     </h6>
@@ -266,6 +314,7 @@ function Products() {
                             id="title"
                             placeholder="Title"
                             value={values.title}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'title')
                             }}
@@ -278,6 +327,7 @@ function Products() {
                             placeholder="Description"
                             id="description"
                             style={{height: '150px'}}
+                            disabled={admin && admin.possibility === 'junior'}
                             value={values.description}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'description')
@@ -291,6 +341,7 @@ function Products() {
                             className="form-control"
                             id="price"
                             placeholder="Price"
+                            disabled={admin && admin.possibility === 'junior'}
                             value={values.price}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'price')
@@ -305,6 +356,7 @@ function Products() {
                             id="categorySlug"
                             placeholder="Category Slug Name"
                             value={values.categorySlug}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'categorySlug')
                             }}
@@ -317,6 +369,7 @@ function Products() {
                             className="form-control"
                             type="file"
                             id="formFile"
+                            disabled={admin && admin.possibility === 'junior'}
                             accept="image/*"
                             onChange={handleChangeImage}
                         />
@@ -353,16 +406,9 @@ function Products() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusAdd === 'pending' || statusUpdate === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
+                            disabled={admin && admin.possibility === 'junior'}
                             onClick={
                                 !_.isEmpty(product) ? handleUpdateProduct : handleAddProduct
                             }

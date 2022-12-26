@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {allUsersListRequest} from "../store/actions/users";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment";
 import Wrapper from "../components/Wrapper";
@@ -20,8 +19,9 @@ function Users() {
     const statusGetAll = useSelector(state => state.status.usersGetAllStatus);
     const totalPages = useSelector(state => state.users.pages);
     const [currentPage, setCurrentPage] = useState(1);
-    const [name, setName] = useState('');
+    const [name, setName] = useState(qs.parse(location.search).name || '');
     const [user, setUser] = useState({});
+    const [myTimeout, setMyTimeout] = useState();
 
     useEffect(() => {
         const page = qs.parse(location.search).page;
@@ -38,7 +38,11 @@ function Users() {
         page = +page || 1;
         const query = qs.stringify({page, name: name || null}, {skipNull: true});
 
-        navigate(`/users${query ? `?${query}` : ''}`);
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/users${query ? `?${query}` : ''}`);
+        }, 400));
     }, [name]);
 
     const openCloseModal = useCallback((userObj) => {
@@ -63,9 +67,9 @@ function Users() {
 
     return (
         <Wrapper
-            searchable={true}
             setSearch={setName}
-            statusGetAll={statusGetAll}
+            search={name}
+            statuses={{statusGetAll}}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -118,7 +122,13 @@ function Users() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         User
                     </h6>

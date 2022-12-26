@@ -2,15 +2,15 @@ import React, {useCallback, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import Wrapper from "../components/Wrapper";
 import {
     changePassRequest,
     getAdminRequest,
     getKeyRequest,
-    modifyAdminAccountRequest
+    modifyCurrentAccountRequest
 } from "../store/actions/admin";
+import Validator from "../helpers/Validator";
 
 function Profile() {
     const dispatch = useDispatch();
@@ -18,13 +18,13 @@ function Profile() {
     const getAdminStatus = useSelector(state => state.status.adminAdminStatus);
     const getKeyStatus = useSelector(state => state.status.adminGetKeyStatus);
     const changePassStatus = useSelector(state => state.status.adminChangePassStatus);
-    const statusModify = useSelector(state => state.status.adminModifyStatus);
+    const statusModify = useSelector(state => state.status.adminModifyCurrentStatus);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [passwordModalIsOpen, setPasswordModalIsOpen] = useState(false);
     const [newValues, setNewValues] = useState({
         token: '',
         password: '',
-        passwordRepeat: ''
+        confirmPassword: ''
     });
     const [value, setValue] = useState({
         key: '',
@@ -44,7 +44,7 @@ function Profile() {
                 ...newValues,
                 password: '',
                 token: '',
-                passwordRepeat: '',
+                confirmPassword: '',
             });
         } else if (key && val && name) {
             setValue({
@@ -62,7 +62,7 @@ function Profile() {
             ...newValues,
             password: '',
             token: '',
-            passwordRepeat: '',
+            confirmPassword: '',
         });
         setPasswordModalIsOpen(!passwordModalIsOpen);
     }, [passwordModalIsOpen, newValues]);
@@ -82,18 +82,28 @@ function Profile() {
     }, [newValues]);
 
     const handleModifyAccount = useCallback(async () => {
-        if (value.value.length < 2) {
-            toast.error("Value can't contain less than 2 symbols!");
+        let validateValues;
+
+        if(value.key === 'firstName'){
+            validateValues = [Validator.validFName(value.value)];
+        }else if(value.key === 'lastName'){
+            validateValues = [Validator.validLName(value.value)];
+        }else if(value.key === 'phoneNum'){
+            validateValues = [Validator.validPhoneNum(value.value)];
+        }
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
 
-        const data = await dispatch(modifyAdminAccountRequest({
-            id: admin.id,
+        const data = await dispatch(modifyCurrentAccountRequest({
             [value.key]: value.value
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminRequest());
@@ -115,15 +125,29 @@ function Profile() {
     }, [value, newValues]);
 
     const handleChangePass = useCallback(async () => {
-        if(newValues.passwordRepeat !== newValues.password){
-            toast.error("Repeated password is wrong!");
+        const validateValues = [
+            Validator.validPass(newValues.password),
+            Validator.validPass(newValues.confirmPassword),
+            Validator.validUUID(newValues.token),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if(newValues.confirmPassword !== newValues.password){
+            toast.error("Confirm password is wrong!");
             return
         }
 
         const data = await dispatch(changePassRequest({
             email: admin.email,
             password: newValues.password,
-            token: newValues.token
+            token: newValues.token,
+            confirmPassword: newValues.confirmPassword,
         }));
 
         if (data.error) {
@@ -136,9 +160,8 @@ function Profile() {
 
     return (
         <Wrapper
-            statusGetAll={getAdminStatus}
-            statusDelete={getKeyStatus}
-            changePassStatus={changePassStatus}
+            pageName='profile'
+            statuses={{statusModify, getAdminStatus, getKeyStatus, changePassStatus}}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4 d-flex justify-content-between">
@@ -186,7 +209,7 @@ function Profile() {
                                     }}
                                 >
                                     <td>Password</td>
-                                    <td>Forget password?</td>
+                                    <td>Forgot password?</td>
                                     <td>></td>
                                 </tr>
                                 <tr className='profile__row'>
@@ -214,7 +237,13 @@ function Profile() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <div className="form-floating mb-3">
                         <input
                             type="text"
@@ -238,13 +267,6 @@ function Profile() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusModify === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
                             onClick={value.key === 'email' ? handleGetKey : handleModifyAccount}
@@ -265,7 +287,13 @@ function Profile() {
                     openClosePassModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openClosePassModal()}}
+                    >
+                        X
+                    </div>
                     <div className="form-floating mb-3">
                         <input
                             type="text"
@@ -296,14 +324,14 @@ function Profile() {
                         <input
                             type="password"
                             className="form-control"
-                            id='passwordRepeat'
-                            placeholder='Repeat password'
-                            value={newValues.passwordRepeat}
+                            id='confirmPassword'
+                            placeholder='Confirm password'
+                            value={newValues.confirmPassword}
                             onChange={(e) => {
-                                handleChangeNewValues('passwordRepeat', e.target.value)
+                                handleChangeNewValues('confirmPassword', e.target.value)
                             }}
                         />
-                        <label htmlFor='passwordRepeat'>Repeat password</label>
+                        <label htmlFor='confirmPassword'>Confirm password</label>
                     </div>
                     <div className='modal-btn-container'>
                         <button

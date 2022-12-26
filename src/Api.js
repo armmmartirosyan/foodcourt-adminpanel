@@ -13,7 +13,7 @@ const api = axios.create({
 class Api {
     //Categories
     static getAllCategoriesList(name) {
-        return api.get(`/categories`, {params: {name}});
+        return api.get(`/categories/get`, {params: {name}});
     }
 
     static addCategory(onUploadProgress, props) {
@@ -40,11 +40,11 @@ class Api {
 
     //Products
     static getAllProductsList(page, title) {
-        return api.get(`/products`, {params: {page, title}});
+        return api.get(`/products/get`, {params: {page, title}});
     }
 
     static getProductsByCat(categorySlug, params) {
-        return api.get(`/products/category/${categorySlug}`, params);
+        return api.get(`/products/get/category/${categorySlug}`, params);
     }
 
     static addProduct(onUploadProgress, params) {
@@ -71,7 +71,7 @@ class Api {
 
     //News
     static getAllNewsList(page, title) {
-        return api.get(`/news/`, {params: {page, title}});
+        return api.get(`/news/get`, {params: {page, title}});
     }
 
     static addNews(onUploadProgress, params) {
@@ -98,7 +98,7 @@ class Api {
 
     //Offers
     static getAllOffersList(title) {
-        return api.get(`/offers/`, {params: {title}});
+        return api.get(`/offers/get`, {params: {title}});
     }
 
     static addOffer(onUploadProgress, params) {
@@ -125,7 +125,7 @@ class Api {
 
     //Slides
     static getAllSlidesList() {
-        return api.get(`/slides/`);
+        return api.get(`/slides/get`);
     }
 
     static addSlide(onUploadProgress, params) {
@@ -150,51 +150,9 @@ class Api {
         return api.delete(`/slides/${id}`);
     }
 
-    //Users
-    static getAllUsersList(page, name) {
-        return api.get(`/users/`, {params: {page, name}});
-    }
-
-    //Admin
-    static getAdmin() {
-        return api.get(`/admin/admin`);
-    }
-
-    static getAllAdminsList() {
-        return api.get(`/admin/`);
-    }
-
-    static getSingleAdmin(id) {
-        return api.get(`/admin/${id}`);
-    }
-
-    static registerAdmin(params) {
-        return api.post(`/admin/register`, params);
-    }
-
-    static modifyAdminAccount(id, params) {
-        return api.put(`/admin/${id}`, params);
-    }
-
-    static deleteAdminAccount(id) {
-        return api.delete(`/admin/${id}`);
-    }
-
-    static signIn({email, password}) {
-        return api.post(`/admin/login`, {email, password});
-    }
-
-    static getKey(email) {
-        return api.post(`/admin/forget-pass`, {email});
-    }
-
-    static changeAdminPass(params) {
-        return api.post(`/admin/change-pass`, {...params});
-    }
-
     //Branches
     static getAllBranchesList() {
-        return api.get(`/map/`);
+        return api.get(`/map/get`);
     }
 
     static addBranch(onUploadProgress, params) {
@@ -217,6 +175,56 @@ class Api {
 
     static deleteBranch(slugName) {
         return api.delete(`/map/${slugName}`);
+    }
+
+    //Users
+    static getAllUsersList(page, name) {
+        return api.get(`/users/`, {params: {page, name}});
+    }
+
+    //Admin
+    static getAdmin() {
+        return api.get(`/admin/current`);
+    }
+
+    static getAllAdminsList() {
+        return api.get(`/admin/`);
+    }
+
+    static getSingleAdmin(id) {
+        return api.get(`/admin/${id}`);
+    }
+
+    static registerAdmin(params) {
+        return api.post(`/admin/register`, params);
+    }
+
+    static modifyAdminAccount(id, params) {
+        return api.put(`/admin/${id}`, params);
+    }
+
+    static deleteAdminAccount(id) {
+        return api.delete(`/admin/${id}`);
+    }
+
+    static modifyCurrentAccount(params) {
+        return api.put(`/admin/current`, params);
+    }
+
+    static deleteCurrentAccount() {
+        return api.delete(`/admin/current`);
+    }
+
+    static signIn({email, password}) {
+        return api.post(`/admin/login`, {email, password});
+    }
+
+    static getKey(email) {
+        return api.post(`/admin/forget-pass`, {email});
+    }
+
+    static changeAdminPass(params) {
+        return api.post(`/admin/change-pass`, {...params});
     }
 }
 

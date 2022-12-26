@@ -43,6 +43,13 @@ export const deleteAdminAccountRequest = createAsyncThunk('admin/delete', async 
     return data;
 });
 
+export const modifyCurrentAccountRequest = createAsyncThunk('admin/modify/current', async (payload = {}) => {
+    const { ...params } = payload;
+    const { data } = await Api.modifyCurrentAccount(params);
+
+    return data;
+});
+
 export const getKeyRequest = createAsyncThunk('admin/get/key', async (payload = {}) => {
     const { email } = payload;
     const { data } = await Api.getKey(email);
@@ -51,8 +58,8 @@ export const getKeyRequest = createAsyncThunk('admin/get/key', async (payload = 
 });
 
 export const changePassRequest = createAsyncThunk('admin/change/pass', async (payload = {}) => {
-    const { email, password, token } = payload;
-    const { data } = await Api.changeAdminPass({email, password, token});
+    const { email, password, token, confirmPassword } = payload;
+    const { data } = await Api.changeAdminPass({email, password, token, confirmPassword});
 
     return data;
 });

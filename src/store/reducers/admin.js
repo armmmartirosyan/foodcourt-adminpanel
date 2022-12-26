@@ -10,8 +10,6 @@ const initialState = {
 
 export default createReducer(initialState, {
     [loginRequest.fulfilled]: (state, action) => {
-        console.log(action.payload)
-
         const remember = action.payload.remember;
         const token = action.payload.data.token;
 

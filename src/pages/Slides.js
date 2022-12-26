@@ -3,7 +3,6 @@ import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
 import {addSlideRequest, allSlidesListRequest, updateSlideRequest} from "../store/actions/slides";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment/moment";
 import Wrapper from "../components/Wrapper";
@@ -19,6 +18,7 @@ function Slides() {
     const statusAdd = useSelector(state => state.status.slidesAddStatus);
     const statusUpdate = useSelector(state => state.status.slidesUpdateStatus);
     const statusDelete = useSelector(state => state.status.slidesDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [slide, setSlide] = useState({});
     const [image, setImage] = useState({});
@@ -57,7 +57,6 @@ function Slides() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allSlidesListRequest());
@@ -94,7 +93,6 @@ function Slides() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allSlidesListRequest());
@@ -107,8 +105,8 @@ function Slides() {
 
     return (
         <Wrapper
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
+            uploadProcess={uploadProcess}
+            statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -152,7 +150,13 @@ function Slides() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`${!_.isEmpty(slide) ? 'Update' : 'Add'} Slide`}
                     </h6>
@@ -171,6 +175,7 @@ function Slides() {
                             className="form-control"
                             type="file"
                             id="formFile"
+                            disabled={admin && admin.possibility === 'junior'}
                             accept="image/*"
                             onChange={handleChangeImage}
                         />
@@ -203,16 +208,9 @@ function Slides() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusAdd === 'pending' || statusUpdate === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
+                            disabled={admin && admin.possibility === 'junior'}
                             onClick={
                                 !_.isEmpty(slide) ? handleUpdateSlide: handleAddSlide
                             }

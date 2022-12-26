@@ -9,10 +9,10 @@ import {
     registerAdminRequest
 } from "../store/actions/admin";
 import Wrapper from "../components/Wrapper";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment";
 import AdminRow from "../components/AdminRow";
+import Validator from "../helpers/Validator";
 
 function Admin() {
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
@@ -29,6 +29,7 @@ function Admin() {
         lastName: '',
         email: '',
         password: '',
+        confirmPassword: '',
         phoneNum: '',
         status: '',
         possibility: 'junior',
@@ -51,7 +52,7 @@ function Admin() {
                 possibility: adminObj.possibility,
                 status: adminObj.status,
             });
-        } else if (editModalIsOpen) {
+        } else if (editModalIsOpen || deleteModalIsOpen) {
             setAdmin({});
             setValues({
                 firstName: '',
@@ -70,28 +71,24 @@ function Admin() {
     }, [editModalIsOpen, deleteModalIsOpen]);
 
     const handleRegisterAdmin = useCallback(async () => {
-        if (values.firstName.length < 2) {
-            toast.error("Field first name can't contain less than 2 symbols!");
+        const validateValues = [
+            Validator.validFName(values.firstName),
+            Validator.validLName(values.lastName),
+            Validator.validEmail(values.email),
+            Validator.validPass(values.password),
+            Validator.validPass(values.confirmPassword),
+            Validator.validPhoneNum(values.phoneNum),
+            Validator.validPossibility(values.possibility),
+        ];
+
+        const invalidVal = validateValues.find((v) => v !== true);
+
+        if (invalidVal) {
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
-        if (values.lastName.length < 2) {
-            toast.error("Field last name can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.email.length < 2) {
-            toast.error("Field email can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.password.length < 8) {
-            toast.error("Field password can't contain less than 8 symbols!");
-            return;
-        }
-        if (values.phoneNum.length < 5) {
-            toast.error("Field phone number can't contain less than 5 symbols!");
-            return;
-        }
-        if (!values.possibility.length) {
-            toast.error("Field possibility can't be empty!");
+        if (values.confirmPassword !== values.password) {
+            toast.error("Invalid confirm password");
             return;
         }
 
@@ -102,10 +99,10 @@ function Admin() {
             phoneNum: values.phoneNum,
             possibility: values.possibility,
             password: values.password,
+            confirmPassword: values.confirmPassword,
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminsListRequest());
@@ -121,6 +118,28 @@ function Admin() {
     }, [values]);
 
     const handleModifyAdminAccount = useCallback(async () => {
+        const validateValues = [
+            values.firstName ? Validator.validFName(values.firstName) : true,
+            values.lastName ? Validator.validLName(values.lastName) : true,
+            values.email ? Validator.validEmail(values.email) : true,
+            values.phoneNum ? Validator.validPhoneNum(values.phoneNum) : true,
+            values.possibility ? Validator.validPossibility(values.possibility) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v !== true);
+
+        if (invalidVal) {
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.firstName && !values.lastName
+            && !values.email && !values.phoneNum
+            && !values.possibility) {
+            toast.error("Fill one of fields!");
+            return;
+        }
+
         const data = await dispatch(modifyAdminAccountRequest({
             id: admin.id,
             firstName: values.firstName || undefined,
@@ -131,7 +150,6 @@ function Admin() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminsListRequest());
@@ -141,18 +159,19 @@ function Admin() {
 
     const handleDelete = useCallback(async (e) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteAdminAccountRequest({id: admin.id}));
+        const data = await dispatch(deleteAdminAccountRequest({id: admin.id}));
 
-        if (payload.status === 'ok') {
-            await dispatch(getAdminsListRequest());
-            openCloseModal();
+        if (data.error) {
+            toast.error('Error deleting admin!');
         }
+
+        await dispatch(getAdminsListRequest());
+        openCloseModal(true);
     }, [admin]);
 
     return (
         <Wrapper
-            statusDelete={statusDelete}
-            statusGetAll={statusAdminsList}
+            statuses={{statusDelete, statusModify, statusRegister, statusAdminsList}}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -205,7 +224,15 @@ function Admin() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {
+                            openCloseModal()
+                        }}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`Admin ${!_.isEmpty(admin) ? `${admin.firstName} ${admin.lastName}` : 'Register'}`}
                     </h6>
@@ -216,7 +243,7 @@ function Admin() {
                             id="firstName"
                             placeholder="First Name"
                             value={values.firstName}
-                            disabled={admin && admin.status !== 'pending'}
+                            disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'firstName')
                             }}
@@ -230,7 +257,7 @@ function Admin() {
                             id="lastName"
                             placeholder="Last Name"
                             value={values.lastName}
-                            disabled={admin && admin.status !== 'pending'}
+                            disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'lastName')
                             }}
@@ -244,7 +271,7 @@ function Admin() {
                             id="email"
                             placeholder="Email"
                             value={values.email}
-                            disabled={admin && admin.status !== 'pending'}
+                            disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'email')
                             }}
@@ -253,20 +280,36 @@ function Admin() {
                     </div>
                     {
                         _.isEmpty(admin) ? (
-                            <div className="form-floating mb-3">
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    id="password"
-                                    placeholder="Password"
-                                    value={values.password}
-                                    disabled={admin && admin.status !== 'pending'}
-                                    onChange={(e) => {
-                                        handleChangeValues(e.target.value, 'password')
-                                    }}
-                                />
-                                <label htmlFor="password">Password</label>
-                            </div>
+                            <>
+                                <div className="form-floating mb-3">
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id="password"
+                                        placeholder="Password"
+                                        value={values.password}
+                                        disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
+                                        onChange={(e) => {
+                                            handleChangeValues(e.target.value, 'password')
+                                        }}
+                                    />
+                                    <label htmlFor="password">Password</label>
+                                </div>
+                                <div className="form-floating mb-3">
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id="confirmPassword"
+                                        placeholder="Confirm Password"
+                                        value={values.confirmPassword}
+                                        disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
+                                        onChange={(e) => {
+                                            handleChangeValues(e.target.value, 'confirmPassword')
+                                        }}
+                                    />
+                                    <label htmlFor="confirmPassword">Confirm Password</label>
+                                </div>
+                            </>
                         ) : null
                     }
                     <div className="form-floating mb-3">
@@ -276,7 +319,7 @@ function Admin() {
                             id="phoneNum"
                             placeholder="Phone Number"
                             value={values.phoneNum}
-                            disabled={admin && admin.status !== 'pending'}
+                            disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'phoneNum')
                             }}
@@ -333,13 +376,6 @@ function Admin() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusRegister === 'pending' || statusModify === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
                             onClick={
@@ -362,7 +398,15 @@ function Admin() {
                     openCloseModal(true)
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {
+                            openCloseModal(true)
+                        }}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`Do you really want to delete admin ${admin.firstName} ${admin.lastName}?`}
                     </h6>
@@ -375,13 +419,6 @@ function Admin() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusDelete === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
                             onClick={

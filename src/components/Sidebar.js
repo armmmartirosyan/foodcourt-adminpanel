@@ -1,16 +1,34 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import _ from 'lodash';
 import Account from "../helpers/Account";
 import Modal from "react-modal";
 import classNames from "classnames";
+import PropTypes from "prop-types";
 
-function Sidebar() {
+function Sidebar(props) {
+    const {pageName} = props;
+    const profileRef = useRef(null);
     const navigate = useNavigate();
     const admin = useSelector(state => state.admin.admin);
     const [isOpenModal, setIsOpenModal] = useState(false);
-    const [isOpenProfile, setIsOpenProfile] = useState(false);
+    const [isOpenProfile, setIsOpenProfile] = useState(pageName === 'profile');
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (profileRef.current
+                && pageName !== 'profile'
+                && !profileRef.current.contains(event.target)) {
+                setIsOpenProfile(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [profileRef]);
 
     const openCloseModal = useCallback(() => {
         setIsOpenModal(!isOpenModal);
@@ -22,9 +40,11 @@ function Sidebar() {
         navigate('/');
     }, []);
 
-    const openCloseProfile = useCallback((e) => {
-        setIsOpenProfile(!isOpenProfile);
-    }, [isOpenProfile]);
+    const openCloseProfile = useCallback(() => {
+        if(pageName !== 'profile'){
+            setIsOpenProfile(!isOpenProfile);
+        }
+    }, [isOpenProfile, pageName]);
 
     return (
         <div className="container-xxl position-relative bg-white d-flex p-0">
@@ -35,9 +55,9 @@ function Sidebar() {
                     </Link>
                     {
                         !_.isEmpty(admin) ? (
-                            <div className="ms-4 mb-3 admin__container">
+                            <div className="ms-4 mb-3 admin__container" ref={profileRef}>
                                 <div
-                                    className="ms-3 admin"
+                                    className="ms-4 admin"
                                     onClick={openCloseProfile}
                                 >
                                     <h6 className="mb-0">{`${admin.firstName} ${admin.lastName}`}</h6>
@@ -85,9 +105,13 @@ function Sidebar() {
                         <NavLink to="/maps" className="nav-item nav-link">
                             Maps
                         </NavLink>
-                        <NavLink to="/users" className="nav-item nav-link">
-                            Users
-                        </NavLink>
+                        {
+                            admin.possibility === 'senior' ? (
+                                <NavLink to="/users" className="nav-item nav-link">
+                                    Users
+                                </NavLink>
+                            ) : null
+                        }
                         {
                             admin.possibility === 'senior' ? (
                                 <NavLink to="/admin" className="nav-item nav-link">
@@ -104,7 +128,13 @@ function Sidebar() {
                 overlayClassName="overlay"
                 onRequestClose={openCloseModal}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={openCloseModal}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         Log Out ?
                     </h6>
@@ -126,6 +156,9 @@ function Sidebar() {
             </Modal>
         </div>
     );
+}
+Sidebar.propTypes = {
+    pageName: PropTypes.string,
 }
 
 export default Sidebar;

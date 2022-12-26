@@ -400,9 +400,33 @@ input[type=number] {
     height: 100%;
     background-color: rgba(129, 127, 127, 0.62);
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+}
+.modal-container{
+    position: relative;
+    padding-top: 60px !important;
+}
+.modal_close{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 15px 20px 0 0;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: inherit;
+    transition: all .4s;
+}
+.modal_close:hover{
+    background-color: #ccc;
 }
 
 [class*="copyrights-pane"]{

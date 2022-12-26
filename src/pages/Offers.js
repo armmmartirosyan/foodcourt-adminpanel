@@ -3,7 +3,6 @@ import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
 import {addOfferRequest, allOffersListRequest, updateOfferRequest} from "../store/actions/offers";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment";
 import Wrapper from "../components/Wrapper";
@@ -12,6 +11,7 @@ import TopBar from "../components/TopBar";
 import SingleImage from "../components/SingleImage";
 import qs from "query-string";
 import {useLocation, useNavigate} from "react-router-dom";
+import Validator from "../helpers/Validator";
 
 function Offers() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -23,10 +23,12 @@ function Offers() {
     const statusAdd = useSelector(state => state.status.offersAddStatus);
     const statusUpdate = useSelector(state => state.status.offersUpdateStatus);
     const statusDelete = useSelector(state => state.status.offersDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState(qs.parse(location.search).title || '');
     const [offer, setOffer] = useState({});
     const [image, setImage] = useState({});
+    const [myTimeout, setMyTimeout] = useState();
     const [values, setValues] = useState({
         title: '',
         description: '',
@@ -44,7 +46,11 @@ function Offers() {
     useEffect(() => {
         const query = qs.stringify({title: title || null}, {skipNull: true});
 
-        navigate(`/offers${query ? `?${query}` : ''}`);
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/offers${query ? `?${query}` : ''}`);
+        }, 400));
     }, [title]);
 
     const openCloseModal = useCallback((offerObj) => {
@@ -71,16 +77,16 @@ function Offers() {
     }, [modalIsOpen]);
 
     const handleAddOffer = useCallback(async () => {
-        if (values.title.length < 2) {
-            toast.error("Field title can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.description.length < 2) {
-            toast.error("Field description can't contain less than 2 symbols!");
-            return;
-        }
-        if (+values.price < 10) {
-            toast.error("Price can't be less than 10");
+        const validateValues = [
+            Validator.validTitle(values.title),
+            Validator.validDesc(values.description),
+            Validator.validPrice(values.price),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
         if (!image.type) {
@@ -100,7 +106,6 @@ function Offers() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allOffersListRequest());
@@ -127,6 +132,25 @@ function Offers() {
     }, []);
 
     const handleUpdateOffer = useCallback(async () => {
+        const validateValues = [
+            values.title ? Validator.validTitle(values.title) : true,
+            values.description ? Validator.validDesc(values.description) : true,
+            values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.title && !values.description
+            && !values.price && !image.type) {
+            toast.error("Fill one of fields!");
+            return;
+        }
+
         if (values.title.length < 2
             && values.description.length < 2
             && +values.price < 10
@@ -148,7 +172,6 @@ function Offers() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allOffersListRequest());
@@ -158,10 +181,10 @@ function Offers() {
 
     return (
         <Wrapper
-            searchable={true}
             setSearch={setTitle}
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
+            search={title}
+            statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
+            uploadProcess={uploadProcess}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -207,7 +230,13 @@ function Offers() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`${!_.isEmpty(offer) ? 'Update' : 'Add'} offer`}
                     </h6>
@@ -227,6 +256,7 @@ function Offers() {
                             id="title"
                             placeholder="Title"
                             value={values.title}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'title')
                             }}
@@ -240,6 +270,7 @@ function Offers() {
                             id="description"
                             style={{height: '150px'}}
                             value={values.description}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'description')
                             }}
@@ -253,6 +284,7 @@ function Offers() {
                             id="price"
                             placeholder="Price(AMD)"
                             value={values.price}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'price')
                             }}
@@ -265,6 +297,7 @@ function Offers() {
                             className="form-control"
                             type="file"
                             id="formFile"
+                            disabled={admin && admin.possibility === 'junior'}
                             accept="image/*"
                             onChange={handleChangeImage}
                         />
@@ -301,16 +334,9 @@ function Offers() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusAdd === 'pending' || statusUpdate === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
+                            disabled={admin && admin.possibility === 'junior'}
                             onClick={
                                 !_.isEmpty(offer) ? handleUpdateOffer : handleAddOffer
                             }

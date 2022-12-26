@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 function UserRow(props) {
     const {user, openCloseModal} = props;
@@ -22,5 +23,8 @@ function UserRow(props) {
         </tr>
     );
 }
-
+UserRow.propTypes = {
+    user: PropTypes.object.isRequired,
+    openCloseModal: PropTypes.func.isRequired,
+}
 export default UserRow;

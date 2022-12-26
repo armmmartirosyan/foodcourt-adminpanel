@@ -7,6 +7,7 @@ import {toast} from "react-toastify";
 import Api from "../Api";
 import Modal from "react-modal";
 import Spinner from "react-bootstrap/Spinner";
+import Validator from "../helpers/Validator";
 
 function Login() {
     const dispatch = useDispatch();
@@ -19,7 +20,7 @@ function Login() {
     const [values, setValues] = useState({
         email: '',
         password: '',
-        passwordRepeat: '',
+        confirmPassword: '',
         remember: false,
         token: '',
     });
@@ -30,7 +31,7 @@ function Login() {
             remember: false,
             password: '',
             token: '',
-            passwordRepeat: '',
+            confirmPassword: '',
         });
 
         isPass ? setPasswordModalIsOpen(!passwordModalIsOpen) : setModalIsOpen(!modalIsOpen);
@@ -45,21 +46,40 @@ function Login() {
 
     const handleSgnIn = useCallback(async () => {
         try {
-           const {data} = await Api.signIn(values);
+            const validateValues = [
+                Validator.validEmail(values.email),
+                //Validator.validPass(values.password),
+            ];
 
-            dispatch(loginRequest({remember:values.remember,data}))
+            if(validateValues.find((v) => v!==true)){
+                toast.error('Invalid email or password');
+                return;
+            }
 
+            const {data} = await Api.signIn(values);
+
+            dispatch(loginRequest({remember: values.remember, data}))
+            //todo kisad e( stuge zaprosy)
             navigate('/home');
-        }catch (e) {
+        } catch (e) {
             toast.error(e.response.data.message);
         }
 
     }, [values]);
 
     const handleGetKey = useCallback(async () => {
+        const validateValues = [
+            Validator.validEmail(values.email)
+        ];
+
+        if(validateValues.find((v) => v!==true)){
+            toast.error('Invalid email');
+            return;
+        }
+
         const data = await dispatch(getKeyRequest({email: values.email}));
 
-        if(data.error){
+        if (data.error) {
             toast.error("Something wrong with email!");
             return;
         }
@@ -69,18 +89,31 @@ function Login() {
     }, [values]);
 
     const handleChangePass = useCallback(async () => {
-        if(values.passwordRepeat !== values.password){
-            toast.error("Repeated password is wrong!");
+        const validateValues = [
+            Validator.validPass(values.password),
+            Validator.validUUID(values.token),
+        ];
+
+        const invalidValue = validateValues.find((v) => v!==true);
+
+        if(invalidValue){
+            toast.error(`Invalid ${invalidValue}`);
+            return;
+        }
+
+        if (values.confirmPassword !== values.password) {
+            toast.error("Confirm password is wrong!");
             return
         }
 
         const data = await dispatch(changePassRequest({
             email: values.email,
             password: values.password,
-            token: values.token
+            token: values.token,
+            confirmPassword: values.confirmPassword
         }));
 
-        if(data.error){
+        if (data.error) {
             toast.error("Something goes wrong!");
             return;
         }
@@ -90,7 +123,7 @@ function Login() {
     }, [values]);
 
     useEffect(() => {
-        if(Account.getToken()) navigate('/home');
+        if (Account.getToken()) navigate('/home');
     }, []);
 
     return (
@@ -180,7 +213,15 @@ function Login() {
                     openCloseModal(false)
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {
+                            openCloseModal(false)
+                        }}
+                    >
+                        X
+                    </div>
                     <div className="form-floating mb-3">
                         <input
                             type="text"
@@ -221,7 +262,15 @@ function Login() {
                     openCloseModal(true)
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {
+                            openCloseModal(true)
+                        }}
+                    >
+                        X
+                    </div>
                     <div className="form-floating mb-3">
                         <input
                             type="text"
@@ -252,14 +301,14 @@ function Login() {
                         <input
                             type="password"
                             className="form-control"
-                            id='passwordRepeat'
-                            placeholder='Repeat password'
-                            value={values.passwordRepeat}
+                            id='confirmPassword'
+                            placeholder='Confirm password'
+                            value={values.confirmPassword}
                             onChange={(e) => {
-                                handleChange(e.target.value, 'passwordRepeat')
+                                handleChange(e.target.value, 'confirmPassword')
                             }}
                         />
-                        <label htmlFor='passwordRepeat'>Repeat password</label>
+                        <label htmlFor='confirmPassword'>Confirm password</label>
                     </div>
                     <div className='modal-btn-container'>
                         <button

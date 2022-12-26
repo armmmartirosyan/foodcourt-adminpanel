@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
 import {addNewsRequest, allNewsListRequest, updateNewsRequest} from "../store/actions/news";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment";
 import NewsRow from "../components/NewsRow";
@@ -13,6 +12,7 @@ import SingleImage from "../components/SingleImage";
 import {useLocation, useNavigate} from "react-router-dom";
 import qs from "query-string";
 import PageNumbers from "../components/PageNumbers";
+import Validator from "../helpers/Validator";
 
 function News() {
     const dispatch = useDispatch();
@@ -24,12 +24,14 @@ function News() {
     const statusAdd = useSelector(state => state.status.newsAddStatus);
     const statusUpdate = useSelector(state => state.status.newsUpdateStatus);
     const statusDelete = useSelector(state => state.status.newsDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [currentPage, setCurrentPage] = useState(1);
     const [news, setNews] = useState({});
     const [image, setImage] = useState({});
-    const [title, setTitle] = useState('');
+    const [myTimeout, setMyTimeout] = useState();
+    const [title, setTitle] = useState(qs.parse(location.search).title || '');
     const [values, setValues] = useState({
         title: '',
         description: '',
@@ -50,7 +52,11 @@ function News() {
         page = +page || 1;
         const query = qs.stringify({page, title: title || null}, {skipNull: true});
 
-        navigate(`/news${query ? `?${query}` : ''}`);
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/news${query ? `?${query}` : ''}`);
+        }, 400));
     }, [title]);
 
     const openCloseModal = useCallback((newObj) => {
@@ -75,12 +81,15 @@ function News() {
     }, [modalIsOpen]);
 
     const handleAddNews = useCallback(async () => {
-        if (values.title.length < 2) {
-            toast.error("Field title can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.description.length < 2) {
-            toast.error("Field description can't contain less than 2 symbols!");
+        const validateValues = [
+            Validator.validTitle(values.title),
+            Validator.validDesc(values.description),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
         if (!image.type) {
@@ -99,7 +108,6 @@ function News() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allNewsListRequest({page: currentPage}));
@@ -126,6 +134,23 @@ function News() {
     }, []);
 
     const handleUpdateNews = useCallback(async () => {
+        const validateValues = [
+            values.title ? Validator.validTitle(values.title) : true,
+            values.description ? Validator.validDesc(values.description) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.title && !values.description && !image.type) {
+            toast.error("Fill one of fields!");
+            return;
+        }
+
         if (values.title.length < 2
             && values.description.length < 2
             && !image.type) {
@@ -145,7 +170,6 @@ function News() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allNewsListRequest({page: currentPage}));
@@ -163,10 +187,10 @@ function News() {
 
     return (
         <Wrapper
-            searchable={true}
             setSearch={setTitle}
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
+            search={title}
+            statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
+            uploadProcess={uploadProcess}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -223,9 +247,15 @@ function News() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
-                        {`${!_.isEmpty(news) ? 'Update' : 'Add'} product`}
+                        {`${!_.isEmpty(news) ? 'Update' : 'Add'} news`}
                     </h6>
                     {
                         !_.isEmpty(news) || !_.isEmpty(image) ? (
@@ -243,6 +273,7 @@ function News() {
                             id="title"
                             placeholder="Title"
                             value={values.title}
+                            disabled={admin && admin.possibility === 'junior'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'title')
                             }}
@@ -255,6 +286,7 @@ function News() {
                             placeholder="Description"
                             id="description"
                             style={{height: '150px'}}
+                            disabled={admin && admin.possibility === 'junior'}
                             value={values.description}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'description')
@@ -268,6 +300,7 @@ function News() {
                             className="form-control"
                             type="file"
                             id="formFile"
+                            disabled={admin && admin.possibility === 'junior'}
                             accept="image/*"
                             onChange={handleChangeImage}
                         />
@@ -303,16 +336,9 @@ function News() {
                         >
                             Cancel
                         </button>
-                        {
-                            statusAdd === 'pending' || statusUpdate === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
                         <button
                             className="btn btn-primary"
+                            disabled={admin && admin.possibility === 'junior'}
                             onClick={
                                 !_.isEmpty(news) ? handleUpdateNews : handleAddNews
                             }

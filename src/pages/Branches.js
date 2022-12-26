@@ -3,12 +3,12 @@ import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
 import {addBranchRequest, allBranchesListRequest, deleteBranchRequest, updateBranchRequest} from "../store/actions/map";
-import Spinner from "react-bootstrap/Spinner";
 import Modal from "react-modal";
 import moment from "moment";
 import Wrapper from "../components/Wrapper";
 import {Map, Placemark, YMaps} from "react-yandex-maps";
 import TopBar from "../components/TopBar";
+import Validator from "../helpers/Validator";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -20,6 +20,7 @@ function Branches() {
     const statusAdd = useSelector(state => state.status.branchAddStatus);
     const statusUpdate = useSelector(state => state.status.branchUpdateStatus);
     const statusDelete = useSelector(state => state.status.branchDeleteStatus);
+    const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [branch, setBranch] = useState({});
     const [images, setImages] = useState([]);
@@ -63,20 +64,17 @@ function Branches() {
     }, [modalIsOpen]);
 
     const handleAddBranch = useCallback(async () => {
-        if (values.title.length < 2) {
-            toast.error("Field title can't contain less than 2 symbols!");
-            return;
-        }
-        if (values.location.length < 2) {
-            toast.error("Field description can't contain less than 2 symbols!");
-            return;
-        }
-        if (!values.lat) {
-            toast.error("Latitude can't be empty");
-            return;
-        }
-        if (!values.lon) {
-            toast.error("Longitude can't be empty");
+        const validateValues = [
+            Validator.validTitle(values.title),
+            Validator.validDesc(values.location),
+            Validator.validGeometry(values.lat),
+            Validator.validGeometry(values.lon),
+        ];
+
+        const invalidVal = validateValues.find((v) => v!==true);
+
+        if(invalidVal){
+            toast.error(`Invalid ${invalidVal}`);
             return;
         }
         if (!images.length) {
@@ -97,7 +95,6 @@ function Branches() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allBranchesListRequest());
@@ -140,7 +137,7 @@ function Branches() {
             toast.error("Fill one of fields");
             return;
         }
-        console.log(images);
+
         const data = await dispatch(updateBranchRequest({
             slugName: branch.slugName,
             title: values.title || undefined,
@@ -155,7 +152,6 @@ function Branches() {
         }));
 
         if (data.error) {
-            console.log(data.error);
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allBranchesListRequest());
@@ -193,8 +189,8 @@ function Branches() {
 
     return (
         <Wrapper
-            statusDelete={statusDelete}
-            statusGetAll={statusGetAll}
+            uploadProcess={uploadProcess}
+            statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
@@ -209,7 +205,7 @@ function Branches() {
                             }}>
                             <Map
                                 modules={["geocode"]}
-                                onClick={onMapClick}
+                                onClick={(e) => {if(admin && admin.possibility !== 'junior') onMapClick(e)}}
                                 width="100%"
                                 height="100%"
                                 defaultState={{
@@ -253,7 +249,13 @@ function Branches() {
                     openCloseModal()
                 }}
             >
-                <div className="bg-light rounded h-100 p-4">
+                <div className="bg-light rounded h-100 p-4 modal-container">
+                    <div
+                        className="modal_close"
+                        onClick={() => {openCloseModal()}}
+                    >
+                        X
+                    </div>
                     <h6 className="mb-4">
                         {`${!_.isEmpty(branch) ? 'Update' : 'Add'} branch`}
                     </h6>
@@ -393,17 +395,10 @@ function Branches() {
                             </button>
                         </div>
                         {
-                            statusAdd === 'pending' || statusUpdate === 'pending' || statusDelete === 'pending' ? (
-                                <div>
-                                    <Spinner animation="border" variant="primary"/>
-                                    <p>{`${Math.floor(uploadProcess)}%`}</p>
-                                </div>
-                            ) : null
-                        }
-                        {
                             !_.isEmpty(branch) ? (
                                 <button
                                     className="btn btn-danger"
+                                    disabled={admin && admin.possibility === 'junior'}
                                     onClick={handleDelete}
                                 >
                                     Delete
