@@ -99,6 +99,7 @@ function Branches() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(allBranchesListRequest());
             openCloseModal();
+            toast.success('Branch added successfully');
         }
     }, [images, values]);
 
@@ -120,44 +121,13 @@ function Branches() {
         });
 
         if (imagesList.length > 10) {
-            toast.info('max files limit');
+            toast.info('max images limit');
             imagesList.length = 10;
         }
 
         setImages(imagesList);
         e.target.value = '';
     }, [images]);
-
-    const handleUpdateBranch = useCallback(async () => {
-        if (values.title.length < 2
-            && values.location.length < 2
-            && !values.lat
-            && !values.lon
-            && !images.length) {
-            toast.error("Fill one of fields");
-            return;
-        }
-
-        const data = await dispatch(updateBranchRequest({
-            slugName: branch.slugName,
-            title: values.title || undefined,
-            location: values.location || undefined,
-            lat: values.lat || undefined,
-            lon: values.lon || undefined,
-            images: images.length ? images : undefined,
-            onUploadProcess: (ev) => {
-                const {total, loaded} = ev;
-                setUploadProcess(loaded / total * 100);
-            }
-        }));
-
-        if (data.error) {
-            toast.error(data.error.message);
-        } else if (data.payload?.status === 'ok') {
-            await dispatch(allBranchesListRequest());
-            openCloseModal();
-        }
-    }, [images, values, branch]);
 
     const handleDeleteImage = useCallback(({src, name}) => {
         if (src) {
@@ -168,11 +138,14 @@ function Branches() {
     }, [images]);
 
     const handleDelete = useCallback(async () => {
-        const {payload} = await dispatch(deleteBranchRequest({slugName: branch.slugName}));
+        const data = await dispatch(deleteBranchRequest({slugName: branch.slugName}));
 
-        if (payload.status === 'ok') {
+        if(data.error){
+            toast.error(data.error.message);
+        }else if (data.payload.status === 'ok') {
             await dispatch(allBranchesListRequest());
             openCloseModal();
+            toast.success('Branch deleted successfully');
         }
     }, [branch]);
 
@@ -187,8 +160,40 @@ function Branches() {
         openCloseModal();
     }, [values]);
 
+    // const handleUpdateBranch = useCallback(async () => {
+    //     if (values.title.length < 2
+    //         && values.location.length < 2
+    //         && !values.lat
+    //         && !values.lon
+    //         && !images.length) {
+    //         toast.error("Fill one of fields");
+    //         return;
+    //     }
+    //
+    //     const data = await dispatch(updateBranchRequest({
+    //         slugName: branch.slugName,
+    //         title: values.title || undefined,
+    //         location: values.location || undefined,
+    //         lat: values.lat || undefined,
+    //         lon: values.lon || undefined,
+    //         images: images.length ? images : undefined,
+    //         onUploadProcess: (ev) => {
+    //             const {total, loaded} = ev;
+    //             setUploadProcess(loaded / total * 100);
+    //         }
+    //     }));
+    //
+    //     if (data.error) {
+    //         toast.error(data.error.message);
+    //     } else if (data.payload?.status === 'ok') {
+    //         await dispatch(allBranchesListRequest());
+    //         openCloseModal();
+    //     }
+    // }, [images, values, branch]);
+
     return (
         <Wrapper
+            pageName='branches'
             uploadProcess={uploadProcess}
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
         >
@@ -196,7 +201,7 @@ function Branches() {
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
                         openCloseModal={openCloseModal}
-                        pageName='Branch'
+                        pageName='branch'
                     />
                     <div className="container">
                         <YMaps
@@ -217,16 +222,16 @@ function Branches() {
                                         branches.map(branchObj => (
                                             <Placemark
                                                 key={branchObj.id}
-                                                modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
+                                                //modules={['geoObject.addon.balloon', 'geoObject.addon.hint']}
                                                 defaultGeometry={[branchObj.lat, branchObj.lon]}
                                                 onClick={() => {
                                                     openCloseModal(branchObj)
                                                 }}
-                                                properties={{
-                                                    balloonContentHeader: `${branchObj.title}`,
-                                                    balloonContentBody: `${branchObj.location}`,
-                                                    balloonContentFooter: '',
-                                                }}
+                                                // properties={{
+                                                //     balloonContentHeader: `${branchObj.title}`,
+                                                //     balloonContentBody: `${branchObj.location}`,
+                                                //     balloonContentFooter: '',
+                                                // }}
                                                 options={{
                                                     preset: 'islands#geolocationIcon',
                                                     iconColor: 'red',

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import Api from "../../Api";
 
-export const loginRequest = createAsyncThunk('admin/login',  (payload) =>payload)
+export const loginRequest = createAsyncThunk('admin/login',  (payload) => payload)
 
 export const registerAdminRequest = createAsyncThunk('admin/register', async (payload = {}) => {
     const { ...params } = payload;
@@ -18,13 +18,6 @@ export const getAdminRequest = createAsyncThunk('admin/admin', async () => {
 
 export const getAdminsListRequest = createAsyncThunk('admins/list', async () => {
     const { data } = await Api.getAllAdminsList();
-
-    return data;
-});
-
-export const getSingleAdminRequest = createAsyncThunk('admin/single', async (payload = {}) => {
-    const { id } = payload;
-    const { data } = await Api.getSingleAdmin(id);
 
     return data;
 });

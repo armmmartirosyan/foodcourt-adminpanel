@@ -2,6 +2,7 @@ import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {allSlidesListRequest, deleteSlideRequest} from "../store/actions/slides";
 import PropTypes from "prop-types";
+import {toast} from "react-toastify";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -12,11 +13,14 @@ function SlidesRow(props) {
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteSlideRequest({id}));
+        const data = await dispatch(deleteSlideRequest({id}));
 
-        if (payload.status === 'ok') {
-            await dispatch(allSlidesListRequest());
+        if (data.error) {
+            toast.error(data.error.message);
         }
+
+        await dispatch(allSlidesListRequest());
+        toast.success('Slide deleted successfully.');
     }, []);
 
     return (
@@ -35,7 +39,7 @@ function SlidesRow(props) {
             </th>
             <td>
                 <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-sm btn-danger right"
                     disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, slide.id)

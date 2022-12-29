@@ -158,7 +158,7 @@ function Sidebar(props) {
     );
 }
 Sidebar.propTypes = {
-    pageName: PropTypes.string,
+    pageName: PropTypes.string.isRequired,
 }
 
 export default Sidebar;

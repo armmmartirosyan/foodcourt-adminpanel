@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Wrapper from "../components/Wrapper";
 import {useDispatch, useSelector} from "react-redux";
 import Modal from "react-modal";
@@ -13,6 +13,7 @@ import TopBar from "../components/TopBar";
 import PageNumbers from "../components/PageNumbers";
 import SingleImage from "../components/SingleImage";
 import Validator from "../helpers/Validator";
+import EmptyPage from "../components/EmptyPage";
 
 function Products() {
     const dispatch = useDispatch();
@@ -39,31 +40,9 @@ function Products() {
         categorySlug: '',
     });
 
-
-    // useMemo(() => {
-    //     console.log(1)
-    //     if(!qs.parse(location.search).page){
-    //         let page = 1;
-    //         let title = qs.parse(location.search).title;
-    //         const query = qs.stringify({page, title: title || null}, {skipNull: true});
-    //         navigate({
-    //             pathname:location.pathname,
-    //             search:query,
-    //         },{replace:true});
-    //         // `/products${query ? `?${query}` : ''}`
-    //     }
-    // }, []);
-
     useEffect(() => {
         const page = qs.parse(location.search).page || 1;
         const newTitle = qs.parse(location.search).title;
-
-        // const query = qs.stringify({page, title: newTitle || null}, {skipNull: true});
-        //
-        // navigate({
-        //     pathname:location.pathname,
-        //     search:query,
-        // },{replace:true});
 
         setCurrentPage(+page || 1);
 
@@ -71,10 +50,6 @@ function Products() {
             await dispatch(allProductsListRequest({page, title: newTitle}));
         })()
     }, [location.search]);
-
-    useEffect(() => {
-
-    }, [title]);
 
     const openCloseModal = useCallback((prod) => {
         if (!_.isEmpty(prod)) {
@@ -109,9 +84,9 @@ function Products() {
             Validator.validSlug(values.categorySlug),
         ];
 
-        const invalidVal = validateValues.find((v) => v!==true);
+        const invalidVal = validateValues.find((v) => v !== true);
 
-        if(invalidVal){
+        if (invalidVal) {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
@@ -136,8 +111,8 @@ function Products() {
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allProductsListRequest({page: currentPage}));
-
             openCloseModal();
+            toast.success('Product added successfully.');
         }
     }, [image, values, currentPage]);
 
@@ -167,9 +142,9 @@ function Products() {
             values.categorySlug ? Validator.validSlug(values.categorySlug) : true,
         ];
 
-        const invalidVal = validateValues.find((v) => v!==true);
+        const invalidVal = validateValues.find((v) => v !== true);
 
-        if(invalidVal){
+        if (invalidVal) {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
@@ -198,8 +173,8 @@ function Products() {
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(allProductsListRequest({page: currentPage}));
-
             openCloseModal();
+            toast.success('Product updated successfully.');
         }
     }, [image, values, currentPage]);
 
@@ -211,9 +186,9 @@ function Products() {
         navigate(`/products?${query}`);
     }, [location.search]);
 
-    const searchChange = useCallback((val)=>{
-        setTitle(val)
+    const searchChange = useCallback((val) => {
         let page = val ? 1 : qs.parse(location.search).page;
+        setTitle(val);
         page = +page || 1;
         const query = qs.stringify({page, title: val || null}, {skipNull: true});
 
@@ -222,21 +197,21 @@ function Products() {
         setMyTimeout(setTimeout(() => {
             navigate(`/products${query ? `?${query}` : ''}`);
         }, 400));
-    },[])
+    }, [myTimeout]);
 
     return (
         <Wrapper
             statuses={{statusDelete, statusGetAll, statusAdd, statusUpdate}}
-            setSearch={setTitle}
-            search={title}
             uploadProcess={uploadProcess}
-            searchChang={(val)=>searchChange(val)}
+            pageName='products'
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
+                        search={title}
+                        searchChange={(val) => searchChange(val)}
                         openCloseModal={openCloseModal}
-                        pageName='Product'
+                        pageName='product'
                     />
                     {
                         !_.isEmpty(products) ? (
@@ -266,7 +241,7 @@ function Products() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                     {
                         totalPages > 1 ? (
@@ -291,7 +266,9 @@ function Products() {
                 <div className="bg-light rounded h-100 p-4 modal-container">
                     <div
                         className="modal_close"
-                        onClick={() => {openCloseModal()}}
+                        onClick={() => {
+                            openCloseModal()
+                        }}
                     >
                         X
                     </div>

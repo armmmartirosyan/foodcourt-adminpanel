@@ -9,6 +9,7 @@ import Wrapper from "../components/Wrapper";
 import SlidesRow from "../components/SlidesRow";
 import TopBar from "../components/TopBar";
 import SingleImage from "../components/SingleImage";
+import EmptyPage from "../components/EmptyPage";
 
 function Slides() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -63,6 +64,7 @@ function Slides() {
 
             setModalIsOpen(false);
             setImage({});
+            toast.success('Slide added successfully.');
         }
     }, [image]);
 
@@ -100,11 +102,13 @@ function Slides() {
             setModalIsOpen(false);
             setImage({});
             setSlide({});
+            toast.success('Slide updated successfully.');
         }
     }, [image]);
 
     return (
         <Wrapper
+            pageName='slides'
             uploadProcess={uploadProcess}
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
         >
@@ -112,7 +116,7 @@ function Slides() {
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
                         openCloseModal={openCloseModal}
-                        pageName='Slide'
+                        pageName='slide'
                     />
                     {
                         !_.isEmpty(slides) ? (
@@ -137,7 +141,7 @@ function Slides() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                 </div>
             </div>

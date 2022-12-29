@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from "prop-types";
+import classNames from "classnames";
 
 function UserRow(props) {
     const {user, openCloseModal} = props;
 
     return (
         <tr
-            className='table-row'
+            className={classNames(
+                'table-row',
+                {deleted: user.status === 'deleted'})
+            }
             onClick={() => {
                 openCloseModal(user);
             }}
@@ -19,6 +23,21 @@ function UserRow(props) {
             </td>
             <td>
                 {user.email}
+            </td>
+            <td>
+                {
+                    user.status !== 'deleted' ? (
+                        <button
+                            className="btn btn-sm btn-danger right"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openCloseModal(user, true)
+                            }}
+                        >
+                            Delete
+                        </button>
+                    ) : null
+                }
             </td>
         </tr>
     );

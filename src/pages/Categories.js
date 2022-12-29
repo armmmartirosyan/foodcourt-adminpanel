@@ -12,6 +12,7 @@ import SingleImage from "../components/SingleImage";
 import qs from "query-string";
 import {useLocation, useNavigate} from "react-router-dom";
 import Validator from "../helpers/Validator";
+import EmptyPage from "../components/EmptyPage";
 
 function Categories() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -38,16 +39,6 @@ function Categories() {
             await dispatch(allCategoriesListRequest({name: newName}));
         })()
     }, [location.search]);
-
-    useEffect(() => {
-        const query = qs.stringify({name: searchName || null}, {skipNull: true});
-
-        clearTimeout(myTimeout);
-
-        setMyTimeout(setTimeout(() => {
-            navigate(`/categories${query ? `?${query}` : ''}`);
-        }, 400));
-    }, [searchName]);
 
     const handleChangeName = useCallback((e) => {
         setName(e.target.value);
@@ -95,7 +86,7 @@ function Categories() {
             return;
         }
 
-        const {payload} = await dispatch(addCategoryRequest({
+        const data = await dispatch(addCategoryRequest({
             name,
             image,
             onUploadProcess: (ev) => {
@@ -104,10 +95,14 @@ function Categories() {
             }
         }));
 
-        if (payload.status === 'ok') {
-            await dispatch(allCategoriesListRequest());
-            openCloseModal();
+        if (data.error) {
+            toast.error(data.error.message);
+            return
         }
+
+        await dispatch(allCategoriesListRequest());
+        openCloseModal();
+        toast.success('Category added successfully');
     }, [image, name]);
 
     const handleUpdateCategory = useCallback(async () => {
@@ -127,7 +122,7 @@ function Categories() {
             return;
         }
 
-        const {payload} = await dispatch(updateCategoryRequest({
+        const data = await dispatch(updateCategoryRequest({
             slugName: category.slugName,
             name: name || undefined,
             image: image.type ? image : undefined,
@@ -137,24 +132,40 @@ function Categories() {
             }
         }));
 
-        if (payload.status === 'ok') {
-            await dispatch(allCategoriesListRequest());
-            openCloseModal();
+        if (data.error) {
+            toast.error(data.error.message);
+            return;
         }
+
+        await dispatch(allCategoriesListRequest());
+        openCloseModal();
+        toast.success('Category added successfully');
     }, [image, name]);
+
+    const searchChange = useCallback((val) => {
+        const query = qs.stringify({name: val || null}, {skipNull: true});
+        setSearchName(val);
+
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/categories${query ? `?${query}` : ''}`);
+        }, 400));
+    }, [myTimeout]);
 
     return (
         <Wrapper
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
-            search={searchName}
-            setSearch={setSearchName}
             uploadProcess={uploadProcess}
+            pageName='categories'
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
+                        search={searchName}
+                        searchChange={searchChange}
                         openCloseModal={openCloseModal}
-                        pageName='Category'
+                        pageName='category'
                     />
                     {
                         !_.isEmpty(categories) ? (
@@ -180,7 +191,7 @@ function Categories() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                 </div>
             </div>
@@ -189,6 +200,7 @@ function Categories() {
                 isOpen={modalIsOpen}
                 className="modal"
                 overlayClassName="overlay"
+                aria-hidden={true}
                 onRequestClose={() => {
                     openCloseModal()
                 }}

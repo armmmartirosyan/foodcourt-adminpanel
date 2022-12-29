@@ -2,6 +2,7 @@ import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {allOffersListRequest, deleteOfferRequest} from "../store/actions/offers";
 import PropTypes from "prop-types";
+import {toast} from "react-toastify";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -12,11 +13,14 @@ function OfferRow(props) {
 
     const handleDelete = useCallback(async (e, slugName) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteOfferRequest({slugName}));
+        const data = await dispatch(deleteOfferRequest({slugName}));
 
-        if (payload.status === 'ok') {
-            await dispatch(allOffersListRequest());
+        if (data.error) {
+            toast.error(data.error.message);
         }
+
+        await dispatch(allOffersListRequest());
+        toast.success('Offer deleted successfully.');
     }, []);
 
     return (
@@ -37,7 +41,7 @@ function OfferRow(props) {
             <td>{`${offer.price} AMD`}</td>
             <td>
                 <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-sm btn-danger right"
                     disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, offer.slugName)

@@ -8,6 +8,7 @@ import Api from "../Api";
 import Modal from "react-modal";
 import Spinner from "react-bootstrap/Spinner";
 import Validator from "../helpers/Validator";
+import {Helmet} from "react-helmet";
 
 function Login() {
     const dispatch = useDispatch();
@@ -59,8 +60,8 @@ function Login() {
             const {data} = await Api.signIn(values);
 
             dispatch(loginRequest({remember: values.remember, data}))
-            //todo kisad e( stuge zaprosy)
             navigate('/home');
+            //todo kisad e( stuge zaprosy)
         } catch (e) {
             toast.error(e.response.data.message);
         }
@@ -86,6 +87,7 @@ function Login() {
 
         openCloseModal(false);
         openCloseModal(true);
+        toast.success('Key sent successfully');
     }, [values]);
 
     const handleChangePass = useCallback(async () => {
@@ -118,8 +120,8 @@ function Login() {
             return;
         }
 
-        toast.success("Password changed!");
         openCloseModal(true);
+        toast.success("Password changed!");
     }, [values]);
 
     useEffect(() => {
@@ -128,6 +130,9 @@ function Login() {
 
     return (
         <div className="container-fluid">
+            <Helmet>
+                <title>Login</title>
+            </Helmet>
             <div
                 className="row h-100 align-items-center justify-content-center"
                 style={{minHeight: '100vh'}}

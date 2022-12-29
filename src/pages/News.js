@@ -13,6 +13,7 @@ import {useLocation, useNavigate} from "react-router-dom";
 import qs from "query-string";
 import PageNumbers from "../components/PageNumbers";
 import Validator from "../helpers/Validator";
+import EmptyPage from "../components/EmptyPage";
 
 function News() {
     const dispatch = useDispatch();
@@ -46,18 +47,6 @@ function News() {
             await dispatch(allNewsListRequest({page, title}));
         })()
     }, [location.search]);
-
-    useEffect(() => {
-        let page = title ? 1 : qs.parse(location.search).page;
-        page = +page || 1;
-        const query = qs.stringify({page, title: title || null}, {skipNull: true});
-
-        clearTimeout(myTimeout);
-
-        setMyTimeout(setTimeout(() => {
-            navigate(`/news${query ? `?${query}` : ''}`);
-        }, 400));
-    }, [title]);
 
     const openCloseModal = useCallback((newObj) => {
         if (!_.isEmpty(newObj)) {
@@ -112,6 +101,7 @@ function News() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(allNewsListRequest({page: currentPage}));
             openCloseModal();
+            toast.success('News added successfully.');
         }
     }, [image, values, currentPage]);
 
@@ -174,6 +164,7 @@ function News() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(allNewsListRequest({page: currentPage}));
             openCloseModal();
+            toast.success('News updated successfully.');
         }
     }, [image, values, currentPage]);
 
@@ -185,18 +176,32 @@ function News() {
         navigate(`/news?${query}`);
     }, [location.search]);
 
+    const searchChange = useCallback((val) => {
+        let page = val ? 1 : qs.parse(location.search).page;
+        setTitle(val);
+        page = +page || 1;
+        const query = qs.stringify({page, title: val || null}, {skipNull: true});
+
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/news${query ? `?${query}` : ''}`);
+        }, 400));
+    }, [myTimeout]);
+
     return (
         <Wrapper
-            setSearch={setTitle}
-            search={title}
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
             uploadProcess={uploadProcess}
+            pageName='news'
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
+                        searchChange={searchChange}
+                        search={title}
                         openCloseModal={openCloseModal}
-                        pageName='News'
+                        pageName='news'
                     />
                     {
                         !_.isEmpty(newsList) ? (
@@ -225,7 +230,7 @@ function News() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                     {
                         totalPages > 1 ? (

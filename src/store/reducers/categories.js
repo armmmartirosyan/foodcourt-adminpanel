@@ -12,7 +12,7 @@ const initialState = {
 // });
 
 export default createReducer(initialState, (builder) => {
-    builder.addMatcher((action) => action.type.endsWith('categories/getAll/fulfilled'), (state, action) => {
+    builder.addMatcher((action) => action.type.endsWith('categories/get/all/fulfilled'), (state, action) => {
         state.categories = [...action.payload.categories];
     })
 })

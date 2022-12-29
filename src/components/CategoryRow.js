@@ -5,6 +5,7 @@ import {
     deleteCategoryRequest
 } from "../store/actions/categories";
 import PropTypes from "prop-types";
+import {toast} from "react-toastify";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -15,11 +16,14 @@ function CategoryRow(props) {
 
     const handleDelete = useCallback(async (e, slugName) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteCategoryRequest({slugName}));
+        const data = await dispatch(deleteCategoryRequest({slugName}));
 
-        if (payload.status === 'ok') {
-            await dispatch(allCategoriesListRequest());
+        if (data.error) {
+            toast.error(data.error.message);
         }
+
+        await dispatch(allCategoriesListRequest());
+        toast.success('Category deleted successfully.');
     }, []);
 
     return (
@@ -39,7 +43,7 @@ function CategoryRow(props) {
             <td>{category.name}</td>
             <td>
                 <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-sm btn-danger right"
                     disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, category.slugName)

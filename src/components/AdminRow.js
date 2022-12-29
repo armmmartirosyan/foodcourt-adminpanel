@@ -1,6 +1,7 @@
 import React from 'react';
 import {useSelector} from "react-redux";
 import PropTypes from "prop-types";
+import classNames from "classnames";
 
 function AdminRow(props) {
     const {admin, openCloseModal} = props;
@@ -11,7 +12,10 @@ function AdminRow(props) {
             {
                 admin.email !== currentAdmin.email ? (
                     <tr
-                        className='table-row'
+                        className={classNames(
+                            'table-row',
+                            {deleted: admin.status === 'deleted'})
+                        }
                         onClick={() => {
                             openCloseModal(false, admin);
                         }}
@@ -20,15 +24,19 @@ function AdminRow(props) {
                         <td>{admin.lastName}</td>
                         <td>{admin.email}</td>
                         <td>
-                            <button
-                                className="btn btn-sm btn-primary"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    openCloseModal(true, admin)
-                                }}
-                            >
-                                Delete
-                            </button>
+                            {
+                                admin.status !== 'deleted' ? (
+                                    <button
+                                        className="btn btn-sm btn-danger right"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            openCloseModal(true, admin)
+                                        }}
+                                    >
+                                        Delete
+                                    </button>
+                                ) : null
+                            }
                         </td>
                     </tr>
                 ) : null

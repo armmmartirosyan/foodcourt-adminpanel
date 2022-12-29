@@ -64,7 +64,6 @@
     border-radius: 50px;
 }
 
-
 /*** Layout ***/
 .sidebar {
     position: fixed;
@@ -230,6 +229,19 @@
 }
 
 /*my styles ------------*/
+/*my styles ------------*/
+/*my styles ------------*/
+/*my styles ------------*/
+/*my styles ------------*/
+/*my styles ------------*/
+[class*="copyrights-pane"] {
+    display: none !important;
+}
+
+[class*="ground-pane"] {
+    filter: grayscale(.5);
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -239,12 +251,18 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance: textfield;
 }
+
+.ReactModal__Body--open {
+    overflow: hidden;
+}
+
 .ReactModal__Body--open .modal,
-.ReactModal__Body--open .overlay{
+.ReactModal__Body--open .overlay {
     display: block;
     z-index: 999;
 }
-.modal{
+
+.modal {
     position: absolute;
     inset: 25px;
     border: 1px solid rgb(204, 204, 204);
@@ -256,12 +274,14 @@ input[type=number] {
     width: calc(100% - 50px);
     height: calc(100% - 50px);
 }
-.modal.small{
+
+.modal.small {
     width: 50%;
     height: fit-content;
     margin: auto;
 }
-.overlay{
+
+.overlay {
     width: 100%;
     height: 100%;
     background-color: rgba(108, 106, 106, 0.68);
@@ -269,25 +289,18 @@ input[type=number] {
     left: 0;
     position: absolute;
 }
-.navbar, .navbar *{
-    z-index: 998 !important;
-}
-.form-control{
-    resize: none;
-}
-.modal-btn-container{
+
+.modal-btn-container {
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
 }
+
 .modal-btn-container .btn {
     margin: 10px;
 }
-.table-img{
-    width: 50px;
-    height: 50px;
-}
-.modal-img-container{
+
+.modal-img-container {
     width: 200px;
     height: 200px;
     display: flex;
@@ -298,7 +311,8 @@ input[type=number] {
     right: 0;
     margin: 15px;
 }
-.modal-img-delete{
+
+.modal-img-delete {
     position: absolute;
     right: -10px;
     bottom: -10px;
@@ -313,103 +327,29 @@ input[type=number] {
     justify-content: center;
     transition: all .4s
 }
-.modal-img-delete:hover{
+
+.modal-img-delete:hover {
     background-color: #b90101;
 }
-.modal-img{
+
+.modal-img {
     width: 200px;
     height: 100%;
     object-fit: cover;
 }
-.table-row{
-    cursor: pointer;
-    transition: all .4s;
-}
-.table-row:hover{
-    transform: scale(1.01);
-}
-.btn {
-    height: fit-content;
-}
-.container{
-    width: 70vw;
-    height: 50vw;
-}
+
 .modal-img-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
-.pages {
-    display: flex;
-    justify-content: center;
-}
-.active_page{
-    background-color: #0b5ed7;
-}
-.admin__container{
-    position: relative;
-    width: 100%;
-    z-index: 999 !important;
-}
-.admin{
-    cursor: pointer;
-}
-.admin__options{
-    top: 100%;
-    width: 100%;
-    display: none;
-}
 
-.admin__options.open{
-    display: block;
-}
-.admin__options__btn{
-    padding: 10px;
-    border: 1px solid #0b5ed7;
-    color: #0b5ed7;
-    background-color: inherit;
-    transition: all .4s;
-    cursor: pointer;
-    margin-bottom: 3px;
-}
-.admin__options__btn:hover{
-    color: #fff;
-    background-color: #0b5ed7;
-}
-.profile__table{
-    width: 70%;
-    border: 1px solid black;
-    border-radius: 10px;
-    margin: 0 auto;
-    background-color: rgb(250 250 250);
-    padding: 10px;
-    cursor: pointer;
-}
-.profile__row{
-    transition: all .4s;
-}
-.profile__row:hover{
-    transform: translateX(10px);
-}
-.spinner-container{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(129, 127, 127, 0.62);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-.modal-container{
+.modal-container {
     position: relative;
     padding-top: 60px !important;
 }
-.modal_close{
+
+.modal_close {
     position: absolute;
     top: 0;
     right: 0;
@@ -425,14 +365,143 @@ input[type=number] {
     background-color: inherit;
     transition: all .4s;
 }
-.modal_close:hover{
+
+.modal_close:hover {
     background-color: #ccc;
 }
 
-[class*="copyrights-pane"]{
-    display: none !important;
+.navbar, .navbar * {
+    z-index: 998 !important;
 }
 
-[class*="ground-pane"]{
-    filter: grayscale(.5);
+.form-control {
+    resize: none;
+}
+
+.table-img {
+    width: 50px;
+    height: 50px;
+}
+
+.table-row {
+    cursor: pointer;
+    transition: all .4s;
+}
+
+.table-row.deleted {
+    background-color: #c17c80;
+}
+
+.table-row:hover {
+    transform: scale(1.01);
+}
+
+.btn {
+    height: fit-content;
+}
+
+.container {
+    width: 70vw;
+    height: 50vw;
+}
+
+.pages {
+    display: flex;
+    justify-content: center;
+}
+
+.active_page {
+    background-color: #0b5ed7;
+}
+
+.admin__container {
+    position: relative;
+    width: 100%;
+    z-index: 999 !important;
+}
+
+.admin {
+    cursor: pointer;
+}
+
+.admin__options {
+    top: 100%;
+    width: 100%;
+    display: none;
+}
+
+.admin__options.open {
+    display: block;
+}
+
+.admin__options__btn {
+    padding: 10px;
+    border: 1px solid #0b5ed7;
+    color: #0b5ed7;
+    background-color: inherit;
+    transition: all .4s;
+    cursor: pointer;
+    margin-bottom: 3px;
+}
+
+.admin__options__btn:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+}
+
+.profile__table {
+    width: 70%;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin: 0 auto;
+    background-color: rgb(250 250 250);
+    padding: 10px;
+    cursor: pointer;
+}
+
+.profile__row {
+    transition: all .4s;
+}
+
+.profile__row:hover {
+    transform: translateX(10px);
+}
+
+.spinner-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(129, 127, 127, 0.62);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.empty_page {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 100px;
+}
+
+.header {
+    height: fit-content;
+    align-items: center;
+    padding: 0 0 10px 0;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+td {
+    position: relative;
+}
+
+.right {
+    position: absolute;
+    right: 7px;
 }

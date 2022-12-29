@@ -8,13 +8,6 @@ export const allProductsListRequest = createAsyncThunk('products/get/all', async
     return data;
 });
 
-export const productsListByCatRequest = createAsyncThunk('products/by/cat', async (payload = {}) => {
-    const { categorySlug, ...params } = payload;
-    const { data } = await Api.getAllProductsList(categorySlug, params);
-
-    return data;
-});
-
 export const addProductRequest = createAsyncThunk('products/add', async (payload = {}) => {
     const {onUploadProcess, ...params} = payload;
     const {data} = await Api.addProduct(onUploadProcess, params);

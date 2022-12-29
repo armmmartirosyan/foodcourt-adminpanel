@@ -107,8 +107,8 @@ function Profile() {
             toast.error(data.error.message);
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminRequest());
-
             openCloseModal();
+            toast.success('Account modified successfully.');
         }
     }, [value]);
 
@@ -122,6 +122,7 @@ function Profile() {
 
         openCloseModal();
         openClosePassModal();
+        toast.success('Key sent successfully.');
     }, [value, newValues]);
 
     const handleChangePass = useCallback(async () => {
@@ -153,9 +154,10 @@ function Profile() {
         if (data.error) {
             toast.error("Something goes wrong!");
             return;
+        }else if(data.payload.status === 'ok'){
+            openClosePassModal();
+            toast.success('Password changed successfully.');
         }
-
-        openClosePassModal();
     }, [newValues]);
 
     return (
@@ -164,8 +166,8 @@ function Profile() {
             statuses={{statusModify, getAdminStatus, getKeyStatus, changePassStatus}}
         >
             <div className="col-12">
-                <div className="bg-light rounded h-100 p-4 d-flex justify-content-between">
-                    <h6 className="mb-4">{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
+                <div className="bg-light rounded h-100 p-4 d-flex justify-content-between header">
+                    <h6>{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
                 </div>
                 {
                     !_.isEmpty(admin) ? (

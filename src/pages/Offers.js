@@ -12,6 +12,7 @@ import SingleImage from "../components/SingleImage";
 import qs from "query-string";
 import {useLocation, useNavigate} from "react-router-dom";
 import Validator from "../helpers/Validator";
+import EmptyPage from "../components/EmptyPage";
 
 function Offers() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -42,16 +43,6 @@ function Offers() {
             await dispatch(allOffersListRequest({title}));
         })()
     }, [location.search]);
-
-    useEffect(() => {
-        const query = qs.stringify({title: title || null}, {skipNull: true});
-
-        clearTimeout(myTimeout);
-
-        setMyTimeout(setTimeout(() => {
-            navigate(`/offers${query ? `?${query}` : ''}`);
-        }, 400));
-    }, [title]);
 
     const openCloseModal = useCallback((offerObj) => {
         if (!_.isEmpty(offerObj)) {
@@ -110,6 +101,7 @@ function Offers() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(allOffersListRequest());
             openCloseModal();
+            toast.success('Offer added successfully.');
         }
     }, [image, values]);
 
@@ -176,21 +168,34 @@ function Offers() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(allOffersListRequest());
             openCloseModal();
+            toast.success('Offer updated successfully.');
         }
     }, [image, values]);
 
+    const searchChange = useCallback((val) => {
+        const query = qs.stringify({title: val || null}, {skipNull: true});
+        setTitle(val);
+
+        clearTimeout(myTimeout);
+
+        setMyTimeout(setTimeout(() => {
+            navigate(`/offers${query ? `?${query}` : ''}`);
+        }, 400));
+    }, [myTimeout]);
+
     return (
         <Wrapper
-            setSearch={setTitle}
-            search={title}
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
             uploadProcess={uploadProcess}
+            pageName='offers'
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
                     <TopBar
+                        searchChange={searchChange}
+                        search={title}
                         openCloseModal={openCloseModal}
-                        pageName='Offer'
+                        pageName='offer'
                     />
                     {
                         !_.isEmpty(offers) ? (
@@ -217,7 +222,7 @@ function Offers() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                 </div>
             </div>

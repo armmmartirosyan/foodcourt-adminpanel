@@ -182,6 +182,10 @@ class Api {
         return api.get(`/users/`, {params: {page, name}});
     }
 
+    static deleteUserAccount(id) {
+        return api.delete(`/users/${id}`);
+    }
+
     //Admin
     static getAdmin() {
         return api.get(`/admin/current`);

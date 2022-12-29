@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import Api from "../../Api";
 
-export const allCategoriesListRequest = createAsyncThunk('categories/getAll', async (payload = {}) => {
+export const allCategoriesListRequest = createAsyncThunk('categories/get/all', async (payload = {}) => {
     const {name} = payload;
     const { data } = await Api.getAllCategoriesList(name);
 

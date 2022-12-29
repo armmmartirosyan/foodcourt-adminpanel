@@ -4,7 +4,7 @@ import Wrapper from "../components/Wrapper";
 
 function Home() {
     return (
-        <Wrapper>
+        <Wrapper pageName='home'>
             <div className="container-fluid pt-4 px-4">
                 <div className="bg-light text-center rounded p-4">
                     <div className="d-flex align-items-center justify-content-between mb-4">

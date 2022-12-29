@@ -18,12 +18,13 @@ function ProductRow(props) {
         const data = await dispatch(deleteProductRequest({slugName}));
 
         if (data.error) {
-            toast.error('Error in deleting');
+            toast.error(data.error.message);
         }
 
         (products.length === 1 && page > 1) ?
             navigate(`/products?page=${page-1}`)
             : await dispatch(allProductsListRequest({page}));
+        toast.success('Product deleted successfully.');
     }, [page, products]);
 
     return (
@@ -45,7 +46,7 @@ function ProductRow(props) {
             <td>{product.categorySlug}</td>
             <td>
                 <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-sm btn-danger right"
                     disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, product.slugName)

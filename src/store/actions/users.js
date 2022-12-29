@@ -7,3 +7,10 @@ export const allUsersListRequest = createAsyncThunk('users/get/all', async (payl
 
     return data;
 });
+
+export const deleteUserAccountRequest = createAsyncThunk('users/delete', async (payload = {}) => {
+    const { id } = payload;
+    const { data } = await Api.deleteUserAccount(id);
+
+    return data;
+});

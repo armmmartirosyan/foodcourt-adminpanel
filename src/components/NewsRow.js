@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {allNewsListRequest, deleteNewsRequest} from "../store/actions/news";
 import {useNavigate} from "react-router-dom";
 import PropTypes from "prop-types";
+import {toast} from "react-toastify";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -14,13 +15,16 @@ function NewsRow(props) {
 
     const handleDelete = useCallback(async (e, slugName) => {
         e.stopPropagation();
-        const {payload} = await dispatch(deleteNewsRequest({slugName}));
+        const data = await dispatch(deleteNewsRequest({slugName}));
 
-        if (payload.status === 'ok') {
-            (newsList.length === 1 && page > 1) ?
-                navigate(`/news?page=${page-1}`)
-                : await dispatch(allNewsListRequest({page}));
+        if (data.error) {
+            toast.error(data.error.message);
         }
+
+        (newsList.length === 1 && page > 1) ?
+            navigate(`/news?page=${page-1}`)
+            : await dispatch(allNewsListRequest({page}));
+        toast.success('News deleted successfully.');
     }, [page, newsList]);
 
     return (
@@ -47,7 +51,7 @@ function NewsRow(props) {
             </td>
             <td>
                 <button
-                    className="btn btn-sm btn-primary"
+                    className="btn btn-sm btn-danger right"
                     disabled={admin && admin.possibility === 'junior'}
                     onClick={async (e) => {
                         await handleDelete(e, news.slugName)

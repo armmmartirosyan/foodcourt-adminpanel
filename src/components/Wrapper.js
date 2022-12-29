@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import Header from "./Header";
 import Account from "../helpers/Account";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -8,11 +7,10 @@ import {getAdminRequest} from "../store/actions/admin";
 import Sidebar from "./Sidebar";
 import Spinner from "react-bootstrap/Spinner";
 import PropTypes from "prop-types";
+import {Helmet} from "react-helmet";
 
 function Wrapper(props) {
-    const {children, setSearch, search,
-        statuses, uploadProcess, pageName = '',
-    searchChang} = props;
+    const {children, pageName, statuses, uploadProcess} = props;
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const admin = useSelector(state => state.admin.admin);
@@ -36,15 +34,9 @@ function Wrapper(props) {
 
     return (
         <div className='content'>
-            {
-                setSearch ? (
-                    <Header
-                        setSearch={setSearch}
-                        search={search}
-                        onChange={(value)=>searchChang(value)}
-                    />
-                ) : null
-            }
+            <Helmet>
+                <title>{_.capitalize(pageName)}</title>
+            </Helmet>
             <Sidebar pageName={pageName}/>
             {children}
             {
@@ -63,12 +55,9 @@ function Wrapper(props) {
     );
 }
 Wrapper.propTypes = {
-    search: PropTypes.string,
-    pageName: PropTypes.string,
-    uploadProcess: PropTypes.number,
+    pageName: PropTypes.string.isRequired,
     children: PropTypes.any.isRequired,
     statuses: PropTypes.object,
-    setSearch: PropTypes.func,
-    searchChang: PropTypes.func,
+    uploadProcess: PropTypes.number,
 }
 export default Wrapper;

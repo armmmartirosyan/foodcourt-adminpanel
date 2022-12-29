@@ -13,6 +13,8 @@ import Modal from "react-modal";
 import moment from "moment";
 import AdminRow from "../components/AdminRow";
 import Validator from "../helpers/Validator";
+import EmptyPage from "../components/EmptyPage";
+import TopBar from "../components/TopBar";
 
 function Admin() {
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
@@ -107,6 +109,7 @@ function Admin() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminsListRequest());
             openCloseModal();
+            toast.success('Admin registered successfully');
         }
     }, [values]);
 
@@ -154,6 +157,7 @@ function Admin() {
         } else if (data.payload?.status === 'ok') {
             await dispatch(getAdminsListRequest());
             openCloseModal();
+            toast.success('Admin modified successfully');
         }
     }, [values]);
 
@@ -163,28 +167,26 @@ function Admin() {
 
         if (data.error) {
             toast.error('Error deleting admin!');
+            return;
         }
 
         await dispatch(getAdminsListRequest());
         openCloseModal(true);
+        toast.success('Admin deleted successfully');
     }, [admin]);
 
     return (
         <Wrapper
             statuses={{statusDelete, statusModify, statusRegister, statusAdminsList}}
+            pageName='admin'
         >
             <div className="col-12">
                 <div className="bg-light rounded h-100 p-4">
                     <div className='d-flex justify-content-between'>
-                        <h6 className="mb-4">Admins</h6>
-                        <button
-                            className="btn btn-sm btn-primary"
-                            onClick={() => {
-                                openCloseModal()
-                            }}
-                        >
-                            Register admin
-                        </button>
+                        <TopBar
+                            pageName='admin'
+                            openCloseModal={openCloseModal}
+                        />
                     </div>
                     {
                         !_.isEmpty(adminsList) ? (
@@ -211,7 +213,7 @@ function Admin() {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null
+                        ) : <EmptyPage/>
                     }
                 </div>
             </div>
@@ -332,6 +334,7 @@ function Admin() {
                             id="possibility"
                             aria-label="Floating label select example"
                             value={values.possibility}
+                            disabled={admin && admin.status === 'deleted'}
                             onChange={(e) => {
                                 handleChangeValues(e.target.value, 'possibility')
                             }}
@@ -376,16 +379,20 @@ function Admin() {
                         >
                             Cancel
                         </button>
-                        <button
-                            className="btn btn-primary"
-                            onClick={
-                                !_.isEmpty(admin) ? handleModifyAdminAccount : handleRegisterAdmin
-                            }
-                        >
-                            {
-                                !_.isEmpty(admin) ? 'Modify' : 'Register'
-                            }
-                        </button>
+                        {
+                            admin && admin.status !== 'deleted' ? (
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={
+                                        !_.isEmpty(admin) ? handleModifyAdminAccount : handleRegisterAdmin
+                                    }
+                                >
+                                    {
+                                        !_.isEmpty(admin) ? 'Modify' : 'Register'
+                                    }
+                                </button>
+                            ) : null
+                        }
                     </div>
                 </div>
             </Modal>
