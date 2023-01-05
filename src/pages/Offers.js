@@ -13,12 +13,15 @@ import qs from "query-string";
 import {useLocation, useNavigate} from "react-router-dom";
 import Validator from "../helpers/Validator";
 import EmptyPage from "../components/EmptyPage";
+import Select from "react-select";
+import {allCategoriesListRequest} from "../store/actions/categories";
 
 function Offers() {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
+    const categoriesList = useSelector(state => state.categories.categories);
     const offers = useSelector(state => state.offers.offers);
     const statusGetAll = useSelector(state => state.status.offersGetAllStatus);
     const statusAdd = useSelector(state => state.status.offersAddStatus);
@@ -29,11 +32,13 @@ function Offers() {
     const [title, setTitle] = useState(qs.parse(location.search).title || '');
     const [offer, setOffer] = useState({});
     const [image, setImage] = useState({});
+    const [categories, setCategories] = useState([]);
     const [myTimeout, setMyTimeout] = useState();
     const [values, setValues] = useState({
         title: '',
         description: '',
         price: 0,
+        categoryId: [],
     });
 
     useEffect(() => {
@@ -43,6 +48,21 @@ function Offers() {
             await dispatch(allOffersListRequest({title}));
         })()
     }, [location.search]);
+
+    useEffect(() => {
+        (async () => {
+            await dispatch(allCategoriesListRequest());
+        })()
+    }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(categoriesList)) {
+            const list = categoriesList.map(cat => {
+                return {value: cat.id, label: cat.name}
+            })
+            setCategories(list);
+        }
+    }, [categoriesList]);
 
     const openCloseModal = useCallback((offerObj) => {
         if (!_.isEmpty(offerObj)) {
@@ -80,6 +100,10 @@ function Offers() {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
+        if(_.isEmpty(values.categoryId)){
+            toast.error(`Select category(at least 1 category!)`);
+            return;
+        }
         if (!image.type) {
             toast.error("Select image!");
             return;
@@ -89,6 +113,7 @@ function Offers() {
             title: values.title,
             description: values.description,
             price: values.price,
+            categoryId: values.categoryId,
             image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
@@ -143,19 +168,12 @@ function Offers() {
             return;
         }
 
-        if (values.title.length < 2
-            && values.description.length < 2
-            && +values.price < 10
-            && !image.type) {
-            toast.error("Fill one of fields");
-            return;
-        }
-
         const data = await dispatch(updateOfferRequest({
             slugName: offer.slugName,
             title: values.title || undefined,
             description: values.description || undefined,
             price: values.price || undefined,
+            categoryId: !_.isEmpty(values.categoryId) ? values.categoryId : undefined,
             image: image.type ? image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
@@ -183,6 +201,15 @@ function Offers() {
         }, 400));
     }, [myTimeout]);
 
+    const onChangeSelect = useCallback((data) => {
+        const ids = data.map(d => d.value);
+
+        setValues({
+            ...values,
+            categoryId: ids
+        })
+    }, [values]);
+
     return (
         <Wrapper
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetAll}}
@@ -206,6 +233,7 @@ function Offers() {
                                         <th scope="col">Image</th>
                                         <th scope="col">Title</th>
                                         <th scope="col">Price</th>
+                                        <th scope="col">Categories</th>
                                         <th scope="col"></th>
                                     </tr>
                                     </thead>
@@ -296,6 +324,23 @@ function Offers() {
                         />
                         <label htmlFor="price">Price(AMD)</label>
                     </div>
+                    {
+                        !_.isEmpty(categories) ? (
+                            <Select
+                                defaultValue={!_.isEmpty(offer) ?
+                                    offer.categories.map(cat => {
+                                        return {value: cat.id, label: cat.name}
+                                    }) : undefined
+                                }
+                                isMulti
+                                name="colors"
+                                options={categories}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                onChange={onChangeSelect}
+                            />
+                        ) : null
+                    }
                     <div className="mb-3">
                         <label htmlFor="formFile" className="form-label">Select Image</label>
                         <input

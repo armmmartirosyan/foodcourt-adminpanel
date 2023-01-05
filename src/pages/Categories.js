@@ -33,6 +33,10 @@ function Categories() {
     const [myTimeout, setMyTimeout] = useState();
 
     useEffect(() => {
+        console.log(categories);
+    }, [categories]);
+
+    useEffect(() => {
         const newName = qs.parse(location.search).name;
 
         (async () => {

@@ -505,3 +505,16 @@ td {
     position: absolute;
     right: 7px;
 }
+.table-multi-val{
+    height: 50px;
+    overflow-y: auto;
+}
+
+.plus{
+    width: 50px;
+}
+.plus input{
+    text-align: center;
+    background-color: inherit !important;
+    border: 0;
+}

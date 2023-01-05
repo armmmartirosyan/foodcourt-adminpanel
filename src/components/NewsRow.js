@@ -19,6 +19,7 @@ function NewsRow(props) {
 
         if (data.error) {
             toast.error(data.error.message);
+            return;
         }
 
         (newsList.length === 1 && page > 1) ?

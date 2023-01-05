@@ -17,6 +17,7 @@ function OfferRow(props) {
 
         if (data.error) {
             toast.error(data.error.message);
+            return;
         }
 
         await dispatch(allOffersListRequest());
@@ -39,6 +40,17 @@ function OfferRow(props) {
             </th>
             <td>{offer.title}</td>
             <td>{`${offer.price} AMD`}</td>
+            <td>
+                <div className='table-multi-val'>
+                    {
+                        offer.categories.map(c => (
+                            <p key={c.slugName}>
+                                {c.name}
+                            </p>
+                        ))
+                    }
+                </div>
+            </td>
             <td>
                 <button
                     className="btn btn-sm btn-danger right"

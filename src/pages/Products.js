@@ -14,12 +14,15 @@ import PageNumbers from "../components/PageNumbers";
 import SingleImage from "../components/SingleImage";
 import Validator from "../helpers/Validator";
 import EmptyPage from "../components/EmptyPage";
+import Select from "react-select";
+import {allCategoriesListRequest} from "../store/actions/categories";
 
 function Products() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
     const products = useSelector(state => state.products.products);
+    const categoriesList = useSelector(state => state.categories.categories);
     const totalPages = useSelector(state => state.products.pages);
     const statusGetAll = useSelector(state => state.status.productsGetAllStatus);
     const statusAdd = useSelector(state => state.status.productsAddStatus);
@@ -32,12 +35,13 @@ function Products() {
     const [image, setImage] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const [myTimeout, setMyTimeout] = useState();
+    const [categories, setCategories] = useState([]);
     const [title, setTitle] = useState(qs.parse(location.search).title || '');
     const [values, setValues] = useState({
         title: '',
         description: '',
         price: 0,
-        categorySlug: '',
+        categoryId: [],
     });
 
     useEffect(() => {
@@ -50,6 +54,21 @@ function Products() {
             await dispatch(allProductsListRequest({page, title: newTitle}));
         })()
     }, [location.search]);
+
+    useEffect(() => {
+        (async () => {
+            await dispatch(allCategoriesListRequest());
+        })()
+    }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(categoriesList)) {
+            const list = categoriesList.map(cat => {
+                return {value: cat.id, label: cat.name}
+            })
+            setCategories(list);
+        }
+    }, [categoriesList]);
 
     const openCloseModal = useCallback((prod) => {
         if (!_.isEmpty(prod)) {
@@ -81,7 +100,7 @@ function Products() {
             Validator.validTitle(values.title),
             Validator.validDesc(values.description),
             Validator.validPrice(values.price),
-            Validator.validSlug(values.categorySlug),
+            //Validator.validSlug(values.categorySlug),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -99,7 +118,7 @@ function Products() {
             title: values.title,
             description: values.description,
             price: values.price,
-            categorySlug: values.categorySlug,
+            categoryId: values.categoryId,
             image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
@@ -139,7 +158,7 @@ function Products() {
             values.title ? Validator.validTitle(values.title) : true,
             values.description ? Validator.validDesc(values.description) : true,
             values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
-            values.categorySlug ? Validator.validSlug(values.categorySlug) : true,
+            /*!_.isEmpty(values.categoryId) ? Validator.validSlug(values.categorySlugs) : true,*/
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -161,7 +180,7 @@ function Products() {
             title: values.title || undefined,
             description: values.description || undefined,
             price: values.price || undefined,
-            categorySlug: values.categorySlug || undefined,
+            categoryId: !_.isEmpty(values.categoryId) ? values.categoryId : undefined,
             image: image.type ? image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
@@ -199,6 +218,15 @@ function Products() {
         }, 400));
     }, [myTimeout]);
 
+    const onChangeSelect = useCallback((data) => {
+        const ids = data.map(d => d.value);
+
+        setValues({
+            ...values,
+            categoryId: ids
+        })
+    }, [values]);
+
     return (
         <Wrapper
             statuses={{statusDelete, statusGetAll, statusAdd, statusUpdate}}
@@ -222,7 +250,7 @@ function Products() {
                                         <th scope="col">Image</th>
                                         <th scope="col">Title</th>
                                         <th scope="col">Price</th>
-                                        <th scope="col">Cat. Slug Name</th>
+                                        <th scope="col">Categories</th>
                                         <th scope="col"></th>
                                     </tr>
                                     </thead>
@@ -326,20 +354,37 @@ function Products() {
                         />
                         <label htmlFor="price">Price(AMD)</label>
                     </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="categorySlug"
-                            placeholder="Category Slug Name"
-                            value={values.categorySlug}
-                            disabled={admin && admin.possibility === 'junior'}
-                            onChange={(e) => {
-                                handleChangeValues(e.target.value, 'categorySlug')
-                            }}
-                        />
-                        <label htmlFor="categorySlug">Category Slug Name</label>
-                    </div>
+                    {/*<div className="form-floating mb-3">*/}
+                    {/*    <input*/}
+                    {/*        type="text"*/}
+                    {/*        className="form-control"*/}
+                    {/*        id="categorySlug"*/}
+                    {/*        placeholder="Category Slug Name"*/}
+                    {/*        value={values.categorySlug}*/}
+                    {/*        disabled={admin && admin.possibility === 'junior'}*/}
+                    {/*        onChange={(e) => {*/}
+                    {/*            handleChangeValues(e.target.value, 'categorySlug')*/}
+                    {/*        }}*/}
+                    {/*    />*/}
+                    {/*    <label htmlFor="categorySlug">Category Slug Name</label>*/}
+                    {/*</div>*/}
+                    {
+                        !_.isEmpty(categories) ? (
+                            <Select
+                                defaultValue={!_.isEmpty(product) ?
+                                    product.categories.map(cat => {
+                                        return {value: cat.id, label: cat.name}
+                                    }) : undefined
+                                }
+                                isMulti
+                                name="colors"
+                                options={categories}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                onChange={onChangeSelect}
+                            />
+                        ) : null
+                    }
                     <div className="mb-3">
                         <label htmlFor="formFile" className="form-label">Select Image</label>
                         <input

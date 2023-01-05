@@ -20,6 +20,7 @@ function CategoryRow(props) {
 
         if (data.error) {
             toast.error(data.error.message);
+            return;
         }
 
         await dispatch(allCategoriesListRequest());

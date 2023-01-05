@@ -27,7 +27,12 @@ function Wrapper(props) {
     useEffect(() => {
         if (_.isEmpty(admin)) {
             (async () => {
-                await dispatch(getAdminRequest());
+                const data = await dispatch(getAdminRequest());
+
+                if(data.error){
+                    Account.deleteToken();
+                    navigate('/');
+                }
             })()
         }
     }, [admin]);

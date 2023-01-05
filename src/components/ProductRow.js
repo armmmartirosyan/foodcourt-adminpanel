@@ -19,10 +19,11 @@ function ProductRow(props) {
 
         if (data.error) {
             toast.error(data.error.message);
+            return;
         }
 
         (products.length === 1 && page > 1) ?
-            navigate(`/products?page=${page-1}`)
+            navigate(`/products?page=${page - 1}`)
             : await dispatch(allProductsListRequest({page}));
         toast.success('Product deleted successfully.');
     }, [page, products]);
@@ -43,7 +44,17 @@ function ProductRow(props) {
             </th>
             <td>{product.title}</td>
             <td>{`${product.price} AMD`}</td>
-            <td>{product.categorySlug}</td>
+            <td>
+                <div className='table-multi-val'>
+                    {
+                        product.categories.map(c => (
+                            <p key={c.slugName}>
+                                {c.name}
+                            </p>
+                        ))
+                    }
+                </div>
+            </td>
             <td>
                 <button
                     className="btn btn-sm btn-danger right"
@@ -58,6 +69,7 @@ function ProductRow(props) {
         </tr>
     );
 }
+
 ProductRow.propTypes = {
     product: PropTypes.object.isRequired,
     page: PropTypes.number.isRequired,

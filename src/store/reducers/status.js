@@ -14,4 +14,4 @@ export default createReducer(initialState, (builder) => {
         const key = _.camelCase(action.type.replace('/rejected', '/status'));
         state[key] = 'error';
     })
-})
+});

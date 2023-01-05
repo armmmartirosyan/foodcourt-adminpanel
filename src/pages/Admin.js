@@ -77,8 +77,8 @@ function Admin() {
             Validator.validFName(values.firstName),
             Validator.validLName(values.lastName),
             Validator.validEmail(values.email),
-            Validator.validPass(values.password),
-            Validator.validPass(values.confirmPassword),
+            //Validator.validPass(values.password),
+            //Validator.validPass(values.confirmPassword),
             Validator.validPhoneNum(values.phoneNum),
             Validator.validPossibility(values.possibility),
         ];
@@ -98,7 +98,7 @@ function Admin() {
             firstName: values.firstName,
             lastName: values.lastName,
             email: values.email,
-            phoneNum: values.phoneNum,
+            phoneNum: '+' + values.phoneNum,
             possibility: values.possibility,
             password: values.password,
             confirmPassword: values.confirmPassword,
@@ -148,7 +148,7 @@ function Admin() {
             firstName: values.firstName || undefined,
             lastName: values.lastName || undefined,
             email: values.email || undefined,
-            phoneNum: values.phoneNum || undefined,
+            phoneNum: !_.isEmpty(values.phoneNum) ? '+' + values.phoneNum : undefined,
             possibility: values.possibility || undefined,
         }));
 
@@ -314,19 +314,29 @@ function Admin() {
                             </>
                         ) : null
                     }
-                    <div className="form-floating mb-3">
-                        <input
-                            type="number"
-                            className="form-control"
-                            id="phoneNum"
-                            placeholder="Phone Number"
-                            value={values.phoneNum}
-                            disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
-                            onChange={(e) => {
-                                handleChangeValues(e.target.value, 'phoneNum')
-                            }}
-                        />
-                        <label htmlFor="phoneNum">Phone Number</label>
+                    <div className='d-flex'>
+                        <div className="form-floating mb-3 plus">
+                            <input
+                                type="text"
+                                className="form-control"
+                                value='+'
+                                disabled={true}
+                            />
+                        </div>
+                        <div className="form-floating mb-3">
+                            <input
+                                type="number"
+                                className="form-control"
+                                id="phoneNum"
+                                placeholder="Phone Number"
+                                value={values.phoneNum.replace("+", "")}
+                                disabled={admin && (admin.status === 'active' || admin.status === 'deleted')}
+                                onChange={(e) => {
+                                    handleChangeValues(e.target.value, 'phoneNum')
+                                }}
+                            />
+                            <label htmlFor="phoneNum">Phone Number</label>
+                        </div>
                     </div>
                     <div className="form-floating mb-3">
                         <select

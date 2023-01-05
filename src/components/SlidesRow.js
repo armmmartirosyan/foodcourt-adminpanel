@@ -17,6 +17,7 @@ function SlidesRow(props) {
 
         if (data.error) {
             toast.error(data.error.message);
+            return;
         }
 
         await dispatch(allSlidesListRequest());
