@@ -1,30 +1,72 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import Api from "../../Api";
 
-export const allCategoriesListRequest = createAsyncThunk('categories/get/all', async (payload = {}) => {
+export const allCategoriesListRequest = createAsyncThunk('categories/get/all', async (payload = {}, {rejectWithValue}) => {
     const {name} = payload;
-    const { data } = await Api.getAllCategoriesList(name);
+    let data;
+
+    try{
+        let newData = await Api.getAllCategoriesList(name);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
 
     return data;
 });
 
-export const addCategoryRequest = createAsyncThunk('categories/add', async (payload = {}) => {
-    const {onUploadProcess, ...props} = payload;
-    const {data} = await Api.addCategory(onUploadProcess, props);
-
-    return data;
-});
-
-export const updateCategoryRequest = createAsyncThunk('categories/update', async (payload = {}) => {
-    const {slugName, onUploadProcess, ...props} = payload;
-    const {data} = await Api.updateCategory(slugName, onUploadProcess, props);
-
-    return data;
-});
-
-export const deleteCategoryRequest = createAsyncThunk('categories/delete', async (payload = {}) => {
+export const singleCategoryRequest = createAsyncThunk('categories/get/single', async (payload = {}, {rejectWithValue}) => {
     const {slugName} = payload;
-    const {data} = await Api.deleteCategory(slugName);
+    let data;
+
+    try{
+        let newData = await Api.singleCategoryList(slugName);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const addCategoryRequest = createAsyncThunk('categories/add', async (payload = {}, {rejectWithValue}) => {
+    const {onUploadProcess, ...props} = payload;
+    let data;
+
+    try{
+        let newData = await Api.addCategory(onUploadProcess, props);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const updateCategoryRequest = createAsyncThunk('categories/update', async (payload = {}, {rejectWithValue}) => {
+    const {slugName, onUploadProcess, ...props} = payload;
+    let data;
+
+    try{
+        let newData = await Api.updateCategory(slugName, onUploadProcess, props);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const deleteCategoryRequest = createAsyncThunk('categories/delete', async (payload = {}, {rejectWithValue}) => {
+    const {id} = payload;
+    let data;
+
+    try{
+        let newData = await Api.deleteCategory(id);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
 
     return data;
 });

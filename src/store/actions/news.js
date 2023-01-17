@@ -1,30 +1,72 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import Api from "../../Api";
 
-export const allNewsListRequest = createAsyncThunk('news/get/all', async (payload = {}) => {
+export const allNewsListRequest = createAsyncThunk('news/get/all', async (payload = {}, {rejectWithValue}) => {
     const {page, title} = payload;
-    const { data } = await Api.getAllNewsList(page, title);
+    let data;
+
+    try{
+        let newData= await Api.getAllNewsList(page, title);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
 
     return data;
 });
 
-export const addNewsRequest = createAsyncThunk('news/add', async (payload = {}) => {
-    const {onUploadProcess, ...params} = payload;
-    const {data} = await Api.addNews(onUploadProcess, params);
-
-    return data;
-});
-
-export const updateNewsRequest = createAsyncThunk('news/update', async (payload = {}) => {
-    const {slugName, onUploadProcess, ...params} = payload;
-    const {data} = await Api.updateNews(slugName, onUploadProcess, params);
-
-    return data;
-});
-
-export const deleteNewsRequest = createAsyncThunk('news/delete', async (payload = {}) => {
+export const singleNewsRequest = createAsyncThunk('news/get/single', async (payload = {}, {rejectWithValue}) => {
     const {slugName} = payload;
-    const {data} = await Api.deleteNews(slugName);
+    let data;
+
+    try{
+        let newData= await Api.getSingleNews(slugName);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const addNewsRequest = createAsyncThunk('news/add', async (payload = {}, {rejectWithValue}) => {
+    const {onUploadProcess, ...params} = payload;
+    let data;
+
+    try{
+        let newData= await Api.addNews(onUploadProcess, params);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const updateNewsRequest = createAsyncThunk('news/update', async (payload = {}, {rejectWithValue}) => {
+    const {slugName, onUploadProcess, ...params} = payload;
+    let data;
+
+    try{
+        let newData= await Api.updateNews(slugName, onUploadProcess, params);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const deleteNewsRequest = createAsyncThunk('news/delete', async (payload = {}, {rejectWithValue}) => {
+    const {id} = payload;
+    let data;
+
+    try{
+        let newData= await Api.deleteNews(id);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
 
     return data;
 });

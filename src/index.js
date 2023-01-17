@@ -8,6 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import reducer from './store/reducers/index';
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-phone-number-input/style.css'
 import Modal from "react-modal";
 
 Modal.setAppElement(document.getElementsByTagName('body'));

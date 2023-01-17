@@ -1,47 +1,33 @@
 import {createReducer} from "@reduxjs/toolkit";
-import {getAdminRequest, getAdminsListRequest, loginRequest} from "../actions/admin";
 import Account from "../../helpers/Account";
 
 const initialState = {
     token: '',
     admin: {},
     adminsList: [],
+    singleAdmin: {},
 }
 
-// export default createReducer(initialState, {
-//     [loginRequest.fulfilled]: (state, action) => {
-//         const remember = action.payload.remember;
-//         const token = action.payload.data.token;
-//
-//         Account.setToken(token, remember);
-//
-//         state.token = token;
-//         state.admin = action.payload.data.admin;
-//     },
-//
-//     [getAdminRequest.fulfilled]: (state, action) => {
-//         state.admin = action.payload.admin;
-//     },
-//
-//     [getAdminsListRequest.fulfilled]: (state, action) => {
-//         state.adminsList = action.payload.admins;
-//     },
-// });
-
 export default createReducer(initialState, (builder) => {
-    builder.addMatcher((action) => action.type.endsWith('admin/login/fulfilled'), (state, action) => {
-        const remember = action.payload.remember;
-        const token = action.payload.data.token;
+    builder
+        .addMatcher((action) => action.type.endsWith('admin/login/fulfilled'), (state, action) => {
+            const remember = action.payload.remember;
+            const token = action.payload.token;
 
-        Account.setToken(token, remember);
+            Account.setToken(token, remember);
 
-        state.token = token;
-        state.admin = action.payload.data.admin;
-    }).addMatcher((action) => action.type.endsWith('admin/admin/fulfilled'), (state, action) => {
-        state.admin = action.payload.admin;
-    }).addMatcher((action) => action.type.endsWith('admins/list/fulfilled'), (state, action) => {
-        state.adminsList = action.payload.admins;
-    })
+            state.token = token;
+            state.admin = action.payload.admin;
+        })
+        .addMatcher((action) => action.type.endsWith('admin/admin/fulfilled'), (state, action) => {
+            state.admin = action.payload.admin;
+        })
+        .addMatcher((action) => action.type.endsWith('admins/list/fulfilled'), (state, action) => {
+            state.adminsList = action.payload.admins;
+        })
+        .addMatcher((action) => action.type.endsWith('admins/single/fulfilled'), (state, action) => {
+            state.singleAdmin = {...action.payload.admin};
+        })
 })
 
 

@@ -1,18 +1,16 @@
-import { createReducer } from "@reduxjs/toolkit";
-import {allCategoriesListRequest} from "../actions/categories";
+import {createReducer} from "@reduxjs/toolkit";
 
 const initialState = {
     categories: [],
+    singleCategory: {},
 }
 
-// export default createReducer(initialState, {
-//     [allCategoriesListRequest.fulfilled]: (state, action) => {
-//         state.categories = [...action.payload.categories];
-//     }
-// });
-
 export default createReducer(initialState, (builder) => {
-    builder.addMatcher((action) => action.type.endsWith('categories/get/all/fulfilled'), (state, action) => {
-        state.categories = [...action.payload.categories];
-    })
+    builder
+        .addMatcher((action) => action.type.endsWith('categories/get/all/fulfilled'), (state, action) => {
+            state.categories = [...action.payload.categories];
+        })
+        .addMatcher((action) => action.type.endsWith('categories/get/single/fulfilled'), (state, action) => {
+            state.singleCategory = {...action.payload.category};
+        })
 })

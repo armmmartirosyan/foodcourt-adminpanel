@@ -16,16 +16,24 @@ export default class Validator{
         return !reg.test(pass) ? "password (at least 1 uppercase letter, 1 number and 8 symbols)" : true;
     }
     static validPhoneNum = (phone) => {
-        const reg = /^\d{11,20}$/;
+        const reg = /^\d{11,}$/;
         return !reg.test(phone) ? "phone number (11-20 numbers)" : true;
     }
-    static validPossibility = (possibility) => {
-        const reg = /^junior|middle|senior$/;
-        return !reg.test(possibility) ? "possibility (junior, middle or senior)" : true;
+    static validPossibility = (role) => {
+        const reg = /^manager|admin manager|senior$/;
+        return !reg.test(role) ? "role (manager, admin manager or admin)" : true;
     }
     static validUUID = (uuid) => {
         const reg = /^.{30,}$/;
         return !reg.test(uuid) ? "uuid token" : true;
+    }
+    static validCountry = (country) => {
+        const reg = /^(?=.*[a-zA-Z]).{3,}$/mg;
+        return !reg.test(country) ? "country (at least 3 letters)" : true;
+    }
+    static validCity = (city) => {
+        const reg = /^(?=.*[a-zA-Z]).{3,}$/mg;
+        return !reg.test(city) ? "city (at least 3 letters)" : true;
     }
     static validTitle = (title) => {
         const reg = /^(?=.*[a-zA-Z]).{3,}$/mg;
@@ -38,10 +46,6 @@ export default class Validator{
     static validDesc = (desc) => {
         const reg = /^(?=.*[a-zA-Z]).{10,}$/mg;
         return !reg.test(desc) ? "description (at least 10 letters)" : true;
-    }
-    static validSlug = (slug) => {
-        const reg = /^(?=.*[a-zA-Z]).{3,}$/mg;
-        return !reg.test(slug) ? "slug (at least 3 letters)" : true;
     }
     static validPrice = (price) => {
         const reg = /^[1-9]\d+$/i;

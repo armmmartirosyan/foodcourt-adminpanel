@@ -61,7 +61,7 @@ function Sidebar(props) {
                                     onClick={openCloseProfile}
                                 >
                                     <h6 className="mb-0">{`${admin.firstName} ${admin.lastName}`}</h6>
-                                    <span>Admin</span>
+                                    <span>{_.capitalize(admin.role)}</span>
                                 </div>
                                 <div className={classNames(
                                     'admin__options mt-4',
@@ -87,33 +87,39 @@ function Sidebar(props) {
                         <NavLink to="/home" className="nav-item nav-link">
                             Home
                         </NavLink>
-                        <NavLink to="/products" className="nav-item nav-link">
-                            Products
-                        </NavLink>
-                        <NavLink to="/categories" className="nav-item nav-link">
-                            Categories
-                        </NavLink>
-                        <NavLink to="/news" className="nav-item nav-link">
-                            News
-                        </NavLink>
-                        <NavLink to="/offers" className="nav-item nav-link">
-                            Offers
-                        </NavLink>
-                        <NavLink to="/slides" className="nav-item nav-link">
-                            Slides
-                        </NavLink>
-                        <NavLink to="/maps" className="nav-item nav-link">
-                            Maps
-                        </NavLink>
                         {
-                            admin.possibility === 'senior' ? (
+                            admin.role !== 'manager' ? (
+                                <>
+                                    <NavLink to="/products" className="nav-item nav-link">
+                                        Products
+                                    </NavLink>
+                                    <NavLink to="/categories" className="nav-item nav-link">
+                                        Categories
+                                    </NavLink>
+                                    <NavLink to="/news" className="nav-item nav-link">
+                                        News
+                                    </NavLink>
+                                    <NavLink to="/offers" className="nav-item nav-link">
+                                        Offers
+                                    </NavLink>
+                                    <NavLink to="/slides" className="nav-item nav-link">
+                                        Slides
+                                    </NavLink>
+                                    <NavLink to="/maps" className="nav-item nav-link">
+                                        Maps
+                                    </NavLink>
+                                </>
+                            ) : null
+                        }
+                        {
+                            admin.role === 'admin' ? (
                                 <NavLink to="/users" className="nav-item nav-link">
                                     Users
                                 </NavLink>
                             ) : null
                         }
                         {
-                            admin.possibility === 'senior' ? (
+                            admin.role === 'admin' ? (
                                 <NavLink to="/admin" className="nav-item nav-link">
                                     Admin
                                 </NavLink>
@@ -138,7 +144,7 @@ function Sidebar(props) {
                     <h6 className="mb-4">
                         Log Out ?
                     </h6>
-                    <div className='modal-btn-container'>
+                    <div className='btn-container'>
                         <button
                             className="btn btn-danger"
                             onClick={openCloseModal}

@@ -8,6 +8,7 @@ import offers from "./offers";
 import slides from "./slides";
 import users from "./users";
 import map from "./map";
+import orders from "./orders";
 
 export default combineReducers({
     status,
@@ -19,4 +20,5 @@ export default combineReducers({
     slides,
     users,
     map,
+    orders,
 })

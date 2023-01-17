@@ -6,7 +6,7 @@ function EmptyPage() {
     return (
         <div className='empty_page'>
             <FontAwesomeIcon icon={faPager} />
-            <p>Empty page</p>
+            <p>Empty</p>
         </div>
     );
 }

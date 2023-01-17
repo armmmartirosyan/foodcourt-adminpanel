@@ -8,13 +8,24 @@ import Sidebar from "./Sidebar";
 import Spinner from "react-bootstrap/Spinner";
 import PropTypes from "prop-types";
 import {Helmet} from "react-helmet";
+import {socketDisconnect, socketInit} from "../store/actions/socket";
 
 function Wrapper(props) {
     const {children, pageName, statuses, uploadProcess} = props;
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const admin = useSelector(state => state.admin.admin);
     const [status, setStatus] = useState('');
+    const admin = useSelector(state => state.admin.admin);
+    const token = useSelector((store) => store.admin.token);
+
+    useEffect(() => {
+        const accountToken = token || Account.getToken();
+        if (accountToken) {
+            dispatch(socketInit(accountToken));
+        } else {
+            dispatch(socketDisconnect());
+        }
+    }, [token]);
 
     useEffect(() => {
         setStatus(Object.values(statuses || {}));
@@ -29,7 +40,7 @@ function Wrapper(props) {
             (async () => {
                 const data = await dispatch(getAdminRequest());
 
-                if(data.error){
+                if(data.payload?.status === "error" || data.payload?.status !== "ok"){
                     Account.deleteToken();
                     navigate('/');
                 }
@@ -43,7 +54,9 @@ function Wrapper(props) {
                 <title>{_.capitalize(pageName)}</title>
             </Helmet>
             <Sidebar pageName={pageName}/>
-            {children}
+            <div className="bg-light rounded h-100 p-4">
+                {children}
+            </div>
             {
                 status.includes('pending') ? (
                     <div className='spinner-container'>
@@ -61,7 +74,7 @@ function Wrapper(props) {
 }
 Wrapper.propTypes = {
     pageName: PropTypes.string.isRequired,
-    children: PropTypes.any.isRequired,
+    children: PropTypes.any,
     statuses: PropTypes.object,
     uploadProcess: PropTypes.number,
 }

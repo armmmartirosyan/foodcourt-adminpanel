@@ -8,19 +8,19 @@ function SingleImage(props) {
     const {image, obj, handleChangeImage} = props;
 
     return (
-        <figure className='modal-img-container'>
+        <figure className='image-container'>
             <img
                 src={
                     !_.isEmpty(image) ? image._src
                         : `${REACT_APP_API_URL}/${obj.imagePath}`
                 }
                 alt="image"
-                className='modal-img'
+                className='image'
             />
             {
-                image.type ? (
+                !_.isEmpty(image) && image.type && handleChangeImage ? (
                     <div
-                        className="modal-img-delete"
+                        className="image-delete"
                         onClick={() => {
                             handleChangeImage({target: {files: []}})
                         }}
@@ -35,6 +35,6 @@ function SingleImage(props) {
 SingleImage.propTypes = {
     image: PropTypes.object.isRequired,
     obj: PropTypes.object.isRequired,
-    handleChangeImage: PropTypes.func.isRequired,
+    handleChangeImage: PropTypes.func,
 }
 export default SingleImage;

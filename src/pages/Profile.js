@@ -11,6 +11,7 @@ import {
     modifyCurrentAccountRequest
 } from "../store/actions/admin";
 import Validator from "../helpers/Validator";
+import Helper from "../helpers/Helper";
 
 function Profile() {
     const dispatch = useDispatch();
@@ -103,20 +104,21 @@ function Profile() {
             [value.key]: value.value
         }));
 
-        if (data.error) {
-            toast.error(data.error.message);
-        } else if (data.payload?.status === 'ok') {
-            await dispatch(getAdminRequest());
-            openCloseModal();
-            toast.success('Account modified successfully.');
+        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+            return;
         }
+
+        await dispatch(getAdminRequest());
+        openCloseModal();
+        toast.success('Account modified successfully.');
     }, [value]);
 
     const handleGetKey = useCallback(async () => {
         const data = await dispatch(getKeyRequest({email: value.value}));
 
-        if (data.error) {
-            toast.error("Something wrong with email!");
+        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
@@ -151,13 +153,13 @@ function Profile() {
             confirmPassword: newValues.confirmPassword,
         }));
 
-        if (data.error) {
-            toast.error("Something goes wrong!");
+        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
-        }else if(data.payload.status === 'ok'){
-            openClosePassModal();
-            toast.success('Password changed successfully.');
         }
+
+        openClosePassModal();
+        toast.success('Password changed successfully.');
     }, [newValues]);
 
     return (
@@ -165,71 +167,74 @@ function Profile() {
             pageName='profile'
             statuses={{statusModify, getAdminStatus, getKeyStatus, changePassStatus}}
         >
-            <div className="col-12">
-                <div className="bg-light rounded h-100 p-4 d-flex justify-content-between header">
-                    <h6>{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
-                </div>
-                {
-                    !_.isEmpty(admin) ? (
-                        <div className="profile__table">
-                            <table className="table">
-                                <tbody>
-                                <tr
-                                    className='profile__row'
-                                    onClick={() => {
-                                        openCloseModal('firstName', admin.firstName, 'First Name')
-                                    }}
-                                >
-                                    <td>First Name</td>
-                                    <td>{admin.firstName}</td>
-                                    <td>></td>
-                                </tr>
-                                <tr
-                                    className='profile__row'
-                                    onClick={() => {
-                                        openCloseModal('lastName', admin.lastName, 'Last Name')
-                                    }}
-                                >
-                                    <td>Last Name</td>
-                                    <td>{admin.lastName}</td>
-                                    <td>></td>
-                                </tr>
-                                <tr
-                                    className='profile__row'
-                                    onClick={() => {
-                                        openCloseModal('phoneNum', admin.phoneNum, 'Phone Number')
-                                    }}
-                                >
-                                    <td>Phone Num</td>
-                                    <td>{admin.phoneNum}</td>
-                                    <td>></td>
-                                </tr>
-                                <tr
-                                    className='profile__row'
-                                    onClick={() => {
-                                        openCloseModal('email', admin.email, 'Email')
-                                    }}
-                                >
-                                    <td>Password</td>
-                                    <td>Forgot password?</td>
-                                    <td>></td>
-                                </tr>
-                                <tr className='profile__row'>
-                                    <td>Email</td>
-                                    <td>{admin.email}</td>
-                                    <td></td>
-                                </tr>
-                                <tr className='profile__row'>
-                                    <td>Possibility</td>
-                                    <td>{admin.possibility}</td>
-                                    <td></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : null
-                }
+            <div className="d-flex justify-content-between header">
+                <h6>{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
             </div>
+            {
+                !_.isEmpty(admin) ? (
+                    <div className="profile__table">
+                        <table className="table">
+                            <tbody>
+                            <tr
+                                className='profile__row'
+                                onClick={() => {
+                                    openCloseModal('firstName', admin.firstName, 'First Name')
+                                }}
+                            >
+                                <td>First Name</td>
+                                <td>{admin.firstName}</td>
+                                <td>></td>
+                            </tr>
+                            <tr
+                                className='profile__row'
+                                onClick={() => {
+                                    openCloseModal('lastName', admin.lastName, 'Last Name')
+                                }}
+                            >
+                                <td>Last Name</td>
+                                <td>{admin.lastName}</td>
+                                <td>></td>
+                            </tr>
+                            <tr
+                                className='profile__row'
+                                onClick={() => {
+                                    openCloseModal('phoneNum', admin.phoneNum, 'Phone Number')
+                                }}
+                            >
+                                <td>Phone Num</td>
+                                <td>{admin.phoneNum}</td>
+                                <td>></td>
+                            </tr>
+                            <tr
+                                className='profile__row'
+                                onClick={() => {
+                                    openCloseModal('email', admin.email, 'Email')
+                                }}
+                            >
+                                <td>Password</td>
+                                <td>Forgot password?</td>
+                                <td>></td>
+                            </tr>
+                            <tr className='profile__row'>
+                                <td>Email</td>
+                                <td>{admin.email}</td>
+                                <td></td>
+                            </tr>
+                            <tr className='profile__row'>
+                                <td>Role</td>
+                                <td>{admin.role}</td>
+                                <td></td>
+                            </tr>
+                            <tr className='profile__row'>
+                                <td>Branch</td>
+                                <td>{admin.branchId || 'All branches'}</td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                ) : null
+            }
 
             <Modal
                 isOpen={modalIsOpen}
@@ -260,9 +265,9 @@ function Profile() {
                         />
                         <label htmlFor='name'>{value.name}</label>
                     </div>
-                    <div className='modal-btn-container'>
+                    <div className='btn-container'>
                         <button
-                            className="btn btn-danger"
+                            className="btn btn-outline-danger"
                             onClick={() => {
                                 openCloseModal()
                             }}
@@ -335,9 +340,9 @@ function Profile() {
                         />
                         <label htmlFor='confirmPassword'>Confirm password</label>
                     </div>
-                    <div className='modal-btn-container'>
+                    <div className='btn-container'>
                         <button
-                            className="btn btn-danger"
+                            className="btn btn-outline-danger"
                             onClick={() => {
                                 openClosePassModal();
                                 openCloseModal('email', admin.email, 'Email');
