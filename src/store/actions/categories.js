@@ -44,11 +44,11 @@ export const addCategoryRequest = createAsyncThunk('categories/add', async (payl
 });
 
 export const updateCategoryRequest = createAsyncThunk('categories/update', async (payload = {}, {rejectWithValue}) => {
-    const {slugName, onUploadProcess, ...props} = payload;
+    const {id, onUploadProcess, ...props} = payload;
     let data;
 
     try{
-        let newData = await Api.updateCategory(slugName, onUploadProcess, props);
+        let newData = await Api.updateCategory(id, onUploadProcess, props);
         data = newData.data;
     }catch (e) {
         return rejectWithValue(e.response.data);

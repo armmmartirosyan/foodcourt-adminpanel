@@ -44,11 +44,11 @@ export const addProductRequest = createAsyncThunk('products/add', async (payload
 });
 
 export const updateProductRequest = createAsyncThunk('products/update', async (payload = {}, {rejectWithValue}) => {
-    const {slugName, onUploadProcess, ...params} = payload;
+    const {id, onUploadProcess, ...params} = payload;
     let data;
 
     try{
-        let newData = await Api.updateProduct(slugName, onUploadProcess, params);
+        let newData = await Api.updateProduct(id, onUploadProcess, params);
         data = newData.data;
     }catch (e) {
         return rejectWithValue(e.response.data);

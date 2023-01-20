@@ -2,7 +2,6 @@ import React, {useCallback, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
-import Modal from "react-modal";
 import Wrapper from "../components/Wrapper";
 import {
     changePassRequest,
@@ -12,6 +11,47 @@ import {
 } from "../store/actions/admin";
 import Validator from "../helpers/Validator";
 import Helper from "../helpers/Helper";
+import ProfileTable from "../components/ProfileTable";
+import UpdateValues from "../components/UpdateValues";
+import ChangePassword from "../components/ChangePassword";
+
+const data = [
+    {
+        path: 'firstName',
+        label: 'First Name',
+        edit: true,
+    },
+    {
+        path: 'lastName',
+        label: 'Last Name',
+        edit: true,
+    },
+    {
+        path: 'phoneNum',
+        label: 'Phone Number',
+        edit: true,
+    },
+    {
+        path: 'email',
+        label: 'Password',
+        edit: true,
+    },
+    {
+        path: 'email',
+        label: 'Email',
+        edit: false,
+    },
+    {
+        path: 'role',
+        label: 'Role',
+        edit: false,
+    },
+    {
+        path: 'branchId',
+        label: 'Branch',
+        edit: false,
+    },
+];
 
 function Profile() {
     const dispatch = useDispatch();
@@ -20,8 +60,7 @@ function Profile() {
     const getKeyStatus = useSelector(state => state.status.adminGetKeyStatus);
     const changePassStatus = useSelector(state => state.status.adminChangePassStatus);
     const statusModify = useSelector(state => state.status.adminModifyCurrentStatus);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [passwordModalIsOpen, setPasswordModalIsOpen] = useState(false);
+    const [state, setState] = useState('');
     const [newValues, setNewValues] = useState({
         token: '',
         password: '',
@@ -33,49 +72,24 @@ function Profile() {
         value: '',
     });
 
-    const openCloseModal = useCallback((key, val, name) => {
-        if (modalIsOpen) {
-            setValue({
-                key: '',
-                name: '',
-                value: '',
-            });
-
-            setNewValues({
-                ...newValues,
-                password: '',
-                token: '',
-                confirmPassword: '',
-            });
-        } else if (key && val && name) {
+    const updateValues = useCallback((key, val, name) => {
+        if (key && val && name) {
             setValue({
                 key,
                 name,
                 value: val,
             });
+        }else{
+           setValue({
+               key: '',
+               name: '',
+               value: '',
+           });
         }
 
-        setModalIsOpen(!modalIsOpen);
-    }, [modalIsOpen, newValues]);
+    }, []);
 
-    const openClosePassModal = useCallback(() => {
-        setNewValues({
-            ...newValues,
-            password: '',
-            token: '',
-            confirmPassword: '',
-        });
-        setPasswordModalIsOpen(!passwordModalIsOpen);
-    }, [passwordModalIsOpen, newValues]);
-
-    const handleChangeValue = useCallback((val) => {
-        setValue({
-            ...value,
-            value: val,
-        });
-    }, [value]);
-
-    const handleChangeNewValues = useCallback((key, val) => {
+    const handleChangeNewValues = useCallback((val, key) => {
         setNewValues({
             ...newValues,
             [key]: val,
@@ -110,7 +124,8 @@ function Profile() {
         }
 
         await dispatch(getAdminRequest());
-        openCloseModal();
+
+        updateValues();
         toast.success('Account modified successfully.');
     }, [value]);
 
@@ -122,15 +137,13 @@ function Profile() {
             return;
         }
 
-        openCloseModal();
-        openClosePassModal();
+        updateValues();
+        setState('changePass');
         toast.success('Key sent successfully.');
     }, [value, newValues]);
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validPass(newValues.password),
-            Validator.validPass(newValues.confirmPassword),
             Validator.validUUID(newValues.token),
         ];
 
@@ -158,209 +171,54 @@ function Profile() {
             return;
         }
 
-        openClosePassModal();
+        setState('');
+        setNewValues({
+            token: '',
+            password: '',
+            confirmPassword: ''
+        });
         toast.success('Password changed successfully.');
     }, [newValues]);
 
     return (
         <Wrapper
-            pageName='profile'
+            pageName={`profile ${!_.isEmpty(admin) ? `${admin.firstName}` : ''}`}
             statuses={{statusModify, getAdminStatus, getKeyStatus, changePassStatus}}
         >
             <div className="d-flex justify-content-between header">
                 <h6>{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
             </div>
             {
-                !_.isEmpty(admin) ? (
-                    <div className="profile__table">
-                        <table className="table">
-                            <tbody>
-                            <tr
-                                className='profile__row'
-                                onClick={() => {
-                                    openCloseModal('firstName', admin.firstName, 'First Name')
-                                }}
-                            >
-                                <td>First Name</td>
-                                <td>{admin.firstName}</td>
-                                <td>></td>
-                            </tr>
-                            <tr
-                                className='profile__row'
-                                onClick={() => {
-                                    openCloseModal('lastName', admin.lastName, 'Last Name')
-                                }}
-                            >
-                                <td>Last Name</td>
-                                <td>{admin.lastName}</td>
-                                <td>></td>
-                            </tr>
-                            <tr
-                                className='profile__row'
-                                onClick={() => {
-                                    openCloseModal('phoneNum', admin.phoneNum, 'Phone Number')
-                                }}
-                            >
-                                <td>Phone Num</td>
-                                <td>{admin.phoneNum}</td>
-                                <td>></td>
-                            </tr>
-                            <tr
-                                className='profile__row'
-                                onClick={() => {
-                                    openCloseModal('email', admin.email, 'Email')
-                                }}
-                            >
-                                <td>Password</td>
-                                <td>Forgot password?</td>
-                                <td>></td>
-                            </tr>
-                            <tr className='profile__row'>
-                                <td>Email</td>
-                                <td>{admin.email}</td>
-                                <td></td>
-                            </tr>
-                            <tr className='profile__row'>
-                                <td>Role</td>
-                                <td>{admin.role}</td>
-                                <td></td>
-                            </tr>
-                            <tr className='profile__row'>
-                                <td>Branch</td>
-                                <td>{admin.branchId || 'All branches'}</td>
-                                <td></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                !_.isEmpty(admin) && !value.key && !state ? (
+                    <ProfileTable
+                        updateValues={updateValues}
+                        admin={admin}
+                        data={data}
+                    />
                 ) : null
             }
-
-            <Modal
-                isOpen={modalIsOpen}
-                className="modal small"
-                overlayClassName="overlay"
-                onRequestClose={() => {
-                    openCloseModal()
-                }}
-            >
-                <div className="bg-light rounded h-100 p-4 modal-container">
-                    <div
-                        className="modal_close"
-                        onClick={() => {openCloseModal()}}
-                    >
-                        X
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            id='name'
-                            disabled={value.key === 'email'}
-                            placeholder={value.name}
-                            value={value.value}
-                            onChange={(e) => {
-                                handleChangeValue(e.target.value)
-                            }}
-                        />
-                        <label htmlFor='name'>{value.name}</label>
-                    </div>
-                    <div className='btn-container'>
-                        <button
-                            className="btn btn-outline-danger"
-                            onClick={() => {
-                                openCloseModal()
-                            }}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className="btn btn-primary"
-                            onClick={value.key === 'email' ? handleGetKey : handleModifyAccount}
-                        >
-                            {
-                                value.key === 'email' ? 'Get Key' : 'Modify'
-                            }
-                        </button>
-                    </div>
-                </div>
-            </Modal>
-
-            <Modal
-                isOpen={passwordModalIsOpen}
-                className="modal small"
-                overlayClassName="overlay"
-                onRequestClose={() => {
-                    openClosePassModal()
-                }}
-            >
-                <div className="bg-light rounded h-100 p-4 modal-container">
-                    <div
-                        className="modal_close"
-                        onClick={() => {openClosePassModal()}}
-                    >
-                        X
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            id='token'
-                            placeholder='Token'
-                            value={newValues.token}
-                            onChange={(e) => {
-                                handleChangeNewValues('token', e.target.value)
-                            }}
-                        />
-                        <label htmlFor='token'>Token</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="password"
-                            className="form-control"
-                            id='password'
-                            placeholder='Password'
-                            value={newValues.password}
-                            onChange={(e) => {
-                                handleChangeNewValues('password', e.target.value)
-                            }}
-                        />
-                        <label htmlFor='password'>Password</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                        <input
-                            type="password"
-                            className="form-control"
-                            id='confirmPassword'
-                            placeholder='Confirm password'
-                            value={newValues.confirmPassword}
-                            onChange={(e) => {
-                                handleChangeNewValues('confirmPassword', e.target.value)
-                            }}
-                        />
-                        <label htmlFor='confirmPassword'>Confirm password</label>
-                    </div>
-                    <div className='btn-container'>
-                        <button
-                            className="btn btn-outline-danger"
-                            onClick={() => {
-                                openClosePassModal();
-                                openCloseModal('email', admin.email, 'Email');
-                            }}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className="btn btn-primary"
-                            onClick={async () => {
-                                await handleChangePass();
-                            }}
-                        >
-                            Change Password
-                        </button>
-                    </div>
-                </div>
-            </Modal>
+            {
+                !_.isEmpty(admin) && value.key ? (
+                    <UpdateValues
+                        value={value}
+                        setValue={setValue}
+                        backFunc={updateValues}
+                        forwardFunc={value.key === 'email' ? handleGetKey : handleModifyAccount}
+                    />
+                ) : null
+            }
+            {
+                !_.isEmpty(admin) && state === 'changePass' ? (
+                        <div className="profile__table">
+                            <ChangePassword
+                                handleChange={handleChangeNewValues}
+                                values={newValues}
+                                forwardFunc={handleChangePass}
+                                backFunc={() => {setState('')}}
+                            />
+                        </div>
+                ) : null
+            }
         </Wrapper>
     );
 }

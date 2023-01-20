@@ -69,12 +69,14 @@ function ProductsChart() {
 
             const productData = data.payload.data.products;
 
-            setProducts(productData.map(product => {
-                return {
-                    label: product.title,
-                    value: product.id
-                }
-            }));
+            if(!_.isEmpty(productData)){
+                setProducts(productData.map(product => {
+                    return {
+                        label: product.title,
+                        value: product.id
+                    }
+                }));
+            }
         })()
     }, []);
 

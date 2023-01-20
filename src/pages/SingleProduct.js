@@ -63,12 +63,14 @@ function SingleProduct() {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
 
-                setProduct({...data.payload.product});
+                const tempProduct = data?.payload?.product;
+
+                setProduct({...tempProduct});
                 setValues({
-                    title: data.payload.product.title,
-                    description: data.payload.product.description,
-                    price: data.payload.product.price,
-                    categoryId: [...data.payload.product.categories.map(c => c.id)],
+                    title: tempProduct.title,
+                    description: tempProduct.description,
+                    price: tempProduct.price,
+                    categoryId: [...tempProduct.categories.map(c => c.id)],
                 });
             })()
         }
@@ -145,7 +147,6 @@ function SingleProduct() {
             values.title ? Validator.validTitle(values.title) : true,
             values.description ? Validator.validDesc(values.description) : true,
             values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
-            /*!_.isEmpty(values.categoryId) ? Validator.validSlug(values.categorySlugs) : true,*/
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -163,7 +164,7 @@ function SingleProduct() {
         }
 
         const data = await dispatch(updateProductRequest({
-            slugName: product.slugName,
+            id: product.id,
             title: values.title || undefined,
             description: values.description || undefined,
             price: values.price || undefined,
@@ -177,6 +178,7 @@ function SingleProduct() {
 
         if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+            return;
         }
 
         toast.success('Product updated successfully.');

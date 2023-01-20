@@ -48,12 +48,12 @@ function SingleOrder() {
             return;
         }
 
-        navigate(-1);
+        navigate('/home');
     }, []);
 
     return (
         <Wrapper
-            pageName='order'
+            pageName={`order${params.id ? ` - ${params.id}` : ''}`}
             statuses={{statusSingleOrder}}
         >
             <h6 className="title">Order Products</h6>

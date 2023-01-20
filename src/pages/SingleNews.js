@@ -42,11 +42,13 @@ function SingleNews() {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
 
+                const tempNews = data?.payload?.singleNews;
+
                 setValues({
-                    title: data.payload.singleNews.title,
-                    description: data.payload.singleNews.description,
+                    title: tempNews.title,
+                    description: tempNews.description,
                 });
-                setNews({...data.payload.singleNews});
+                setNews({...tempNews});
             })()
         }
     }, [params.slugName]);
@@ -131,7 +133,7 @@ function SingleNews() {
         }
 
         const data = await dispatch(updateNewsRequest({
-            slugName: news.slugName,
+            id: news.id,
             title: values.title || undefined,
             description: values.description || undefined,
             image: image.type ? image : undefined,

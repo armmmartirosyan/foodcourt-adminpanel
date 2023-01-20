@@ -44,11 +44,11 @@ export const addNewsRequest = createAsyncThunk('news/add', async (payload = {}, 
 });
 
 export const updateNewsRequest = createAsyncThunk('news/update', async (payload = {}, {rejectWithValue}) => {
-    const {slugName, onUploadProcess, ...params} = payload;
+    const {id, onUploadProcess, ...params} = payload;
     let data;
 
     try{
-        let newData= await Api.updateNews(slugName, onUploadProcess, params);
+        let newData= await Api.updateNews(id, onUploadProcess, params);
         data = newData.data;
     }catch (e) {
         return rejectWithValue(e.response.data);

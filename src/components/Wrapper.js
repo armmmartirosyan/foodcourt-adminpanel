@@ -51,7 +51,7 @@ function Wrapper(props) {
     return (
         <div className='content'>
             <Helmet>
-                <title>{_.capitalize(pageName)}</title>
+                <title>{_.startCase(pageName)}</title>
             </Helmet>
             <Sidebar pageName={pageName}/>
             <div className="bg-light rounded h-100 p-4">

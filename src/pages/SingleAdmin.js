@@ -50,17 +50,19 @@ function SingleAdmin() {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
 
-                setAdmin({...data.payload.admin});
+                const tempAdmin = data?.payload?.admin;
+
+                setAdmin({...tempAdmin});
                 setValues({
-                    firstName: data.payload.admin.firstName,
-                    lastName: data.payload.admin.lastName,
-                    email: data.payload.admin.email,
-                    password: data.payload.admin.password,
-                    confirmPassword: data.payload.admin.confirmPassword,
-                    phoneNum: "+" + data.payload.admin.phoneNum,
-                    status: data.payload.admin.status,
-                    role: data.payload.admin.role,
-                    branchId: data.payload.admin.branchId,
+                    firstName: tempAdmin.firstName,
+                    lastName: tempAdmin.lastName,
+                    email: tempAdmin.email,
+                    password: tempAdmin.password,
+                    confirmPassword: tempAdmin.confirmPassword,
+                    phoneNum: "+" + tempAdmin.phoneNum,
+                    status: tempAdmin.status,
+                    role: tempAdmin.role,
+                    branchId: tempAdmin.branchId,
                 });
             })()
         }
@@ -185,10 +187,10 @@ function SingleAdmin() {
     return (
         <Wrapper
             statuses={{statusDelete, statusModify, statusRegister, statusBranchesList}}
-            pageName={`admin${admin.email ? ' - ' + admin.email : ''}`}
+            pageName={`admin ${admin.firstName ? admin.firstName : ''}`}
         >
             <TopBar
-                pageName={`admin${admin.email ? ' - ' + admin.email : ''}`}
+                pageName={`admin ${admin.firstName ? admin.firstName : ''}`}
                 allowAdd={false}
             />
             {

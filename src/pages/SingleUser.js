@@ -50,7 +50,7 @@ function SingleUser() {
     return (
         <Wrapper
             statuses={{statusGetSingle}}
-            pageName={`user${user.email ? ' - ' + user.email : ''}`}
+            pageName={`user ${user.firstName ? user.firstName : ''}`}
         >
             <TopBar
                 pageName={`user${user.email ? ' - ' + user.email : ''}`}

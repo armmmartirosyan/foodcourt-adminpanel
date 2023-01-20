@@ -58,12 +58,14 @@ function SingleOffer() {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
 
-                setOffer({...data.payload.offer});
+                const tempOffer = data?.payload?.offer
+
+                setOffer({...tempOffer});
                 setValues({
-                    title: data.payload.offer.title,
-                    description: data.payload.offer.description,
-                    price: data.payload.offer.price,
-                    categoryId: [...data.payload.offer.categories.map(c => c.id)]
+                    title: tempOffer.title,
+                    description: tempOffer.description,
+                    price: tempOffer.price,
+                    categoryId: [...tempOffer.categories.map(c => c.id)]
                 });
             })()
         }
@@ -151,7 +153,7 @@ function SingleOffer() {
         }
 
         const data = await dispatch(updateOfferRequest({
-            slugName: offer.slugName,
+            id: offer.id,
             title: values.title || undefined,
             description: values.description || undefined,
             price: values.price || undefined,

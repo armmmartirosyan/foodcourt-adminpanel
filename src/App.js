@@ -29,16 +29,15 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path='/home' element={<Home/>}/>
-                    <Route path='/order/:id' element={<SingleOrder/>}/>
-
                     <Route path='/profile' element={<Profile/>}/>
+                    <Route path='/order/:id' element={<SingleOrder/>}/>
 
                     <Route path='/' element={<Login/>}/>
                     <Route path='/forgot-password' element={<ForgotPassword/>}/>
 
                     <Route path='/maps' element={<Branches/>}/>
                     <Route path='/maps/add' element={<SingleBranch/>}/>
-                    <Route path='/maps/:slugName' element={<SingleBranch/>}/>
+                    <Route path='/maps/:id' element={<SingleBranch/>}/>
 
                     <Route path='/users' element={<Users/>}/>
                     <Route path='/users/add' element={<SingleUser/>}/>

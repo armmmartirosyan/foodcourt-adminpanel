@@ -37,9 +37,10 @@ function SingleCategory() {
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
+                const tempCategory = data?.payload?.category;
 
-                setName(data.payload.category.name);
-                setCategory({...data.payload.category})
+                setName(tempCategory.name);
+                setCategory({...tempCategory})
             })()
         }
     }, [params.slugName]);
@@ -111,7 +112,7 @@ function SingleCategory() {
         }
 
         const data = await dispatch(updateCategoryRequest({
-            slugName: category.slugName,
+            id: category.id,
             name: name || undefined,
             image: image.type ? image : undefined,
             onUploadProcess: (ev) => {

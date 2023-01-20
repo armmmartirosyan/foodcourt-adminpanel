@@ -50,8 +50,8 @@ class Api {
         });
     }
 
-    static updateProduct(slugName, onUploadProgress, params) {
-        return api.put(`/products/${slugName}`, params, {
+    static updateProduct(id, onUploadProgress, params) {
+        return api.put(`/products/${id}`, params, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -81,8 +81,8 @@ class Api {
         });
     }
 
-    static updateCategory(slugName, onUploadProgress, props) {
-        return api.put(`/categories/${slugName}`, props, {
+    static updateCategory(id, onUploadProgress, props) {
+        return api.put(`/categories/${id}`, props, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -112,8 +112,8 @@ class Api {
         });
     }
 
-    static updateNews(slugName, onUploadProgress, params) {
-        return api.put(`/news/${slugName}`, params, {
+    static updateNews(id, onUploadProgress, params) {
+        return api.put(`/news/${id}`, params, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -143,8 +143,8 @@ class Api {
         });
     }
 
-    static updateOffer(slugName, onUploadProgress, params) {
-        return api.put(`/offers/${slugName}`, params, {
+    static updateOffer(id, onUploadProgress, params) {
+        return api.put(`/offers/${id}`, params, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -192,8 +192,9 @@ class Api {
         return api.get(`/map/get`);
     }
 
-    static getSingleBranch(slugName) {
-        return api.get(`/map/get/${slugName}`);
+    static getSingleBranch(id) {
+        console.log(id);
+        return api.get(`/map/get/${id}`);
     }
 
     static addBranch(onUploadProgress, params) {
@@ -205,14 +206,14 @@ class Api {
         });
     }
 
-    static updateBranch(slugName, onUploadProgress, params) {
-        return api.put(`/map/${slugName}`, params, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress
-        });
-    }
+    // static updateBranch(slugName, onUploadProgress, params) {
+    //     return api.put(`/map/${slugName}`, params, {
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //         onUploadProgress
+    //     });
+    // }
 
     static deleteBranch(id) {
         return api.delete(`/map/${id}`);

@@ -19,7 +19,6 @@ function SingleSlide() {
     const dispatch = useDispatch();
     const params = useParams();
     const navigate = useNavigate();
-    const slide = useSelector(state => state.slides.singleSlide);
     const admin = useSelector(state => state.admin.admin);
     const statusAdd = useSelector(state => state.status.slidesAddStatus);
     const statusUpdate = useSelector(state => state.status.slidesUpdateStatus);
@@ -27,6 +26,7 @@ function SingleSlide() {
     const statusGetSingle = useSelector(state => state.status.slidesGetSingleStatus);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [image, setImage] = useState({});
+    const [slide, setSlide] = useState({});
 
     useEffect(() => {
         if (params.id) {
@@ -36,6 +36,8 @@ function SingleSlide() {
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
+
+                setSlide({...data.payload.slide});
             })()
         }
     }, [params.id]);

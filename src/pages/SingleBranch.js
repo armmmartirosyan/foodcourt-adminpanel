@@ -38,9 +38,9 @@ function SingleBranch() {
     });
 
     useEffect(() => {
-        if (params.slugName) {
+        if (params.id) {
             (async () => {
-                const data = await dispatch(singleBranchRequest({slugName: params.slugName}));
+                const data = await dispatch(singleBranchRequest({id: params.id}));
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
@@ -59,7 +59,7 @@ function SingleBranch() {
                 ]);
             })()
         }
-    }, [params.slugName]);
+    }, [params.id]);
 
     const handleChangeValues = useCallback((val, key) => {
         setValues({
@@ -210,9 +210,10 @@ function SingleBranch() {
                     singleBranch={values.id ? values : {}}
                     onMapClick={onMapClick}
                     center={center[0] !== 0 ? center : [40.786543, 43.838250]}
-                    allowMapClick={!params.slugName}
+                    allowMapClick={!params.id}
                 />
             </div>
+
             <div className="form-floating mb-3">
                 <input
                     type="text"
@@ -241,6 +242,7 @@ function SingleBranch() {
                 />
                 <label htmlFor="country">Country</label>
             </div>
+
             <div className="form-floating mb-3">
                 <input
                     type="text"
@@ -253,8 +255,10 @@ function SingleBranch() {
                         handleChangeValues(e.target.value, 'city')
                     }}
                 />
+
                 <label htmlFor="city">City</label>
             </div>
+
             <div className="form-floating mb-3">
                 <input
                     type="text"
@@ -267,8 +271,10 @@ function SingleBranch() {
                         handleChangeValues(e.target.value, 'location')
                     }}
                 />
+
                 <label htmlFor="location">Location</label>
             </div>
+
             <div className="form-floating mb-3">
                 <input
                     type="number"
@@ -406,30 +412,3 @@ function SingleBranch() {
 }
 
 export default SingleBranch;
-
-{/*<YMaps*/}
-{/*    query={{*/}
-{/*        ns: 'use-load-option'*/}
-{/*    }}>*/}
-{/*    <Map*/}
-{/*        modules={["geocode"]}*/}
-{/*        width="100%"*/}
-{/*        height="100%"*/}
-{/*        onClick={(e) => {*/}
-{/*            if (!values.id) onMapClick(e);*/}
-{/*        }}*/}
-{/*        defaultState={{*/}
-{/*            center: center[0] !== 0 ? center : [40.786543, 43.838250],*/}
-{/*            zoom: 12,*/}
-{/*        }}*/}
-{/*    >*/}
-{/*        {*/}
-{/*            values.id ? (*/}
-{/*                <YandexPlacemark*/}
-{/*                    geometry={[+values.lat, +values.lon]}*/}
-{/*                    slugName=''*/}
-{/*                />*/}
-{/*            ) : null*/}
-{/*        }*/}
-{/*    </Map>*/}
-{/*</YMaps>*/}

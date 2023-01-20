@@ -34,7 +34,7 @@ function YandexMap(props) {
                             <YandexPlacemark
                                 key={branchObj.id}
                                 geometry={[branchObj.lat, branchObj.lon]}
-                                slugName={branchObj.slugName}
+                                id={branchObj.id}
                             />
                         ))
                     ) : null
