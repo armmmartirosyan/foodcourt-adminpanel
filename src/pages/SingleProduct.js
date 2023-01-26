@@ -7,21 +7,19 @@ import _ from "lodash";
 import Helper from "../helpers/Helper";
 import {
     addProductRequest,
-    deleteProductRequest, singleProductRequest,
+    deleteProductRequest,
+    singleProductRequest,
     updateProductRequest
 } from "../store/actions/products";
 import Validator from "../helpers/Validator";
-import SingleImage from "../components/SingleImage";
-import Select from "react-select";
-import moment from "moment";
 import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
+import Single from "../components/Single";
 
 function SingleProduct() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const params = useParams();
-    const products = useSelector(state => state.products.products);
     const statusGetSingle = useSelector(state => state.status.productsGetSingleStatus);
     const statusAdd = useSelector(state => state.status.productsAddStatus);
     const statusUpdate = useSelector(state => state.status.productsUpdateStatus);
@@ -29,14 +27,48 @@ function SingleProduct() {
     const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [product, setProduct] = useState({});
-    const [image, setImage] = useState({});
     const [categories, setCategories] = useState([]);
     const [values, setValues] = useState({
         title: '',
         description: '',
         price: 0,
         categoryId: [],
+        image: {},
     });
+
+    const drawData = [
+        {
+            path: ['image'],
+            label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['title'],
+            label: 'Title',
+            disabled: false,
+        },
+        {
+            path: ['description'],
+            label: 'Description',
+            disabled: false,
+        },
+        {
+            path: ['price'],
+            label: 'Price(AMD)',
+            disabled: false,
+        },
+        {
+            path: ['categories'],
+            label: 'Select Categories',
+            array: [...categories],
+            disabled: false,
+        },
+        {
+            path: ['imageSelect'],
+            label: 'Select Image',
+            disabled: false,
+        },
+    ];
 
     useEffect(() => {
         (async () => {
@@ -67,48 +99,51 @@ function SingleProduct() {
 
                 setProduct({...tempProduct});
                 setValues({
+                    ...values,
                     title: tempProduct.title,
                     description: tempProduct.description,
                     price: tempProduct.price,
-                    categoryId: [...tempProduct.categories.map(c => c.id)],
+                    categoryId: [...(tempProduct?.categories?.map(c => c.id) || [])],
                 });
             })()
         }
     }, [params.slugName]);
 
     const handleChangeValues = useCallback((val, key) => {
-        setValues({
-            ...values,
-            [key]: val,
-        })
-    }, [values]);
+        if(key === 'image' && val.target
+            && !_.isEmpty(val.target.files)){
+            const {files} = val.target;
 
-    const handleChangeImage = useCallback((e) => {
-        const {files} = e.target;
-
-        if (files.length) {
             files[0]._src = URL.createObjectURL(files[0]);
-            setImage(files[0]);
-        } else {
-            setImage({});
+            setValues({
+                ...values,
+                [key]: files[0],
+            });
+        }else if(key === 'image'){
+            setValues({
+                ...values,
+                [key]: {},
+            });
+        }else if(key === 'categories'){
+            const ids = val.map(d => d.value);
+
+            setValues({
+                ...values,
+                categoryId: ids
+            });
+        }else{
+            setValues({
+                ...values,
+                [key]: val,
+            });
         }
-    }, []);
-
-    const onChangeSelect = useCallback((data) => {
-        const ids = data.map(d => d.value);
-
-        setValues({
-            ...values,
-            categoryId: ids
-        })
     }, [values]);
 
     const handleAddProduct = useCallback(async () => {
         const validateValues = [
-            Validator.validTitle(values.title),
-            Validator.validDesc(values.description),
-            Validator.validPrice(values.price),
-            //Validator.validSlug(values.categorySlug),
+            Validator.validString(values.title),
+            Validator.validString(values.description),
+            Validator.validNumGreatOne(values.price),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -117,7 +152,7 @@ function SingleProduct() {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image!");
             return;
         }
@@ -127,7 +162,7 @@ function SingleProduct() {
             description: values.description,
             price: values.price,
             categoryId: values.categoryId,
-            image,
+            image: values.image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -136,17 +171,18 @@ function SingleProduct() {
 
         if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+            return;
         }
 
         toast.success('Product added successfully.');
         navigate('/products');
-    }, [image, values]);
+    }, [values]);
 
     const handleUpdateProduct = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validTitle(values.title) : true,
-            values.description ? Validator.validDesc(values.description) : true,
-            values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
+            values.title ? Validator.validString(values.title) : true,
+            values.description ? Validator.validString(values.description) : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -158,7 +194,7 @@ function SingleProduct() {
 
         if (!values.title && !values.categorySlug
             && !values.description && !values.price
-            && !image.type) {
+            && !values.image.type) {
             toast.error("Fill one of fields!");
             return;
         }
@@ -169,7 +205,7 @@ function SingleProduct() {
             description: values.description || undefined,
             price: values.price || undefined,
             categoryId: !_.isEmpty(values.categoryId) ? values.categoryId : undefined,
-            image: image.type ? image : undefined,
+            image: values.image.type ? values.image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -183,7 +219,7 @@ function SingleProduct() {
 
         toast.success('Product updated successfully.');
         navigate('/products');
-    }, [image, values]);
+    }, [values]);
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
@@ -196,7 +232,7 @@ function SingleProduct() {
 
         toast.success('Product deleted successfully.');
         navigate('/products');
-    }, [products]);
+    }, []);
 
     return (
         <Wrapper
@@ -208,108 +244,13 @@ function SingleProduct() {
                 pageName={`product${product.title ? ' - ' + product.title : ''}`}
                 allowAdd={false}
             />
-            {
-                !_.isEmpty(product) || !_.isEmpty(image) ? (
-                    <SingleImage
-                        image={image}
-                        obj={product}
-                        handleChangeImage={handleChangeImage}
-                    />
-                ) : null
-            }
-            <div className="form-floating mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    placeholder="Title"
-                    value={values.title}
-                    disabled={admin && admin.role === 'manager'}
-                    onChange={(e) => {
-                        handleChangeValues(e.target.value, 'title')
-                    }}
-                />
-                <label htmlFor="title">Title</label>
-            </div>
-            <div className="form-floating mb-3">
-                        <textarea
-                            className="form-control"
-                            placeholder="Description"
-                            id="description"
-                            style={{height: '150px'}}
-                            disabled={admin && admin.role === 'manager'}
-                            value={values.description}
-                            onChange={(e) => {
-                                handleChangeValues(e.target.value, 'description')
-                            }}
-                        />
-                <label htmlFor="description">Description</label>
-            </div>
-            <div className="form-floating mb-3">
-                <input
-                    type="number"
-                    className="form-control"
-                    id="price"
-                    placeholder="Price"
-                    disabled={admin && admin.role === 'manager'}
-                    value={values.price}
-                    onChange={(e) => {
-                        handleChangeValues(e.target.value, 'price')
-                    }}
-                />
-                <label htmlFor="price">Price(AMD)</label>
-            </div>
-            {
-                !_.isEmpty(categories)
-                && (!_.isEmpty(product) || !params.slugName) ? (
-                    <div className="mb-3">
-                        <label htmlFor="category-select" className="form-label">Select Categories</label>
-                        <Select
-                            defaultValue={!_.isEmpty(product) ?
-                                product.categories.map(cat => {
-                                    return {value: cat.id, label: cat.name}
-                                }) : undefined
-                            }
-                            isMulti
-                            name="colors"
-                            options={categories}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={onChangeSelect}
-                            id='category-select'
-                        />
-                    </div>
-                ) : null
-            }
-            <div className="mb-3">
-                <label htmlFor="formFile" className="form-label">Select Image</label>
-                <input
-                    className="form-control"
-                    type="file"
-                    id="formFile"
-                    disabled={admin && admin.role === 'manager'}
-                    accept="image/*"
-                    onChange={handleChangeImage}
-                />
-            </div>
-            {
-                !_.isEmpty(product) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(product.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(product.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
-                ) : null
-            }
+
+            <Single
+                drawData={drawData}
+                obj={product}
+                changeValues={handleChangeValues}
+                values={values}
+            />
 
             <div className='btn-container'>
                 <button

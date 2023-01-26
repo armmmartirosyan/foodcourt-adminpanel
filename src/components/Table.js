@@ -32,7 +32,7 @@ function Table(props) {
                                 onWay: tempItem.status === 'onTheWay',
                             })}
                         onClick={() => {
-                            navigate(`/${path}/${tempItem.slugName || tempItem.id}`);
+                            if(path) navigate(`/${path}/${tempItem.slugName || tempItem.id}`);
                         }}
                     >
                         {

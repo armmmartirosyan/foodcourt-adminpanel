@@ -53,7 +53,8 @@ function ForgotPassword() {
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validUUID(values.token),
+            Validator.validEmail(values.email),
+            Validator.validEverySymbol(values.token),
         ];
 
         const invalidValue = validateValues.find((v) => v !== true);

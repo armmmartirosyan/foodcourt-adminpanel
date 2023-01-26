@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 function SwitchBtn(props) {
     const {order, modifyOrder} = props;
@@ -57,6 +58,11 @@ function SwitchBtn(props) {
             }
         </>
     );
+}
+
+SwitchBtn.propTypes = {
+    order: PropTypes.object.isRequired,
+    modifyOrder: PropTypes.func.isRequired,
 }
 
 export default SwitchBtn;

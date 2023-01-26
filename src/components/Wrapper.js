@@ -72,9 +72,10 @@ function Wrapper(props) {
         </div>
     );
 }
+
 Wrapper.propTypes = {
     pageName: PropTypes.string.isRequired,
-    children: PropTypes.any,
+    children: PropTypes.any.isRequired,
     statuses: PropTypes.object,
     uploadProcess: PropTypes.number,
 }

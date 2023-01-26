@@ -2,10 +2,24 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {notReceivedOrdersListRequest} from "../store/actions/orders";
-import OrderRow from "./OrderRow";
-import EmptyPage from "./EmptyPage";
 import {toast} from "react-toastify";
 import Helper from "../helpers/Helper";
+import Table from "./Table";
+
+const tableHeader = [
+    {
+        path:['id'],
+        label:'ID',
+    },
+    {
+        path:['user', 'phoneNum'],
+        label:'User Phone Number',
+    },
+    {
+        path:['createdAt'],
+        label:'Date',
+    },
+];
 
 function Orders() {
     const dispatch = useDispatch();
@@ -25,32 +39,17 @@ function Orders() {
     }, [admin]);
 
     return (
-        <div className="table-responsive">
-            <h6 className='title'>Orders</h6>
+        <>
             {
                 !_.isEmpty(notReceivedOrders) ? (
-                    <table className="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">User Phone Number</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            notReceivedOrders.map(order => (
-                                <OrderRow
-                                    order={order}
-                                    key={order.id}
-                                />
-                            ))
-                        }
-                        </tbody>
-                    </table>
-                ) : <EmptyPage/>
+                    <Table
+                        tableHeader={tableHeader}
+                        list={notReceivedOrders}
+                        path='order'
+                    />
+                ) : null
             }
-        </div>
+        </>
     );
 }
 

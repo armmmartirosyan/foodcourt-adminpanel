@@ -5,9 +5,9 @@ import {deleteUserAccountRequest, singleUserRequest} from "../store/actions/user
 import {toast} from "react-toastify";
 import _ from "lodash";
 import Helper from "../helpers/Helper";
-import moment from "moment/moment";
 import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
+import Single from "../components/Single";
 
 function SingleUser() {
     const dispatch = useDispatch();
@@ -16,6 +16,34 @@ function SingleUser() {
     const statusGetSingle = useSelector(state => state.status.usersGetSingleStatus);
     const [user, setUser] = useState({});
 
+    const drawData = [
+        {
+            path: ['firstName'],
+            label: 'First name',
+            disabled: true,
+        },
+        {
+            path: ['lastName'],
+            label: 'Last name',
+            disabled: true,
+        },
+        {
+            path: ['email'],
+            label: 'Email',
+            disabled: true,
+        },
+        {
+            path: ['phoneNum'],
+            label: 'Phone',
+            disabled: true,
+        },
+        {
+            path: ['status'],
+            label: 'Status',
+            disabled: true,
+        },
+    ];
+
     useEffect(() => {
         if(params.id){
             (async () => {
@@ -23,14 +51,18 @@ function SingleUser() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
-                setUser({...data.payload.user});
+                setUser({
+                    ...data.payload.user,
+                    phoneNum: '+' + data.payload.user.phoneNum,
+                });
             })()
         }
     }, [params.id]);
 
-    const handleDelete = useCallback(async (e, id) => {
+    const handleBlock = useCallback(async (e, id) => {
         e.stopPropagation();
         const data = await dispatch(deleteUserAccountRequest({id}));
 
@@ -53,45 +85,17 @@ function SingleUser() {
             pageName={`user ${user.firstName ? user.firstName : ''}`}
         >
             <TopBar
-                pageName={`user${user.email ? ' - ' + user.email : ''}`}
+                pageName={`user ${user.firstName ? user.firstName : ''}`}
                 allowAdd={false}
             />
             {
                 !_.isEmpty(user) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>{user.firstName}</p>
-                            <label>First Name</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>{user.lastName}</p>
-                            <label>Last Name</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>{user.email}</p>
-                            <label>Email</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>{user.phoneNum}</p>
-                            <label>Phone Number</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>{user.status}</p>
-                            <label>Status</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(user.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(user.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
+                    <Single
+                        drawData={drawData}
+                        obj={user}
+                        changeValues={() => {}}
+                        values={{...user}}
+                    />
                 ) : null
             }
 
@@ -109,7 +113,7 @@ function SingleUser() {
                         <button
                             className="btn btn-danger"
                             onClick={async (e) => {
-                                await handleDelete(e, user.id)
+                                await handleBlock(e, user.id)
                             }}
                         >
                             Block

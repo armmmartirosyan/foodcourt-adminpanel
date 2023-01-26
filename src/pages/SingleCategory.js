@@ -3,17 +3,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
 import {
     addCategoryRequest,
-    deleteCategoryRequest, singleCategoryRequest,
+    deleteCategoryRequest,
+    singleCategoryRequest,
     updateCategoryRequest
 } from "../store/actions/categories";
 import {toast} from "react-toastify";
 import _ from "lodash";
 import Helper from "../helpers/Helper";
 import Validator from "../helpers/Validator";
-import SingleImage from "../components/SingleImage";
-import moment from "moment/moment";
 import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
+import Single from "../components/Single";
 
 function SingleCategory() {
     const dispatch = useDispatch();
@@ -25,9 +25,29 @@ function SingleCategory() {
     const statusDelete = useSelector(state => state.status.categoriesDeleteStatus);
     const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
-    const [name, setName] = useState('');
-    const [image, setImage] = useState({});
     const [category, setCategory] = useState({});
+    const [values, setValues] = useState({
+       name: '',
+       image: {},
+    });
+
+    const drawData = [
+        {
+            path: ['image'],
+            label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['name'],
+            label: 'Name',
+            disabled: false,
+        },
+        {
+            path: ['imageSelect'],
+            label: 'Select Image',
+            disabled: false,
+        },
+    ];
 
     useEffect(() => {
         if(params.slugName){
@@ -36,33 +56,45 @@ function SingleCategory() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
                 const tempCategory = data?.payload?.category;
 
-                setName(tempCategory.name);
-                setCategory({...tempCategory})
+                setCategory({...tempCategory});
+                setValues({
+                    ...values,
+                    name: tempCategory.name,
+                });
             })()
         }
     }, [params.slugName]);
 
-    const handleChangeName = useCallback((e) => {
-        setName(e.target.value);
-    }, []);
+    const handleChangeValues = useCallback((val, key) => {
+        if(key === 'image' && val.target
+            && !_.isEmpty(val.target.files)){
+            const {files} = val.target;
 
-    const handleChangeImage = useCallback((e) => {
-        const {files} = e.target;
-
-        if (files.length) {
             files[0]._src = URL.createObjectURL(files[0]);
-            setImage(files[0]);
-        } else {
-            setImage({});
+            setValues({
+                ...values,
+                [key]: files[0],
+            });
+        }else if(key === 'image'){
+            setValues({
+                ...values,
+                [key]: {},
+            });
+        }else{
+            setValues({
+                ...values,
+                [key]: val,
+            });
         }
-    }, []);
+    }, [values]);
 
     const handleAddCategory = useCallback(async () => {
         const validateValues = [
-            Validator.validName(name),
+            Validator.validString(values.name),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -71,14 +103,14 @@ function SingleCategory() {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image!");
             return;
         }
 
         const data = await dispatch(addCategoryRequest({
-            name,
-            image,
+            name: values.name,
+            image: values.image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -92,11 +124,11 @@ function SingleCategory() {
 
         toast.success('Category added successfully');
         navigate('/categories');
-    }, [image, name]);
+    }, [values]);
 
     const handleUpdateCategory = useCallback(async () => {
         const validateValues = [
-            name ? Validator.validName(name) : true,
+            values.name ? Validator.validString(values.name) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -106,15 +138,15 @@ function SingleCategory() {
             return;
         }
 
-        if (!name && !image.type) {
+        if (!values.name && !values.image.type) {
             toast.error("Either fill name field, either select new image!");
             return;
         }
 
         const data = await dispatch(updateCategoryRequest({
             id: category.id,
-            name: name || undefined,
-            image: image.type ? image : undefined,
+            name: values.name || undefined,
+            image: values.image.type ? values.image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -128,7 +160,7 @@ function SingleCategory() {
 
         toast.success('Category added successfully');
         navigate('/categories');
-    }, [image, name]);
+    }, [values]);
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
@@ -153,56 +185,13 @@ function SingleCategory() {
                 pageName={`category${category.name ? ' - ' + category.name : ''}`}
                 allowAdd={false}
             />
-            {
-                !_.isEmpty(category) || !_.isEmpty(image) ? (
-                    <SingleImage
-                        image={image}
-                        obj={category}
-                        handleChangeImage={handleChangeImage}
-                    />
-                ) : null
-            }
-            <div className="form-floating mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    id="floatingInput"
-                    placeholder="Name"
-                    disabled={admin && admin.role === 'manager'}
-                    value={name}
-                    onChange={handleChangeName}
-                />
-                <label htmlFor="name">Name</label>
-            </div>
-            <div className="mb-3">
-                <label htmlFor="formFile" className="form-label">Select Image</label>
-                <input
-                    className="form-control"
-                    type="file"
-                    id="formFile"
-                    disabled={admin && admin.role === 'manager'}
-                    accept="image/*"
-                    onChange={handleChangeImage}
-                />
-            </div>
-            {
-                !_.isEmpty(category) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(category.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(category.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
-                ) : null
-            }
+
+            <Single
+                drawData={drawData}
+                obj={category}
+                changeValues={handleChangeValues}
+                values={values}
+            />
 
             <div className='btn-container'>
                 <button

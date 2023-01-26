@@ -15,15 +15,15 @@ import Helper from "../helpers/Helper";
 
 const tableHeader = [
     {
-        path:'imagePath',
+        path:['imagePath'],
         label:'Image',
     },
     {
-        path:'title',
+        path:['title'],
         label:'Title',
     },
     {
-        path:'price',
+        path:['price'],
         label:'Price',
     },
 ];
@@ -48,6 +48,7 @@ function Products() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
             const list = data.payload.categories.map(cat => {
@@ -68,6 +69,7 @@ function Products() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
             setCurrentPage(+page || 1);

@@ -29,7 +29,6 @@ function Login() {
     const handleSgnIn = useCallback(async () => {
         const validateValues = [
             Validator.validEmail(values.email),
-            //Validator.validPass(values.password),
         ];
 
         if (validateValues.find((v) => v !== true)) {
@@ -43,7 +42,10 @@ function Login() {
             remember: values.remember,
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if(data.error?.message && data.payload === 'Too many requests, please try again later.'){
+            toast.error('Too many requests, please try again later.');
+            return;
+        }else if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

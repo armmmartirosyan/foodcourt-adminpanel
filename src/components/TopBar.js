@@ -10,13 +10,13 @@ function TopBar(props) {
     const location = useLocation();
     const navigate = useNavigate();
     const {
-        selectedCategoryId,
-        allowAdd = false,
         pageName,
         searchChange,
-        search = '',
-        categories = [],
         onChangeCategory,
+        selectedCategoryId,
+        allowAdd = false,
+        categories = [],
+        search = '',
     } = props;
 
     return (
@@ -36,15 +36,9 @@ function TopBar(props) {
                 ) : null
             }
             {
-                onChangeCategory
-                && selectedCategoryId !== undefined
-                && categories.length ? (
+                onChangeCategory ? (
                     <Select
-                        defaultValue={
-                            selectedCategoryId ?
-                                categories.find(cat => cat.value === selectedCategoryId)
-                                : undefined
-                        }
+                        value={categories.find(cat => cat.value === selectedCategoryId)}
                         name="categories"
                         options={categories}
                         className="basic-select"

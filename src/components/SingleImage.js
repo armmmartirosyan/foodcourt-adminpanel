@@ -22,7 +22,7 @@ function SingleImage(props) {
                     <div
                         className="image-delete"
                         onClick={() => {
-                            handleChangeImage({target: {files: []}})
+                            handleChangeImage({target: {files: []}}, 'image')
                         }}
                     >
                         X

@@ -15,6 +15,6 @@ export default createReducer(initialState, (builder) => {
             state.pages = data.totalPages || 1;
         })
         .addMatcher((action) => action.type.endsWith('news/get/single/fulfilled'), (state, action) => {
-            state.singleNews = {...action.payload.singleNews};
+            state.singleNews = action.payload.singleNews;
         })
 })

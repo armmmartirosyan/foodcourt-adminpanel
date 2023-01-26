@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Helmet} from "react-helmet";
 import Spinner from "react-bootstrap/Spinner";
 import _ from "lodash";
+import PropTypes from "prop-types";
 
 function WrapperLogIn(props) {
     const {children, statuses, pageName} = props;
@@ -38,6 +39,11 @@ function WrapperLogIn(props) {
             </div>
         </div>
     );
+}
+WrapperLogIn.propTypes = {
+    pageName: PropTypes.string.isRequired,
+    children: PropTypes.any.isRequired,
+    statuses: PropTypes.array,
 }
 
 export default WrapperLogIn;

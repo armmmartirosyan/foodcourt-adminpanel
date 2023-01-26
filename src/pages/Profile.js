@@ -14,6 +14,8 @@ import Helper from "../helpers/Helper";
 import ProfileTable from "../components/ProfileTable";
 import UpdateValues from "../components/UpdateValues";
 import ChangePassword from "../components/ChangePassword";
+import Account from "../helpers/Account";
+import {useNavigate} from "react-router-dom";
 
 const data = [
     {
@@ -39,7 +41,7 @@ const data = [
     {
         path: 'email',
         label: 'Email',
-        edit: false,
+        edit: true,
     },
     {
         path: 'role',
@@ -55,6 +57,7 @@ const data = [
 
 function Profile() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const admin = useSelector(state => state.admin.admin);
     const getAdminStatus = useSelector(state => state.status.adminAdminStatus);
     const getKeyStatus = useSelector(state => state.status.adminGetKeyStatus);
@@ -97,14 +100,14 @@ function Profile() {
     }, [newValues]);
 
     const handleModifyAccount = useCallback(async () => {
-        let validateValues;
+        let validateValues = [];
 
-        if(value.key === 'firstName'){
-            validateValues = [Validator.validFName(value.value)];
-        }else if(value.key === 'lastName'){
-            validateValues = [Validator.validLName(value.value)];
+        if(value.key === 'firstName' || value.key === 'lastName'){
+            validateValues = [Validator.validString(value.value)];
         }else if(value.key === 'phoneNum'){
             validateValues = [Validator.validPhoneNum(value.value)];
+        }else if(value.key === 'email'){
+            validateValues = [Validator.validEmail(value.value)];
         }
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -120,6 +123,12 @@ function Profile() {
 
         if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+            return;
+        }
+
+        if(value.name === 'Email'){
+            Account.deleteToken();
+            navigate('/');
             return;
         }
 
@@ -144,7 +153,7 @@ function Profile() {
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validUUID(newValues.token),
+            Validator.validEverySymbol(newValues.token),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -203,7 +212,7 @@ function Profile() {
                         value={value}
                         setValue={setValue}
                         backFunc={updateValues}
-                        forwardFunc={value.key === 'email' ? handleGetKey : handleModifyAccount}
+                        forwardFunc={value.name === 'Password' ? handleGetKey : handleModifyAccount}
                     />
                 ) : null
             }

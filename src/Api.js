@@ -193,7 +193,6 @@ class Api {
     }
 
     static getSingleBranch(id) {
-        console.log(id);
         return api.get(`/map/get/${id}`);
     }
 

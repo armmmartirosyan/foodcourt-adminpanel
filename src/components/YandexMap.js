@@ -1,14 +1,16 @@
 import React from 'react';
 import {Map, YMaps} from "react-yandex-maps";
 import YandexPlacemark from "./YandexPlacemark";
+import PropTypes from "prop-types";
+import _ from "lodash";
 
 function YandexMap(props) {
     const {
-        center = [],
-        branches = [],
-        singleBranch={},
-        allowMapClick = false,
         onMapClick = () => {},
+        singleBranch={},
+        branches = [],
+        allowMapClick,
+        center,
     } = props;
 
     return (
@@ -21,10 +23,10 @@ function YandexMap(props) {
                 width="100%"
                 height="100%"
                 onClick={(e) => {
-                    if (allowMapClick) onMapClick(e);
+                    if (allowMapClick) onMapClick(e, 'map');
                 }}
-                defaultState={{
-                    center: center.length ? center : [40.786543, 43.838250],
+                state={{
+                    center: !_.isEmpty(center) ? center : [55.758544, 37.639774],
                     zoom: 12,
                 }}
             >
@@ -50,6 +52,13 @@ function YandexMap(props) {
             </Map>
         </YMaps>
     );
+}
+YandexMap.propTypes = {
+    allowMapClick: PropTypes.bool.isRequired,
+    center: PropTypes.array.isRequired,
+    singleBranch: PropTypes.object,
+    onMapClick: PropTypes.func,
+    branches: PropTypes.array,
 }
 
 export default YandexMap;

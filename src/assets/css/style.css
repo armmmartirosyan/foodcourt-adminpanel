@@ -556,17 +556,17 @@ input[type=number] {
     font-size: 23px;
 }
 
-.form-floating > .form-control, .form-floating > .form-control-plaintext, .form-floating > .form-select {
-    height: unset !important;
-}
-
 .chart__control, .basic-select {
     width: 190px;
     margin: 0 5px;
 }
 
-.basic-multi-select{
+.multi-select{
     margin-bottom: 1rem;
+}
+
+.description-input{
+    height: 150px !important;
 }
 
 td {
@@ -576,3 +576,10 @@ td {
 td, th {
     text-align: center;
 }
+
+/*.form-floating > .form-control,*/
+/*.form-floating > .form-control-plaintext,*/
+/*.form-floating > .form-select {*/
+/*    height: unset !important;*/
+/*}*/
+

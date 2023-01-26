@@ -126,7 +126,7 @@ function ProductsChart() {
                         <Select
                             name="products"
                             options={products}
-                            className="basic-multi-select"
+                            className="multi-select"
                             classNamePrefix="chart"
                             onChange={onChangeProduct}
                         />
@@ -137,7 +137,7 @@ function ProductsChart() {
                     defaultValue={{value: currentYear, label: currentYear}}
                     name="years"
                     options={years}
-                    className="basic-multi-select"
+                    className="multi-select"
                     classNamePrefix="chart"
                     onChange={onChangeYear}
                 />

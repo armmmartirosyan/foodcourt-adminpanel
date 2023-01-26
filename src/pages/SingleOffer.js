@@ -6,12 +6,10 @@ import Validator from "../helpers/Validator";
 import {toast} from "react-toastify";
 import {addOfferRequest, deleteOfferRequest, singleOfferRequest, updateOfferRequest} from "../store/actions/offers";
 import Helper from "../helpers/Helper";
-import SingleImage from "../components/SingleImage";
-import Select from "react-select";
-import moment from "moment/moment";
 import Wrapper from "../components/Wrapper";
 import {allCategoriesListRequest} from "../store/actions/categories";
 import TopBar from "../components/TopBar";
+import Single from "../components/Single";
 
 function SingleOffer() {
     const params = useParams();
@@ -24,14 +22,48 @@ function SingleOffer() {
     const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [offer, setOffer] = useState({});
-    const [image, setImage] = useState({});
     const [categories, setCategories] = useState([]);
     const [values, setValues] = useState({
         title: '',
         description: '',
         price: 0,
         categoryId: [],
+        image: {},
     });
+
+    const drawData = [
+        {
+            path: ['image'],
+            label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['title'],
+            label: 'Title',
+            disabled: false,
+        },
+        {
+            path: ['description'],
+            label: 'Description',
+            disabled: false,
+        },
+        {
+            path: ['price'],
+            label: 'Price(AMD)',
+            disabled: false,
+        },
+        {
+            path: ['categories'],
+            label: 'Select Categories',
+            array: [...categories],
+            disabled: false,
+        },
+        {
+            path: ['imageSelect'],
+            label: 'Select Image',
+            disabled: false,
+        },
+    ];
 
     useEffect(() => {
         (async () => {
@@ -39,6 +71,7 @@ function SingleOffer() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
             const list = data.payload.categories.map(cat => {
@@ -56,12 +89,14 @@ function SingleOffer() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
                 const tempOffer = data?.payload?.offer
 
                 setOffer({...tempOffer});
                 setValues({
+                    ...values,
                     title: tempOffer.title,
                     description: tempOffer.description,
                     price: tempOffer.price,
@@ -72,28 +107,40 @@ function SingleOffer() {
     }, [params.slugName]);
 
     const handleChangeValues = useCallback((val, key) => {
-        setValues({
-            ...values,
-            [key]: val,
-        })
-    }, [values]);
+        if(key === 'image' && val.target
+            && !_.isEmpty(val.target.files)){
+            const {files} = val.target;
 
-    const handleChangeImage = useCallback((e) => {
-        const {files} = e.target;
-
-        if (files.length) {
             files[0]._src = URL.createObjectURL(files[0]);
-            setImage(files[0]);
-        } else {
-            setImage({});
+            setValues({
+                ...values,
+                [key]: files[0],
+            });
+        }else if(key === 'image'){
+            setValues({
+                ...values,
+                [key]: {},
+            });
+        }else if(key === 'categories'){
+            const ids = val.map(d => d.value);
+
+            setValues({
+                ...values,
+                categoryId: ids
+            });
+        }else{
+            setValues({
+                ...values,
+                [key]: val,
+            });
         }
-    }, []);
+    }, [values]);
 
     const handleAddOffer = useCallback(async () => {
         const validateValues = [
-            Validator.validTitle(values.title),
-            Validator.validDesc(values.description),
-            Validator.validPrice(values.price),
+            Validator.validString(values.title),
+            Validator.validString(values.description),
+            Validator.validNumGreatOne(values.price),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -106,7 +153,7 @@ function SingleOffer() {
             toast.error(`Select category(at least 1 category!)`);
             return;
         }
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image!");
             return;
         }
@@ -116,7 +163,7 @@ function SingleOffer() {
             description: values.description,
             price: values.price,
             categoryId: values.categoryId,
-            image,
+            image: values.image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -130,13 +177,13 @@ function SingleOffer() {
 
         toast.success('Offer added successfully.');
         navigate('/offers');
-    }, [image, values]);
+    }, [values]);
 
     const handleUpdateOffer = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validTitle(values.title) : true,
-            values.description ? Validator.validDesc(values.description) : true,
-            values.price || values.price === 0 ? Validator.validPrice(values.price) : true,
+            values.title ? Validator.validString(values.title) : true,
+            values.description ? Validator.validString(values.description) : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -147,7 +194,7 @@ function SingleOffer() {
         }
 
         if (!values.title && !values.description
-            && !values.price && !image.type) {
+            && !values.price && !values.image.type) {
             toast.error("Fill one of fields!");
             return;
         }
@@ -158,7 +205,7 @@ function SingleOffer() {
             description: values.description || undefined,
             price: values.price || undefined,
             categoryId: !_.isEmpty(values.categoryId) ? values.categoryId : undefined,
-            image: image.type ? image : undefined,
+            image: values.image.type ? values.image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -172,7 +219,7 @@ function SingleOffer() {
 
         toast.success('Offer updated successfully.');
         navigate('/offers');
-    }, [image, values]);
+    }, [values]);
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
@@ -197,110 +244,13 @@ function SingleOffer() {
                 pageName={`offer${offer.title ? ' - ' + offer.title : ''}`}
                 allowAdd={false}
             />
-            {
-                !_.isEmpty(offer) || !_.isEmpty(image) ? (
-                    <SingleImage
-                        image={image}
-                        obj={offer}
-                        handleChangeImage={handleChangeImage}
-                    />
-                ) : null
-            }
-            <div className="form-floating mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    placeholder="Title"
-                    value={values.title}
-                    disabled={admin && admin.role === 'manager'}
-                    onChange={(e) => {
-                        handleChangeValues(e.target.value, 'title')
-                    }}
-                />
-                <label htmlFor="title">Title</label>
-            </div>
-            <div className="form-floating mb-3">
-                        <textarea
-                            className="form-control"
-                            placeholder="Description"
-                            id="description"
-                            style={{height: '150px'}}
-                            value={values.description}
-                            disabled={admin && admin.role === 'manager'}
-                            onChange={(e) => {
-                                handleChangeValues(e.target.value, 'description')
-                            }}
-                        />
-                <label htmlFor="description">Description</label>
-            </div>
-            <div className="form-floating mb-3">
-                <input
-                    type="number"
-                    className="form-control"
-                    id="price"
-                    placeholder="Price(AMD)"
-                    value={values.price}
-                    disabled={admin && admin.role === 'manager'}
-                    onChange={(e) => {
-                        handleChangeValues(e.target.value, 'price')
-                    }}
-                />
-                <label htmlFor="price">Price(AMD)</label>
-            </div>
-            {
-                !_.isEmpty(categories)
-                && (!_.isEmpty(offer) || !params.slugName) ? (
-                    <div className="mb-3">
-                        <label htmlFor="category-list" className="form-label">Select Categories</label>
-                        <Select
-                            defaultValue={!_.isEmpty(offer) ?
-                                offer.categories.map(cat => {
-                                    return {value: cat.id, label: cat.name}
-                                }) : undefined
-                            }
-                            isMulti
-                            name="colors"
-                            options={categories}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                            onChange={(data) => {
-                                handleChangeValues(data.map(d => d.value), "categoryId")
-                            }}
-                            id='category-list'
-                        />
-                    </div>
-                ) : null
-            }
-            <div className="mb-3">
-                <label htmlFor="formFile" className="form-label">Select Image</label>
-                <input
-                    className="form-control"
-                    type="file"
-                    id="formFile"
-                    disabled={admin && admin.role === 'manager'}
-                    accept="image/*"
-                    onChange={handleChangeImage}
-                />
-            </div>
-            {
-                !_.isEmpty(offer) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(offer.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(offer.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
-                ) : null
-            }
+
+            <Single
+                drawData={drawData}
+                obj={offer}
+                changeValues={handleChangeValues}
+                values={values}
+            />
 
             <div className='btn-container'>
                 <button

@@ -14,15 +14,15 @@ import {allCategoriesListRequest} from "../store/actions/categories";
 
 const tableHeader = [
     {
-        path: 'imagePath',
+        path: ['imagePath'],
         label: 'Image',
     },
     {
-        path: 'title',
+        path: ['title'],
         label: 'Title',
     },
     {
-        path: 'price',
+        path: ['price'],
         label: 'Price',
     },
 ];
@@ -44,6 +44,7 @@ function Offers() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
             const list = data.payload.categories.map(cat => {
@@ -63,6 +64,7 @@ function Offers() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
             setSelectedCategoryId(category ? +category : 0);
@@ -70,7 +72,9 @@ function Offers() {
     }, [location.search]);
 
     const searchChange = useCallback((val) => {
-        const query = qs.stringify({title: val || null}, {skipNull: true});
+        let query = qs.parse(location.search);
+        query.title = val || null;
+        query = qs.stringify(query, {skipNull: true});
         setTitle(val);
 
         clearTimeout(myTimeout);

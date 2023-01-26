@@ -11,7 +11,7 @@ import Helper from "../helpers/Helper";
 
 const tableHeader = [
     {
-        path:'imagePath',
+        path:['imagePath'],
         label:'Image',
     },
 ];

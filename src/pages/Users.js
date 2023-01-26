@@ -14,15 +14,15 @@ import Helper from "../helpers/Helper";
 
 const tableHeader = [
     {
-        path:'firstName',
+        path:['firstName'],
         label:'First Name',
     },
     {
-        path:'lastName',
+        path:['lastName'],
         label:'Last Name',
     },
     {
-        path:'email',
+        path:['email'],
         label:'Email',
     },
 ];

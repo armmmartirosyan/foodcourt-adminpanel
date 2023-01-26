@@ -14,15 +14,15 @@ import Helper from "../helpers/Helper";
 
 const tableHeader = [
     {
-        path:'imagePath',
+        path:['imagePath'],
         label:'Image',
     },
     {
-        path:'title',
+        path:['title'],
         label:'Title',
     },
     {
-        path:'description',
+        path:['description'],
         label:'Description',
     },
 ];

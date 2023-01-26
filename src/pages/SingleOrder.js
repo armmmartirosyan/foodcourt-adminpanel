@@ -1,14 +1,75 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Wrapper from "../components/Wrapper";
 import _ from "lodash";
-import OrderProductRow from "../components/OrderProductRow";
-import moment from "moment/moment";
 import {useDispatch, useSelector} from "react-redux";
 import {modifyOrderRequest, singleNotReceivedOrderRequest} from "../store/actions/orders";
 import {toast} from "react-toastify";
 import {useNavigate, useParams} from "react-router-dom";
 import Helper from "../helpers/Helper";
 import SwitchBtn from "../components/SwitchBtn";
+import Table from "../components/Table";
+import Single from "../components/Single";
+
+const tableHeader = [
+    {
+        path:['product', 'id'],
+        label:'ID',
+    },
+    {
+        path:['product', 'imagePath'],
+        label:'Image',
+    },
+    {
+        path:['product', 'title'],
+        label:'Title',
+    },
+    {
+        path:['quantity'],
+        label:'Quantity',
+    },
+    {
+        path:['product', 'price'],
+        label:'Price',
+    },
+];
+
+const drawData = [
+    {
+        path: ['message'],
+        label: 'Message',
+        disabled: true,
+    },
+    {
+        path: ['address'],
+        label: 'Address',
+        disabled: true,
+    },
+    {
+        path: ['user', 'firstName'],
+        label: 'User Name',
+        disabled: true,
+    },
+    {
+        path: ['user', 'phoneNum'],
+        label: 'User Phone Number',
+        disabled: true,
+    },
+    {
+        path: ['receiveType'],
+        label: 'Receive Type',
+        disabled: true,
+    },
+    {
+        path: ['status'],
+        label: 'Status',
+        disabled: true,
+    },
+    {
+        path: ['createdAt'],
+        label: 'Ordered at',
+        disabled: true,
+    },
+];
 
 function SingleOrder() {
     const params = useParams();
@@ -25,10 +86,16 @@ function SingleOrder() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
                 const tempOrder = data.payload.singleNotReceivedOrder;
                 let price = 0;
+
+                tempOrder.user = {
+                    ...tempOrder.user,
+                    phoneNum: "+" + tempOrder.user.phoneNum
+                };
 
                 tempOrder.orders.forEach((tempOrder) => {
                     price += +tempOrder.quantity * +tempOrder.product.price
@@ -59,88 +126,31 @@ function SingleOrder() {
             <h6 className="title">Order Products</h6>
             {
                 !_.isEmpty(order) ? (
-                    <table className="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Image</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Price</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {
-                            order.orders.map(order => (
-                                <OrderProductRow
-                                    order={order}
-                                    key={order.id}
-                                />
-                            ))
-                        }
-                        </tbody>
-                    </table>
-                ) : null
-            }
-            {
-                !_.isEmpty(order) ? (
                     <>
+                        <Table
+                            tableHeader={tableHeader}
+                            list={order.orders}
+                            path=''
+                        />
+
                         <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {totalPrice}
-                            </p>
-                            <label>Total Price(AMD)</label>
+                            <input
+                                type='text'
+                                className="form-control"
+                                id='Total Price(AMD)'
+                                placeholder='Total Price(AMD)'
+                                disabled={true}
+                                value={totalPrice}
+                            />
+                            <label htmlFor='Total Price(AMD)'>Total Price(AMD)</label>
                         </div>
-                        {
-                            order.message ? (
-                                <div className="form-floating mb-3">
-                                    <p className='form-control'>
-                                        {order.message}
-                                    </p>
-                                    <label>Message</label>
-                                </div>
-                            ) : null
-                        }
-                        {
-                            order.address ? (
-                                <div className="form-floating mb-3">
-                                    <p className='form-control'>
-                                        {order.address}
-                                    </p>
-                                    <label>Address</label>
-                                </div>
-                            ) : null
-                        }
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {order.user.firstName}
-                            </p>
-                            <label>User Name</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {order.user.phoneNum}
-                            </p>
-                            <label>User Phone Number</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {_.capitalize(order.receiveType.split(/(?=[A-Z])/).join(' '))}
-                            </p>
-                            <label>Receive Type</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {_.capitalize(order.status.split(/(?=[A-Z])/).join(' '))}
-                            </p>
-                            <label>Status</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(order.createdAt).format('LLL')}
-                            </p>
-                            <label>Ordered At</label>
-                        </div>
+
+                        <Single
+                            drawData={drawData}
+                            obj={order}
+                            changeValues={() => {}}
+                            values={{}}
+                        />
                     </>
                 ) : null
             }

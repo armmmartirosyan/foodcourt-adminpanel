@@ -1,4 +1,5 @@
 import React, {useCallback} from 'react';
+import PropTypes from "prop-types";
 
 function UpdateValues(props) {
     const {forwardFunc, backFunc, value, setValue} = props;
@@ -9,6 +10,7 @@ function UpdateValues(props) {
             value: val,
         });
     }, [value]);
+
     return (
         <div className="profile__table position-relative pt-5">
             <div
@@ -22,7 +24,7 @@ function UpdateValues(props) {
                     type="text"
                     className="form-control"
                     id='name'
-                    disabled={value.key === 'email'}
+                    disabled={value.name === 'Password'}
                     placeholder={value.name}
                     value={value.value}
                     onChange={(e) => {
@@ -45,12 +47,19 @@ function UpdateValues(props) {
                     onClick={forwardFunc}
                 >
                     {
-                        value.key === 'email' ? 'Get Key' : 'Modify'
+                        value.name === 'Password' ? 'Get Key' : 'Modify'
                     }
                 </button>
             </div>
         </div>
     );
+}
+
+UpdateValues.propTypes = {
+    forwardFunc: PropTypes.func.isRequired,
+    backFunc: PropTypes.func.isRequired,
+    setValue: PropTypes.func.isRequired,
+    value: PropTypes.object.isRequired,
 }
 
 export default UpdateValues;

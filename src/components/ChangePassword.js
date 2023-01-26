@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 function ChangePassword(props) {
     const {values, handleChange, forwardFunc, backFunc} = props;
+
     return (
         <>
             <div className="form-floating mb-3">
@@ -59,6 +61,12 @@ function ChangePassword(props) {
             </div>
         </>
     );
+}
+ChangePassword.propTypes = {
+    values: PropTypes.object.isRequired,
+    handleChange: PropTypes.func.isRequired,
+    forwardFunc: PropTypes.func.isRequired,
+    backFunc: PropTypes.func.isRequired,
 }
 
 export default ChangePassword;

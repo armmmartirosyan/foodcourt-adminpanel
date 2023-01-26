@@ -11,10 +11,9 @@ import {toast} from "react-toastify";
 import _ from "lodash";
 import Helper from "../helpers/Helper";
 import Validator from "../helpers/Validator";
-import SingleImage from "../components/SingleImage";
-import moment from "moment/moment";
 import TopBar from "../components/TopBar";
 import Wrapper from "../components/Wrapper";
+import Single from "../components/Single";
 
 function SingleNews() {
     const dispatch = useDispatch();
@@ -27,11 +26,34 @@ function SingleNews() {
     const admin = useSelector(state => state.admin.admin);
     const [uploadProcess, setUploadProcess] = useState(100);
     const [news, setNews] = useState({});
-    const [image, setImage] = useState({});
     const [values, setValues] = useState({
         title: '',
         description: '',
+        image: {}
     });
+
+    const drawData = [
+        {
+            path: ['image'],
+            label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['title'],
+            label: 'Title',
+            disabled: false,
+        },
+        {
+            path: ['description'],
+            label: 'Description',
+            disabled: false,
+        },
+        {
+            path: ['imageSelect'],
+            label: 'Select Image',
+            disabled: false,
+        },
+    ];
 
     useEffect(() => {
         if(params.slugName){
@@ -40,11 +62,13 @@ function SingleNews() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
                 const tempNews = data?.payload?.singleNews;
 
                 setValues({
+                    ...values,
                     title: tempNews.title,
                     description: tempNews.description,
                 });
@@ -54,27 +78,32 @@ function SingleNews() {
     }, [params.slugName]);
 
     const handleChangeValues = useCallback((val, key) => {
-        setValues({
-            ...values,
-            [key]: val,
-        })
-    }, [values]);
+        if(key === 'image' && val.target
+            && !_.isEmpty(val.target.files)){
+            const {files} = val.target;
 
-    const handleChangeImage = useCallback((e) => {
-        const {files} = e.target;
-
-        if (files.length) {
             files[0]._src = URL.createObjectURL(files[0]);
-            setImage(files[0]);
-        } else {
-            setImage({});
+            setValues({
+                ...values,
+                [key]: files[0],
+            });
+        }else if(key === 'image'){
+            setValues({
+                ...values,
+                [key]: {},
+            });
+        }else{
+            setValues({
+                ...values,
+                [key]: val,
+            });
         }
-    }, []);
+    }, [values]);
 
     const handleAddNews = useCallback(async () => {
         const validateValues = [
-            Validator.validTitle(values.title),
-            Validator.validDesc(values.description),
+            Validator.validString(values.title),
+            Validator.validString(values.description),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -83,7 +112,7 @@ function SingleNews() {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image!");
             return;
         }
@@ -91,7 +120,7 @@ function SingleNews() {
         const data = await dispatch(addNewsRequest({
             title: values.title,
             description: values.description,
-            image,
+            image: values.image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -105,12 +134,12 @@ function SingleNews() {
 
         toast.success('News added successfully.');
         navigate('/news');
-    }, [image, values]);
+    }, [values]);
 
     const handleUpdateNews = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validTitle(values.title) : true,
-            values.description ? Validator.validDesc(values.description) : true,
+            values.title ? Validator.validString(values.title) : true,
+            values.description ? Validator.validString(values.description) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -120,14 +149,14 @@ function SingleNews() {
             return;
         }
 
-        if (!values.title && !values.description && !image.type) {
+        if (!values.title && !values.description && !values.image.type) {
             toast.error("Fill one of fields!");
             return;
         }
 
         if (values.title.length < 2
             && values.description.length < 2
-            && !image.type) {
+            && !values.image.type) {
             toast.error("Fill one of fields");
             return;
         }
@@ -136,7 +165,7 @@ function SingleNews() {
             id: news.id,
             title: values.title || undefined,
             description: values.description || undefined,
-            image: image.type ? image : undefined,
+            image: values.image.type ? values.image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -150,7 +179,7 @@ function SingleNews() {
 
         toast.success('News updated successfully.');
         navigate('/news');
-    }, [image, values]);
+    }, [values]);
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
@@ -175,72 +204,14 @@ function SingleNews() {
                 pageName={`news${news.title ? ' - ' + news.title : ''}`}
                 allowAdd={false}
             />
-            {
-                !_.isEmpty(news) || !_.isEmpty(image) ? (
-                    <SingleImage
-                        image={image}
-                        obj={news}
-                        handleChangeImage={handleChangeImage}
-                    />
-                ) : null
-            }
-            <div className="form-floating mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    placeholder="Title"
-                    value={values.title}
-                    disabled={admin && admin.role === 'manager'}
-                    onChange={(e) => {
-                        handleChangeValues(e.target.value, 'title')
-                    }}
-                />
-                <label htmlFor="title">Title</label>
-            </div>
-            <div className="form-floating mb-3">
-                        <textarea
-                            className="form-control"
-                            placeholder="Description"
-                            id="description"
-                            style={{height: '150px'}}
-                            disabled={admin && admin.role === 'manager'}
-                            value={values.description}
-                            onChange={(e) => {
-                                handleChangeValues(e.target.value, 'description')
-                            }}
-                        />
-                <label htmlFor="description">Description</label>
-            </div>
-            <div className="mb-3">
-                <label htmlFor="formFile" className="form-label">Select Image</label>
-                <input
-                    className="form-control"
-                    type="file"
-                    id="formFile"
-                    disabled={admin && admin.role === 'manager'}
-                    accept="image/*"
-                    onChange={handleChangeImage}
-                />
-            </div>
-            {
-                !_.isEmpty(news) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(news.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(news.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
-                ) : null
-            }
+
+            <Single
+                drawData={drawData}
+                obj={news}
+                changeValues={handleChangeValues}
+                values={values}
+            />
+
             <div className='btn-container'>
                 <button
                     className="btn btn-outline-danger"

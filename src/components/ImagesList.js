@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
 const {REACT_APP_API_URL} = process.env;
 
 function ImagesList(props) {
-    const {image, handleDeleteImage} = props;
+    const {image = {}, handleDeleteImage} = props;
 
     return (
         <figure
@@ -29,6 +30,11 @@ function ImagesList(props) {
             }
         </figure>
     );
+}
+
+ImagesList.propTypes = {
+    image: PropTypes.object,
+    handleDeleteImage: PropTypes.func.isRequired,
 }
 
 export default ImagesList;

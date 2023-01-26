@@ -20,19 +20,21 @@ function Branches() {
 
             if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                return;
             }
 
+            const tempBranches = data.payload.branches;
             let mediumNum = [0, 0];
 
-            data.payload.branches.forEach(b => {
+            tempBranches.forEach(b => {
                 mediumNum[0] = +mediumNum[0] + +b.lat;
                 mediumNum[1] = +mediumNum[1] + +b.lon;
             });
 
-            if(data.payload.branches.length) {
+            if(tempBranches.length) {
                 setCenter([
-                    mediumNum[0] / data.payload.branches.length,
-                    mediumNum[1] / data.payload.branches.length,
+                    mediumNum[0] / tempBranches.length,
+                    mediumNum[1] / tempBranches.length,
                 ]);
             }
         })()
@@ -49,8 +51,9 @@ function Branches() {
             />
             <div className="container mb-3">
                 <YandexMap
-                    center={center[0] !== 0 ? center : [40.786543, 43.838250]}
+                    center={center[0] !== 0 ? center : []}
                     branches={branches || []}
+                    allowMapClick={false}
                 />
             </div>
         </Wrapper>

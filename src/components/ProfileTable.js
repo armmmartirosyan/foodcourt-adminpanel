@@ -4,11 +4,17 @@ import {useDispatch} from "react-redux";
 import {singleBranchRequest} from "../store/actions/map";
 import {toast} from "react-toastify";
 import Helper from "../helpers/Helper";
+import PropTypes from "prop-types";
 
 function ProfileTable(props) {
-    const {data, admin, updateValues} = props;
+    const {data = [], admin, updateValues} = props;
     const [branchTitle, setBranchTitle] = useState('All branches')
     const dispatch = useDispatch();
+    const excludeLabel = [
+        'Password',
+        'Role',
+        'Branch',
+    ];
 
     useEffect(() => {
         (async () => {
@@ -45,12 +51,13 @@ function ProfileTable(props) {
                                         item.label === 'Password' ? 'Forgot Password?' : null
                                     }
                                     {
+                                        item.label === 'Role' ? _.capitalize(admin.role) : null
+                                    }
+                                    {
                                         item.label === 'Branch' ? branchTitle : null
                                     }
                                     {
-                                        item.label !== 'Password'
-                                        && item.label !== 'Branch'
-                                            ? admin[item.path] : null
+                                        !excludeLabel.includes(item.label) ? admin[item.path] : null
                                     }
                                 </td>
                                 <td>{item.edit ? '>' : null}</td>
@@ -62,6 +69,12 @@ function ProfileTable(props) {
             </table>
         </div>
     );
+}
+
+ProfileTable.propTypes = {
+    data: PropTypes.array,
+    admin: PropTypes.object.isRequired,
+    updateValues: PropTypes.func.isRequired,
 }
 
 export default ProfileTable;

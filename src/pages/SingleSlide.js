@@ -1,8 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import TopBar from "../components/TopBar";
 import _ from "lodash";
-import SingleImage from "../components/SingleImage";
-import moment from "moment";
 import {useDispatch, useSelector} from "react-redux";
 import {
     addSlideRequest,
@@ -14,6 +12,7 @@ import {toast} from "react-toastify";
 import Helper from "../helpers/Helper";
 import {useNavigate, useParams} from "react-router-dom";
 import Wrapper from "../components/Wrapper";
+import Single from "../components/Single";
 
 function SingleSlide() {
     const dispatch = useDispatch();
@@ -25,8 +24,23 @@ function SingleSlide() {
     const statusDelete = useSelector(state => state.status.slidesDeleteStatus);
     const statusGetSingle = useSelector(state => state.status.slidesGetSingleStatus);
     const [uploadProcess, setUploadProcess] = useState(100);
-    const [image, setImage] = useState({});
     const [slide, setSlide] = useState({});
+    const [values, setValues] = useState({
+        image: {},
+    });
+
+    const drawData = [
+        {
+            path: ['image'],
+            label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['imageSelect'],
+            label: 'Select Image',
+            disabled: false,
+        },
+    ];
 
     useEffect(() => {
         if (params.id) {
@@ -35,6 +49,7 @@ function SingleSlide() {
 
                 if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
                 setSlide({...data.payload.slide});
@@ -42,25 +57,32 @@ function SingleSlide() {
         }
     }, [params.id]);
 
-    const handleChangeImage = useCallback((e) => {
-        const {files} = e.target;
+    const handleChangeValues = useCallback((val, key) => {
+        if(key === 'image' && val.target
+            && !_.isEmpty(val.target.files)){
+            const {files} = val.target;
 
-        if (files.length) {
             files[0]._src = URL.createObjectURL(files[0]);
-            setImage(files[0]);
-        } else {
-            setImage({});
+            setValues({
+                ...values,
+                [key]: files[0],
+            });
+        }else if(key === 'image'){
+            setValues({
+                ...values,
+                [key]: {},
+            });
         }
-    }, []);
+    }, [values]);
 
     const handleAddSlide = useCallback(async () => {
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image!");
             return;
         }
 
         const data = await dispatch(addSlideRequest({
-            image,
+            image: values.image,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -74,17 +96,17 @@ function SingleSlide() {
 
         toast.success('Slide added successfully.');
         navigate('/slides');
-    }, [image]);
+    }, [values]);
 
     const handleUpdateSlide = useCallback(async () => {
-        if (!image.type) {
+        if (!values.image.type) {
             toast.error("Select image");
             return;
         }
 
         const data = await dispatch(updateSlideRequest({
             id: slide.id,
-            image: image.type ? image : undefined,
+            image: values.image.type ? values.image : undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
@@ -98,7 +120,7 @@ function SingleSlide() {
 
         toast.success('Slide updated successfully.');
         navigate('/slides');
-    }, [image]);
+    }, [values]);
 
     const handleDelete = useCallback(async (e, id) => {
         e.stopPropagation();
@@ -109,6 +131,7 @@ function SingleSlide() {
             return;
         }
 
+        toast.success('Slide deleted successfully.');
         navigate('/slides');
     }, []);
 
@@ -122,44 +145,14 @@ function SingleSlide() {
                 pageName='slide'
                 allowAdd={false}
             />
-            {
-                !_.isEmpty(slide) || !_.isEmpty(image) ? (
-                    <SingleImage
-                        image={image}
-                        obj={slide}
-                        handleChangeImage={handleChangeImage}
-                    />
-                ) : null
-            }
-            <div className="mb-3">
-                <label htmlFor="formFile" className="form-label">Select Image</label>
-                <input
-                    className="form-control"
-                    type="file"
-                    id="formFile"
-                    disabled={admin && admin.role === 'manager'}
-                    accept="image/*"
-                    onChange={handleChangeImage}
-                />
-            </div>
-            {
-                !_.isEmpty(slide) ? (
-                    <>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(slide.createdAt).format('LLL')}
-                            </p>
-                            <label>Created At</label>
-                        </div>
-                        <div className="form-floating mb-3">
-                            <p className='form-control'>
-                                {moment(slide.updatedAt).format('LLL')}
-                            </p>
-                            <label>Last Update</label>
-                        </div>
-                    </>
-                ) : null
-            }
+
+            <Single
+                drawData={drawData}
+                obj={slide}
+                changeValues={handleChangeValues}
+                values={values}
+            />
+
             <div className='btn-container'>
                 <button
                     className="btn btn-outline-danger"
