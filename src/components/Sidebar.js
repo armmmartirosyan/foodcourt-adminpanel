@@ -34,16 +34,15 @@ function Sidebar(props) {
         setIsOpenModal(!isOpenModal);
     }, [isOpenModal]);
 
-    const handleLogOut = useCallback(() =>{
+    const handleLogOut = useCallback(() => {
         Account.deleteToken();
 
         navigate('/');
+        window.location.reload();
     }, []);
 
     const openCloseProfile = useCallback(() => {
-        if(pageName !== 'profile'){
-            setIsOpenProfile(!isOpenProfile);
-        }
+        if (pageName !== 'profile') setIsOpenProfile(!isOpenProfile);
     }, [isOpenProfile, pageName]);
 
     return (
@@ -106,23 +105,24 @@ function Sidebar(props) {
                                         Slides
                                     </NavLink>
                                     <NavLink to="/maps" className="nav-item nav-link">
-                                        Maps
+                                        Branches
                                     </NavLink>
                                 </>
                             ) : null
                         }
                         {
                             admin.role === 'admin' ? (
-                                <NavLink to="/users" className="nav-item nav-link">
-                                    Users
-                                </NavLink>
-                            ) : null
-                        }
-                        {
-                            admin.role === 'admin' ? (
-                                <NavLink to="/admin" className="nav-item nav-link">
-                                    Admin
-                                </NavLink>
+                                <>
+                                    <NavLink to="/users" className="nav-item nav-link">
+                                        Users
+                                    </NavLink>
+                                    <NavLink to="/admin" className="nav-item nav-link">
+                                        Admin
+                                    </NavLink>
+                                    <NavLink to="/payment-types" className="nav-item nav-link">
+                                        Payment types
+                                    </NavLink>
+                                </>
                             ) : null
                         }
                     </div>
@@ -163,6 +163,7 @@ function Sidebar(props) {
         </div>
     );
 }
+
 Sidebar.propTypes = {
     pageName: PropTypes.string.isRequired,
 }

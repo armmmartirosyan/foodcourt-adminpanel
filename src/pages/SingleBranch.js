@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {addBranchRequest, deleteBranchRequest, singleBranchRequest} from "../store/actions/map";
+import {addBranchRequest, deleteBranchRequest, singleBranchRequest, updateBranchRequest} from "../store/actions/map";
 import {toast} from "react-toastify";
 import _ from "lodash";
 import Helper from "../helpers/Helper";
@@ -38,7 +38,7 @@ function SingleBranch() {
             (async () => {
                 const data = await dispatch(singleBranchRequest({id: params.id}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -49,15 +49,15 @@ function SingleBranch() {
                     ...tempBranch,
                     phoneNum: "+" + tempBranch.phoneNum,
                     main: tempBranch.main === 'main',
-                    center: [ tempBranch.lat, tempBranch.lon ],
+                    center: [tempBranch.lat, tempBranch.lon],
                     images: [...tempBranch.images]
                 });
             })()
         }
     }, [params.id]);
 
-    const handleChangeValues = useCallback((val, key) =>    {
-        if(key === 'map'){
+    const handleChangeValues = useCallback((val, key) => {
+        if (key === 'map') {
             const coords = val.get('coords');
 
             setValues({
@@ -65,7 +65,8 @@ function SingleBranch() {
                 lat: coords[0],
                 lon: coords[1],
             });
-        }else if(key === 'images'){
+            toast.info(`Selected coords\` \n${coords[0]} \n${coords[1]}`);
+        } else if (key === 'images') {
             const {files} = val.target;
             const imagesList = [...values.images];
 
@@ -85,7 +86,7 @@ function SingleBranch() {
                 images: [...imagesList],
             });
             val.target.value = '';
-        }else{
+        } else {
             setValues({
                 ...values,
                 [key]: val,
@@ -143,7 +144,7 @@ function SingleBranch() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -152,10 +153,63 @@ function SingleBranch() {
         navigate(`/maps`);
     }, [values]);
 
+    const handleUpdateBranch = useCallback(async () => {
+        const notDeleteImageIdList = values.images.map(file => file.id);
+
+        const validateValues = [
+            values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1)) : true,
+            values.title ? Validator.validString(values.title) : true,
+            values.location ? Validator.validString(values.location) : true,
+            values.country ? Validator.validString(values.country) : true,
+            values.city ? Validator.validString(values.city) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v !== true);
+
+        if (invalidVal) {
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.phoneNum && !values.title && !values.location
+            && !values.country && !values.city && !values.lat && !values.lon
+            && _.isEmpty(notDeleteImageIdList) && _.isEmpty(values.images)
+        ) {
+            toast.error(`Fill one of fields`);
+            return;
+        }
+
+        const data = await dispatch(updateBranchRequest({
+            id: values.id,
+            title: values.title ? values.title : undefined,
+            location: values.location ? values.location : undefined,
+            lat: values.lat ? values.lat : undefined,
+            lon: values.lon ? values.lon : undefined,
+            phoneNum: values.phoneNum ? values.phoneNum.slice(1) : undefined,
+            city: values.city ? values.city : undefined,
+            country: values.country ? values.country : undefined,
+            main: values.main ? values.main : undefined,
+            images: values.images.length ? values.images.filter(file => !file.id) : undefined,
+            notDeleteImageIdList,
+            onUploadProcess: (ev) => {
+                const {total, loaded} = ev;
+                setUploadProcess(loaded / total * 100);
+            }
+        }));
+
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
+            toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+            return;
+        }
+
+        toast.success('Branch updated successfully');
+        navigate(`/maps`);
+    }, [values]);
+
     const handleDelete = useCallback(async () => {
         const data = await dispatch(deleteBranchRequest({id: values.id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -168,52 +222,52 @@ function SingleBranch() {
         {
             path: ['map'],
             label: 'Map',
-            disabled: !values.id,
+            disabled: false,
         },
         {
             path: ['title'],
             label: 'Title',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['country'],
             label: 'Country',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['city'],
             label: 'City',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['location'],
             label: 'Location',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['lat'],
             label: 'Lat',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['lon'],
             label: 'Lon',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['phoneNum'],
             label: 'Phone',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['main'],
             label: 'Main branch',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['images'],
             label: 'Select images',
-            disabled: !!values.id,
+            disabled: false,
         },
         {
             path: ['imagesList'],
@@ -252,21 +306,33 @@ function SingleBranch() {
 
                 {
                     values.id ? (
-                        <button
-                            className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
-                            onClick={handleDelete}
-                        >
-                            Delete
-                        </button>
-                    ) : (
+                        <>
+                            <button
+                                className="btn btn-danger"
+                                disabled={admin && admin.role === 'manager'}
+                                onClick={handleDelete}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={handleUpdateBranch}
+                            >
+                                Update
+                            </button>
+                        </>
+                    ) : null
+                }
+
+                {
+                    !values.id ? (
                         <button
                             className="btn btn-primary"
                             onClick={handleAddBranch}
                         >
                             Add
                         </button>
-                    )
+                    ) : null
                 }
             </div>
         </Wrapper>

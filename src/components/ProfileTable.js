@@ -18,15 +18,15 @@ function ProfileTable(props) {
 
     useEffect(() => {
         (async () => {
-            if(admin.branchId){
+            if (admin.branchId) {
                 const data = await dispatch(singleBranchRequest({id: admin.branchId}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
 
-                setBranchTitle(data.payload.singleBranch.title);
+                setBranchTitle(data?.payload?.singleBranch?.title);
             }
         })()
     }, []);

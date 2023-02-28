@@ -1,8 +1,8 @@
 import React from 'react';
+import {ToastContainer} from "react-toastify";
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import {ToastContainer} from "react-toastify";
 import Products from "./pages/Products";
 import Categories from "./pages/Categories";
 import News from "./pages/News";
@@ -22,6 +22,8 @@ import SingleUser from "./pages/SingleUser";
 import SingleBranch from "./pages/SingleBranch";
 import ForgotPassword from "./pages/ForgotPassword";
 import SingleOrder from "./pages/SingleOrder";
+import PaymentTypes from "./pages/PaymentTypes";
+import SinglePaymentType from "./pages/SinglePaymentType";
 
 function App() {
     return (
@@ -54,6 +56,10 @@ function App() {
                     <Route path='/categories' element={<Categories/>}/>
                     <Route path='/categories/add' element={<SingleCategory/>}/>
                     <Route path='/categories/:slugName' element={<SingleCategory/>}/>
+
+                    <Route path='/payment-types' element={<PaymentTypes/>}/>
+                    <Route path='/payment-types/add' element={<SinglePaymentType/>}/>
+                    <Route path='/payment-types/:id' element={<SinglePaymentType/>}/>
 
                     <Route path='/news' element={<News/>}/>
                     <Route path='/news/add' element={<SingleNews/>}/>

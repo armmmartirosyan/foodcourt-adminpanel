@@ -93,7 +93,7 @@ function SingleAdmin() {
             (async () => {
                 const data = await dispatch(getSingleAdminRequest({id: params.id}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -102,15 +102,8 @@ function SingleAdmin() {
 
                 setAdmin({...tempAdmin});
                 setValues({
-                    firstName: tempAdmin.firstName,
-                    lastName: tempAdmin.lastName,
-                    email: tempAdmin.email,
-                    password: tempAdmin.password,
-                    confirmPassword: tempAdmin.confirmPassword,
+                    ...tempAdmin,
                     phoneNum: "+" + tempAdmin.phoneNum,
-                    status: tempAdmin.status,
-                    role: tempAdmin.role,
-                    branchId: tempAdmin.branchId,
                 });
             })()
         }
@@ -120,7 +113,7 @@ function SingleAdmin() {
         (async () => {
             const data = await dispatch(allBranchesListRequest());
 
-            if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 return;
             }
@@ -174,7 +167,7 @@ function SingleAdmin() {
             branchId: values.branchId.value || null
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -215,7 +208,7 @@ function SingleAdmin() {
             branchId: values?.branchId?.value || null,
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -228,7 +221,7 @@ function SingleAdmin() {
         e.stopPropagation();
         const data = await dispatch(deleteAdminAccountRequest({id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

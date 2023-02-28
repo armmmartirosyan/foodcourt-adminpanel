@@ -40,8 +40,6 @@ function TableCol(props) {
                     moment(temp).format('ddd, LT')
                 ) : null
             }
-
-
             {
                 !excludePath.includes(headerCol.path[headerCol.path.length - 1]) ? (
                     Helper.shortTxt(temp)

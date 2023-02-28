@@ -54,7 +54,7 @@ function SingleCategory() {
             (async () => {
                 const data = await dispatch(singleCategoryRequest({slugName: params.slugName}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -117,7 +117,7 @@ function SingleCategory() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -153,7 +153,7 @@ function SingleCategory() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -166,7 +166,7 @@ function SingleCategory() {
         e.stopPropagation();
         const data = await dispatch(deleteCategoryRequest({id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

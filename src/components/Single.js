@@ -4,7 +4,7 @@ import Select from "react-select";
 import moment from "moment/moment";
 import _ from "lodash";
 import PhoneInput from "react-phone-number-input";
-import ru from 'react-phone-number-input/locale/ru'
+import en from 'react-phone-number-input/locale/en'
 import YandexMap from "./YandexMap";
 import ImagesList from "./ImagesList";
 import PropTypes from "prop-types";
@@ -53,7 +53,7 @@ function Single(props) {
                                             singleBranch={values.id ? values : {}}
                                             onMapClick={changeValues}
                                             center={values.center[0] !== 0 ? values.center : []}
-                                            allowMapClick={item.disabled}
+                                            allowMapClick={!item.disabled}
                                         />
                                     </div>
                                 ) : null
@@ -86,7 +86,7 @@ function Single(props) {
                                 ) : null
                             }
                             {
-                                !values.id && tempPath === 'images' ? (
+                                tempPath === 'images' ? (
                                     <div className="mb-3">
                                         <label htmlFor={tempPath} className="form-label">{item.label}</label>
                                         <input
@@ -181,8 +181,8 @@ function Single(props) {
                                         <label htmlFor={tempPath}>{item.label}</label>
                                         <PhoneInput
                                             international
-                                            defaultCountry="RU"
-                                            labels={ru}
+                                            defaultCountry="AM"
+                                            labels={en}
                                             id={tempPath}
                                             disabled={item.disabled}
                                             value={value}

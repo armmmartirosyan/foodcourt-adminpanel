@@ -74,7 +74,7 @@ function SingleProduct() {
         (async () => {
             const data = await dispatch(allCategoriesListRequest());
 
-            if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             }
 
@@ -91,8 +91,9 @@ function SingleProduct() {
             (async () => {
                 const data = await dispatch(singleProductRequest({slugName: params.slugName}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
+                    return;
                 }
 
                 const tempProduct = data?.payload?.product;
@@ -169,7 +170,7 @@ function SingleProduct() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -212,7 +213,7 @@ function SingleProduct() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -225,7 +226,7 @@ function SingleProduct() {
         e.stopPropagation();
         const data = await dispatch(deleteProductRequest({id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

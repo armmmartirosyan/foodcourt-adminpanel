@@ -60,7 +60,7 @@ function SingleNews() {
             (async () => {
                 const data = await dispatch(singleNewsRequest({slugName: params.slugName}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -127,7 +127,7 @@ function SingleNews() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -172,7 +172,7 @@ function SingleNews() {
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -185,7 +185,7 @@ function SingleNews() {
         e.stopPropagation();
         const data = await dispatch(deleteNewsRequest({id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

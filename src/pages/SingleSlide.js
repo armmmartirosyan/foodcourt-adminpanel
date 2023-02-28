@@ -13,6 +13,7 @@ import Helper from "../helpers/Helper";
 import {useNavigate, useParams} from "react-router-dom";
 import Wrapper from "../components/Wrapper";
 import Single from "../components/Single";
+import Validator from "../helpers/Validator";
 
 function SingleSlide() {
     const dispatch = useDispatch();
@@ -27,12 +28,24 @@ function SingleSlide() {
     const [slide, setSlide] = useState({});
     const [values, setValues] = useState({
         image: {},
+        title: '',
+        description: '',
     });
 
     const drawData = [
         {
             path: ['image'],
             label: 'Image',
+            disabled: false,
+        },
+        {
+            path: ['title'],
+            label: 'Title',
+            disabled: false,
+        },
+        {
+            path: ['description'],
+            label: 'Description',
             disabled: false,
         },
         {
@@ -47,19 +60,24 @@ function SingleSlide() {
             (async () => {
                 const data = await dispatch(singleSlideRequest({id: params.id}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
 
                 setSlide({...data.payload.slide});
+                setValues({
+                    ...values,
+                    title: data.payload.slide.title || '',
+                    description: data.payload.slide.description || '',
+                })
             })()
         }
     }, [params.id]);
 
     const handleChangeValues = useCallback((val, key) => {
-        if(key === 'image' && val.target
-            && !_.isEmpty(val.target.files)){
+        if (key === 'image' && val.target
+            && !_.isEmpty(val.target.files)) {
             const {files} = val.target;
 
             files[0]._src = URL.createObjectURL(files[0]);
@@ -67,15 +85,32 @@ function SingleSlide() {
                 ...values,
                 [key]: files[0],
             });
-        }else if(key === 'image'){
+        } else if (key === 'image') {
             setValues({
                 ...values,
                 [key]: {},
+            });
+        } else {
+            setValues({
+                ...values,
+                [key]: val,
             });
         }
     }, [values]);
 
     const handleAddSlide = useCallback(async () => {
+        const validateValues = [
+            values.title ? Validator.validString(values.title) : true,
+            values.description ? Validator.validString(values.description) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v !== true);
+
+        if (invalidVal) {
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
         if (!values.image.type) {
             toast.error("Select image!");
             return;
@@ -83,13 +118,15 @@ function SingleSlide() {
 
         const data = await dispatch(addSlideRequest({
             image: values.image,
+            title: values.title || undefined,
+            description: values.description || undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -99,21 +136,35 @@ function SingleSlide() {
     }, [values]);
 
     const handleUpdateSlide = useCallback(async () => {
-        if (!values.image.type) {
-            toast.error("Select image");
+        const validateValues = [
+            values.title ? Validator.validString(values.title) : true,
+            values.description ? Validator.validString(values.description) : true,
+        ];
+
+        const invalidVal = validateValues.find((v) => v !== true);
+
+        if (invalidVal) {
+            toast.error(`Invalid ${invalidVal}`);
+            return;
+        }
+
+        if (!values.title && !values.description && !values.image.type) {
+            toast.error("Fill one of fields!");
             return;
         }
 
         const data = await dispatch(updateSlideRequest({
             id: slide.id,
             image: values.image.type ? values.image : undefined,
+            title: values.title || undefined,
+            description: values.description || undefined,
             onUploadProcess: (ev) => {
                 const {total, loaded} = ev;
                 setUploadProcess(loaded / total * 100);
             }
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -126,7 +177,7 @@ function SingleSlide() {
         e.stopPropagation();
         const data = await dispatch(deleteSlideRequest({id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

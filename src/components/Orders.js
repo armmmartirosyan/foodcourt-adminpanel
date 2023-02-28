@@ -31,7 +31,7 @@ function Orders() {
             (async () => {
                 const data = await dispatch(notReceivedOrdersListRequest({branchId: admin.branchId}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 }
             })()

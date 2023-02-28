@@ -94,6 +94,27 @@ class Api {
         return api.delete(`/categories/${id}`);
     }
 
+    //Payment types
+    static getAllPaymentTypes() {
+        return api.get(`/payment-types`);
+    }
+
+    static singlePaymentType(id) {
+        return api.get(`/payment-types/${id}`);
+    }
+
+    static addPaymentType(props) {
+        return api.post(`/payment-types`, props);
+    }
+
+    static updatePaymentType(id, props) {
+        return api.put(`/payment-types/${id}`, props);
+    }
+
+    static deletePaymentType(id) {
+        return api.delete(`/payment-types/${id}`);
+    }
+
     //News
     static getAllNewsList(page, title) {
         return api.get(`/news/get`, {params: {page, title}});
@@ -205,14 +226,14 @@ class Api {
         });
     }
 
-    // static updateBranch(slugName, onUploadProgress, params) {
-    //     return api.put(`/map/${slugName}`, params, {
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //         onUploadProgress
-    //     });
-    // }
+    static updateBranch(id, onUploadProgress, params) {
+        return api.put(`/map/${id}`, params, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress
+        });
+    }
 
     static deleteBranch(id) {
         return api.delete(`/map/${id}`);
@@ -227,8 +248,8 @@ class Api {
         return api.get(`/users/${id}`);
     }
 
-    static deleteUserAccount(id) {
-        return api.delete(`/users/${id}`);
+    static changeUserStatus(id, status) {
+        return api.post(`/users/${id}`, {status});
     }
 
     //Admin

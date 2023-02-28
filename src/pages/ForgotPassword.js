@@ -42,7 +42,7 @@ function ForgotPassword() {
 
         const data = await dispatch(getKeyRequest({email: values.email}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -55,6 +55,8 @@ function ForgotPassword() {
         const validateValues = [
             Validator.validEmail(values.email),
             Validator.validEverySymbol(values.token),
+            Validator.validEverySymbol(values.password),
+            Validator.validEverySymbol(values.confirmPassword),
         ];
 
         const invalidValue = validateValues.find((v) => v !== true);
@@ -76,7 +78,7 @@ function ForgotPassword() {
             confirmPassword: values.confirmPassword
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

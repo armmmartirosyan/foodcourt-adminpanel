@@ -18,7 +18,7 @@ function Branches() {
         (async () => {
             const data = await dispatch(allBranchesListRequest());
 
-            if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+            if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 return;
             }

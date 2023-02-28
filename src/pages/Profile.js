@@ -5,7 +5,6 @@ import {toast} from "react-toastify";
 import Wrapper from "../components/Wrapper";
 import {
     changePassRequest,
-    getAdminRequest,
     getKeyRequest,
     modifyCurrentAccountRequest
 } from "../store/actions/admin";
@@ -82,12 +81,12 @@ function Profile() {
                 name,
                 value: val,
             });
-        }else{
-           setValue({
-               key: '',
-               name: '',
-               value: '',
-           });
+        } else {
+            setValue({
+                key: '',
+                name: '',
+                value: '',
+            });
         }
 
     }, []);
@@ -102,17 +101,17 @@ function Profile() {
     const handleModifyAccount = useCallback(async () => {
         let validateValues = [];
 
-        if(value.key === 'firstName' || value.key === 'lastName'){
+        if (value.key === 'firstName' || value.key === 'lastName') {
             validateValues = [Validator.validString(value.value)];
-        }else if(value.key === 'phoneNum'){
+        } else if (value.key === 'phoneNum') {
             validateValues = [Validator.validPhoneNum(value.value)];
-        }else if(value.key === 'email'){
+        } else if (value.key === 'email') {
             validateValues = [Validator.validEmail(value.value)];
         }
 
-        const invalidVal = validateValues.find((v) => v!==true);
+        const invalidVal = validateValues.find((v) => v !== true);
 
-        if(invalidVal){
+        if (invalidVal) {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
@@ -121,27 +120,32 @@ function Profile() {
             [value.key]: value.value
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
-        if(value.name === 'Email'){
+        if (value.name === 'Email') {
             Account.deleteToken();
             navigate('/');
             return;
         }
-
-        await dispatch(getAdminRequest());
 
         updateValues();
         toast.success('Account modified successfully.');
     }, [value]);
 
     const handleGetKey = useCallback(async () => {
+        const validateEmail = Validator.validEmail(value.value);
+
+        if (validateEmail !== true) {
+            toast.error(`Invalid email`);
+            return;
+        }
+
         const data = await dispatch(getKeyRequest({email: value.value}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -154,16 +158,18 @@ function Profile() {
     const handleChangePass = useCallback(async () => {
         const validateValues = [
             Validator.validEverySymbol(newValues.token),
+            Validator.validEverySymbol(newValues.password),
+            Validator.validEverySymbol(newValues.confirmPassword),
         ];
 
-        const invalidVal = validateValues.find((v) => v!==true);
+        const invalidVal = validateValues.find((v) => v !== true);
 
-        if(invalidVal){
+        if (invalidVal) {
             toast.error(`Invalid ${invalidVal}`);
             return;
         }
 
-        if(newValues.confirmPassword !== newValues.password){
+        if (newValues.confirmPassword !== newValues.password) {
             toast.error("Confirm password is wrong!");
             return
         }
@@ -175,7 +181,7 @@ function Profile() {
             confirmPassword: newValues.confirmPassword,
         }));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
@@ -218,14 +224,16 @@ function Profile() {
             }
             {
                 !_.isEmpty(admin) && state === 'changePass' ? (
-                        <div className="profile__table">
-                            <ChangePassword
-                                handleChange={handleChangeNewValues}
-                                values={newValues}
-                                forwardFunc={handleChangePass}
-                                backFunc={() => {setState('')}}
-                            />
-                        </div>
+                    <div className="profile__table">
+                        <ChangePassword
+                            handleChange={handleChangeNewValues}
+                            values={newValues}
+                            forwardFunc={handleChangePass}
+                            backFunc={() => {
+                                setState('')
+                            }}
+                        />
+                    </div>
                 ) : null
             }
         </Wrapper>

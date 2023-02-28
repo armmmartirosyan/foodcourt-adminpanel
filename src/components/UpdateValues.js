@@ -15,7 +15,9 @@ function UpdateValues(props) {
         <div className="profile__table position-relative pt-5">
             <div
                 className="modal_close"
-                onClick={() => {backFunc()}}
+                onClick={() => {
+                    backFunc()
+                }}
             >
                 X
             </div>

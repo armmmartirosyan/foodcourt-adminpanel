@@ -84,7 +84,7 @@ function SingleOrder() {
             (async () => {
                 const data = await dispatch(singleNotReceivedOrderRequest({id: params.id}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -110,7 +110,7 @@ function SingleOrder() {
     const modifyOrder = useCallback(async (status, id) => {
         const data = await dispatch(modifyOrderRequest({status, id}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }

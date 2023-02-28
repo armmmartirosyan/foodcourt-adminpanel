@@ -40,7 +40,7 @@ function Wrapper(props) {
             (async () => {
                 const data = await dispatch(getAdminRequest());
 
-                if(data.payload?.status === "error" || data.payload?.status !== "ok"){
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     Account.deleteToken();
                     navigate('/');
                 }

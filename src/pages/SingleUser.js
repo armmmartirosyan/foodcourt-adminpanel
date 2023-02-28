@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
-import {deleteUserAccountRequest, singleUserRequest} from "../store/actions/users";
+import {changeUserStatusRequest, singleUserRequest} from "../store/actions/users";
 import {toast} from "react-toastify";
 import _ from "lodash";
 import Helper from "../helpers/Helper";
@@ -49,7 +49,7 @@ function SingleUser() {
             (async () => {
                 const data = await dispatch(singleUserRequest({id: params.id}));
 
-                if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                     toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                     return;
                 }
@@ -62,20 +62,16 @@ function SingleUser() {
         }
     }, [params.id]);
 
-    const handleBlock = useCallback(async (e, id) => {
+    const handleChangeUserStatus = useCallback(async (e, id, status) => {
         e.stopPropagation();
-        const data = await dispatch(deleteUserAccountRequest({id}));
+        const data = await dispatch(changeUserStatusRequest({id, status}));
 
-        if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
-        // (users.length === 1 && currentPage > 1) ?
-        //     navigate(`/users?page=${currentPage - 1}`)
-        //     : navigate(`/users?page=${currentPage - 1}`);
-
-        toast.success('User deleted successfully');
+        toast.success(`Change user status success.`);
         navigate("/users");
     }, []);
 
@@ -113,12 +109,21 @@ function SingleUser() {
                         <button
                             className="btn btn-danger"
                             onClick={async (e) => {
-                                await handleBlock(e, user.id)
+                                await handleChangeUserStatus(e, user.id, 'blocked')
                             }}
                         >
                             Block
                         </button>
-                    ) : null
+                    ) : (
+                        <button
+                            className="btn btn-success"
+                            onClick={async (e) => {
+                                await handleChangeUserStatus(e, user.id, 'active')
+                            }}
+                        >
+                            Unlock
+                        </button>
+                    )
                 }
             </div>
         </Wrapper>

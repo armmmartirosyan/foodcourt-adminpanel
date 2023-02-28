@@ -32,6 +32,7 @@ function SingleImage(props) {
         </figure>
     );
 }
+
 SingleImage.propTypes = {
     image: PropTypes.object.isRequired,
     obj: PropTypes.object.isRequired,

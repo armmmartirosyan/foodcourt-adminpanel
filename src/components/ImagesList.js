@@ -17,11 +17,11 @@ function ImagesList(props) {
                 className='image'
             />
             {
-                image.type ? (
+                image.name ? (
                     <div
                         className="image-delete"
                         onClick={() => {
-                            handleDeleteImage({src: image._src} || {name: image.name})
+                            handleDeleteImage({src: image._src, name: image.name})
                         }}
                     >
                         X

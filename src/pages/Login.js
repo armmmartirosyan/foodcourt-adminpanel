@@ -29,6 +29,7 @@ function Login() {
     const handleSgnIn = useCallback(async () => {
         const validateValues = [
             Validator.validEmail(values.email),
+            Validator.validEverySymbol(values.password),
         ];
 
         if (validateValues.find((v) => v !== true)) {
@@ -45,12 +46,13 @@ function Login() {
         if(data.error?.message && data.payload === 'Too many requests, please try again later.'){
             toast.error('Too many requests, please try again later.');
             return;
-        }else if (data.payload?.status === 'error' || data.payload?.status !== 'ok') {
+        }else if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
         navigate('/home');
+        window.location.reload();
     }, [values]);
 
     useEffect(() => {

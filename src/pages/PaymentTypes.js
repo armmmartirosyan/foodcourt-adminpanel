@@ -2,28 +2,32 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import _ from "lodash";
 import {toast} from "react-toastify";
-import {allSlidesListRequest} from "../store/actions/slides";
-import Wrapper from "../components/Wrapper";
-import TopBar from "../components/TopBar";
-import EmptyPage from "../components/EmptyPage";
-import Table from "../components/Table";
 import Helper from "../helpers/Helper";
+import TopBar from "../components/TopBar";
+import Table from "../components/Table";
+import EmptyPage from "../components/EmptyPage";
+import Wrapper from "../components/Wrapper";
+import {getAllPaymentTypesRequest} from "../store/actions/paymentTypes";
 
 const tableHeader = [
     {
-        path:['imagePath'],
-        label:'Image',
+        path:['type'],
+        label:'Payment type',
+    },
+    {
+        path:['typeName'],
+        label:'Payment type name',
     },
 ];
 
-function Slides() {
+function PaymentTypes() {
     const dispatch = useDispatch();
-    const slides = useSelector(state => state.slides.slides);
-    const statusGetAll = useSelector(state => state.status.slidesGetAllStatus);
+    const paymentTypes = useSelector(state => state.paymentTypes.paymentTypes);
+    const statusGetAll = useSelector(state => state.status.paymentTypesGetAllStatus);
 
     useEffect(() => {
         (async () => {
-            const data = await dispatch(allSlidesListRequest());
+            const data = await dispatch(getAllPaymentTypesRequest());
 
             if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
@@ -33,19 +37,19 @@ function Slides() {
 
     return (
         <Wrapper
-            pageName='slides'
             statuses={{statusGetAll}}
+            pageName='payment types'
         >
             <TopBar
-                pageName='slides'
+                pageName='payment types'
                 allowAdd={true}
             />
             {
-                !_.isEmpty(slides) ? (
+                !_.isEmpty(paymentTypes) ? (
                     <Table
                         tableHeader={tableHeader}
-                        list={slides}
-                        path='slides'
+                        list={paymentTypes}
+                        path='payment-types'
                     />
                 ) : <EmptyPage/>
             }
@@ -53,4 +57,4 @@ function Slides() {
     );
 }
 
-export default Slides;
+export default PaymentTypes;

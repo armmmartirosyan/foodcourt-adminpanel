@@ -29,12 +29,12 @@ export const singleUserRequest = createAsyncThunk('users/get/single', async (pay
     return data;
 });
 
-export const deleteUserAccountRequest = createAsyncThunk('users/delete', async (payload = {}, {rejectWithValue}) => {
-    const { id } = payload;
+export const changeUserStatusRequest = createAsyncThunk('users/delete', async (payload = {}, {rejectWithValue}) => {
+    const { id, status } = payload;
     let data;
 
     try{
-        let newData= await Api.deleteUserAccount(id);
+        let newData= await Api.changeUserStatus(id, status);
         data = newData.data;
     }catch (e) {
         return rejectWithValue(e.response.data);

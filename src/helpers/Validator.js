@@ -4,7 +4,7 @@ export default class Validator{
         return !reg.test(str) ? "Invalid value (at least 2 letters)" : true;
     }
     static validEmail = (email) => {
-        const reg = /^(\w{8,})@([a-z]{2,})\.([a-z]{2,6})$/i;
+        const reg = /^([\w\.-]{8,})@([a-z]{2,})\.([a-z]{2,6})$/i;
         return !reg.test(email) ? "Invalid email" : true;
     }
     static validPhoneNum = (phone) => {

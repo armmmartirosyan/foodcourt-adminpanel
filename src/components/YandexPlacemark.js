@@ -11,7 +11,7 @@ function YandexPlacemark(props) {
         <Placemark
             defaultGeometry={geometry}
             onClick={() => {
-                if(id) navigate(`/maps/${id}`);
+                if (id) navigate(`/maps/${id}`);
             }}
             options={{
                 preset: 'islands#geolocationIcon',

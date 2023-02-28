@@ -28,6 +28,9 @@ export default createReducer(initialState, (builder) => {
         .addMatcher((action) => action.type.endsWith('admins/single/fulfilled'), (state, action) => {
             state.singleAdmin = action.payload.admin;
         })
+        .addMatcher((action) => action.type.endsWith('admin/modify/current/fulfilled'), (state, action) => {
+            state.admin = action.payload.updatedAdmin;
+        })
 })
 
 
