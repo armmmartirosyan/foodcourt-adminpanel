@@ -65,7 +65,7 @@ function SingleBranch() {
                 lat: coords[0],
                 lon: coords[1],
             });
-            toast.info(`Selected coords\` \n${coords[0]} \n${coords[1]}`);
+            toast.info(`Выбранные координаты\` \n${coords[0]} \n${coords[1]}`);
         } else if (key === 'images') {
             const {files} = val.target;
             const imagesList = [...values.images];
@@ -77,7 +77,7 @@ function SingleBranch() {
             });
 
             if (imagesList.length > 10) {
-                toast.info('max images limit');
+                toast.info('Максимальное количество изображений');
                 imagesList.length = 10;
             }
 
@@ -110,21 +110,21 @@ function SingleBranch() {
 
     const handleAddBranch = useCallback(async () => {
         const validateValues = [
-            Validator.validPhoneNum(values.phoneNum.slice(1)),
-            Validator.validString(values.title),
-            Validator.validString(values.location),
-            Validator.validString(values.country),
-            Validator.validString(values.city),
+            Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона'),
+            Validator.validString(values.title, 'Недопустимый заголовок'),
+            Validator.validString(values.location, 'Неверный адрес'),
+            Validator.validString(values.country, 'Неверная страна'),
+            Validator.validString(values.city, 'Неверный город'),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
         if (!values.images.length) {
-            toast.error("Select image!");
+            toast.error("Выберите изображение");
             return;
         }
 
@@ -149,7 +149,7 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Branch added successfully');
+        toast.success('Филиал успешно добавлен');
         navigate(`/maps`);
     }, [values]);
 
@@ -158,16 +158,16 @@ function SingleBranch() {
 
         const validateValues = [
             values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1)) : true,
-            values.title ? Validator.validString(values.title) : true,
-            values.location ? Validator.validString(values.location) : true,
-            values.country ? Validator.validString(values.country) : true,
-            values.city ? Validator.validString(values.city) : true,
+            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
+            values.location ? Validator.validString(values.location, 'Неверный адрес') : true,
+            values.country ? Validator.validString(values.country, 'Неверная страна') : true,
+            values.city ? Validator.validString(values.city, 'Неверный город') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
@@ -175,7 +175,7 @@ function SingleBranch() {
             && !values.country && !values.city && !values.lat && !values.lon
             && _.isEmpty(notDeleteImageIdList) && _.isEmpty(values.images)
         ) {
-            toast.error(`Fill one of fields`);
+            toast.error(`Заполните одно из полей`);
             return;
         }
 
@@ -202,7 +202,7 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Branch updated successfully');
+        toast.success('Ветка успешно обновлена');
         navigate(`/maps`);
     }, [values]);
 
@@ -214,34 +214,34 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Branch deleted successfully');
+        toast.success('Ветка успешно удалена');
         navigate(`/maps`);
     }, [values]);
 
     const drawData = [
         {
             path: ['map'],
-            label: 'Map',
+            label: 'карта',
             disabled: false,
         },
         {
             path: ['title'],
-            label: 'Title',
+            label: 'Название',
             disabled: false,
         },
         {
             path: ['country'],
-            label: 'Country',
+            label: 'Страна',
             disabled: false,
         },
         {
             path: ['city'],
-            label: 'City',
+            label: 'Город',
             disabled: false,
         },
         {
             path: ['location'],
-            label: 'Location',
+            label: 'Адрес',
             disabled: false,
         },
         {
@@ -256,34 +256,34 @@ function SingleBranch() {
         },
         {
             path: ['phoneNum'],
-            label: 'Phone',
+            label: 'Номер телефона',
             disabled: false,
         },
         {
             path: ['main'],
-            label: 'Main branch',
+            label: 'Основная',
             disabled: false,
         },
         {
             path: ['images'],
-            label: 'Select images',
+            label: 'Выберите изображение',
             disabled: false,
         },
         {
             path: ['imagesList'],
-            label: 'Images list',
+            label: 'Список изображений',
             handleDelete: handleDeleteImage,
         },
     ];
 
     return (
         <Wrapper
-            pageName={`branch${values.id ? ' - ' + values.title : ''}`}
+            pageName={`Ветвь${values.id ? ' - ' + values.title : ''}`}
             uploadProcess={uploadProcess}
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetSingle}}
         >
             <TopBar
-                pageName={`branch${values.id ? ' - ' + values.title : ''}`}
+                pageName={`Ветвь${values.id ? ' - ' + values.title : ''}`}
                 allowAdd={false}
             />
 
@@ -301,7 +301,7 @@ function SingleBranch() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
 
                 {
@@ -309,34 +309,26 @@ function SingleBranch() {
                         <>
                             <button
                                 className="btn btn-danger"
-                                disabled={admin && admin.role === 'manager'}
+                                disabled={admin && admin.role === 'админ'}
                                 onClick={handleDelete}
                             >
-                                Delete
-                            </button>
-                            <button
-                                className="btn btn-primary"
-                                onClick={handleUpdateBranch}
-                            >
-                                Update
+                                Удалить
                             </button>
                         </>
                     ) : null
                 }
-
-                {
-                    !values.id ? (
-                        <button
-                            className="btn btn-primary"
-                            onClick={handleAddBranch}
-                        >
-                            Add
-                        </button>
-                    ) : null
-                }
+                <button
+                    className="btn btn-primary"
+                    onClick={values.id ? handleUpdateBranch : handleAddBranch}
+                >
+                    {
+                        values.id ? 'Обнавить' : 'Добавить'
+                    }
+                </button>
             </div>
         </Wrapper>
     );
 }
 
 export default SingleBranch;
+//шашлыков

@@ -36,7 +36,7 @@ function ForgotPassword() {
         ];
 
         if (validateValues.find((v) => v !== true)) {
-            toast.error('Invalid email');
+            toast.error('Неверный адрес электронной почты');
             return;
         }
 
@@ -47,27 +47,27 @@ function ForgotPassword() {
             return;
         }
 
-        toast.success('Key sent successfully');
+        toast.success('Ключ успешно отправлен');
         setState('changePass');
     }, [values]);
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validEmail(values.email),
-            Validator.validEverySymbol(values.token),
-            Validator.validEverySymbol(values.password),
-            Validator.validEverySymbol(values.confirmPassword),
+            Validator.validEmail(values.email, 'Неверный адрес электронной почты'),
+            Validator.validEverySymbol(values.token, 'Неправильный ключ'),
+            Validator.validEverySymbol(values.password, 'Неверный пароль'),
+            Validator.validEverySymbol(values.confirmPassword, 'Неверный пароль для подтверждения'),
         ];
 
         const invalidValue = validateValues.find((v) => v !== true);
 
         if (invalidValue) {
-            toast.error(`Invalid ${invalidValue}`);
+            toast.error(invalidValue);
             return;
         }
 
         if (values.confirmPassword !== values.password) {
-            toast.error("Confirm password is wrong!");
+            toast.error("Неверный пароль для подтверждения!");
             return
         }
 
@@ -83,12 +83,12 @@ function ForgotPassword() {
             return;
         }
 
-        toast.success("Password changed!");
+        toast.success("Пароль успешно изменен");
         navigate('/');
     }, [values]);
 
     useEffect(() => {
-        if (Account.getToken()) navigate('/home');
+        if (Account.getToken()) navigate('/orders');
     }, []);
 
     return (
@@ -104,20 +104,20 @@ function ForgotPassword() {
                                 type="email"
                                 className="form-control"
                                 id="floatingInput"
-                                placeholder="Email"
+                                placeholder="Электронная почта"
                                 value={values.email}
                                 onChange={(ev) => {
                                     handleChange(ev.target.value, 'email')
                                 }}
                             />
-                            <label htmlFor="floatingInput">Email address</label>
+                            <label htmlFor="floatingInput">Электронная почта</label>
                         </div>
                         <button
                             type="submit"
                             className="btn btn-primary py-3 w-100 mb-4"
                             onClick={handleGetKey}
                         >
-                            Get key
+                            Получить ключ
                         </button>
                     </>
                 ) : null
@@ -138,7 +138,7 @@ function ForgotPassword() {
                     navigate('/');
                 }}
             >
-                Login
+                Войти
             </button>
         </WrapperLogIn>
     );

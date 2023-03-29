@@ -10,6 +10,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-phone-number-input/style.css'
 import './assets/css/style.css';
+import momentWL from "moment-with-locales-es6";
+
+momentWL.locale('ru');
 
 Modal.setAppElement(document.getElementsByTagName('body'));
 

@@ -1,13 +1,13 @@
 import React from 'react';
 import SingleImage from "./SingleImage";
 import Select from "react-select";
-import moment from "moment/moment";
-import _ from "lodash";
+import momentWL from 'moment-with-locales-es6'
 import PhoneInput from "react-phone-number-input";
 import en from 'react-phone-number-input/locale/en'
 import YandexMap from "./YandexMap";
 import ImagesList from "./ImagesList";
 import PropTypes from "prop-types";
+import _ from 'lodash';
 
 function Single(props) {
     const {drawData, obj, changeValues, values} = props;
@@ -15,12 +15,12 @@ function Single(props) {
         'confirmPassword',
         'description',
         'imageSelect',
-        'receiveType',
         'categories',
         'imagesList',
         'createdAt',
         'updatedAt',
         'branchId',
+        'allowUse',
         'phoneNum',
         'password',
         'address',
@@ -120,7 +120,7 @@ function Single(props) {
                                 ) : null
                             }
                             {
-                                tempPath === "description" || (tempPath === "message" && value) ? (
+                                tempPath === "description" || (tempPath === "message" && value) || tempPath === 'comment' ? (
                                     <div className="form-floating mb-3">
                                     <textarea
                                         className="form-control description-input"
@@ -149,6 +149,7 @@ function Single(props) {
                                             classNamePrefix="select"
                                             className="multi-select"
                                             id={tempPath}
+                                            placeholder='Категории'
                                             onChange={(e) => {
                                                 changeValues(e, tempPath)
                                             }}
@@ -168,6 +169,7 @@ function Single(props) {
                                             isDisabled={item.disabled}
                                             classNamePrefix="select"
                                             className="single-select"
+                                            placeholder='Ветви'
                                             onChange={(e) => {
                                                 changeValues(e, tempPath)
                                             }}
@@ -233,7 +235,7 @@ function Single(props) {
                                 ) : null
                             }
                             {
-                                tempPath === 'main' ? (
+                                tempPath === 'main' || tempPath === 'allowUse' ? (
                                     <div className="form-check form-switch mb-3">
                                         <input
                                             className="form-check-input"
@@ -242,7 +244,8 @@ function Single(props) {
                                             checked={value}
                                             disabled={item.disabled}
                                             onChange={(e) => {
-                                                changeValues(!values.main, tempPath)
+                                                console.log(values.allowUse);
+                                                changeValues(!values.allowUse, tempPath)
                                             }}
                                         />
                                         <label className="form-check-label" htmlFor={tempPath}>
@@ -252,8 +255,7 @@ function Single(props) {
                                 ) : null
                             }
                             {
-                                (tempPath === 'status' && obj.id && obj.status)
-                                || tempPath === 'receiveType' ? (
+                                (tempPath === 'status' && obj.id && obj.status) ? (
                                     <div className="form-floating mb-3">
                                         <input
                                             type='text'
@@ -276,7 +278,7 @@ function Single(props) {
                                             id={tempPath}
                                             placeholder={item.label}
                                             disabled={item.disabled}
-                                            value={moment(value).format('LLL')}
+                                            value={momentWL(value).format('LLL')}
                                         />
                                         <label htmlFor={tempPath}>{item.label}</label>
                                     </div>

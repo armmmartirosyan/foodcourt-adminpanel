@@ -1,7 +1,7 @@
 import React from 'react';
 import Helper from "../helpers/Helper";
 import PropTypes from "prop-types";
-import moment from "moment/moment";
+import momentWL from "moment-with-locales-es6";
 
 const {REACT_APP_API_URL} = process.env;
 
@@ -17,6 +17,8 @@ function TableCol(props) {
         'price',
         'imagePath',
         'createdAt',
+        'phoneNum',
+        'allowUse',
     ];
 
     return (
@@ -32,12 +34,22 @@ function TableCol(props) {
             }
             {
                 headerCol.path[headerCol.path.length - 1] === 'price' ? (
-                    temp + ' AMD'
+                    temp + ' RUB'
                 ) : null
             }
             {
                 headerCol.path[headerCol.path.length - 1] === 'createdAt' ? (
-                    moment(temp).format('ddd, LT')
+                    momentWL(temp).format('ddd, LT')
+                ) : null
+            }
+            {
+                headerCol.path[headerCol.path.length - 1] === 'allowUse' ? (
+                    temp === 't' ? 'Использовать' : 'Не использовать'
+                ) : null
+            }
+            {
+                headerCol.path[headerCol.path.length - 1] === 'phoneNum' ? (
+                    `+${temp}`
                 ) : null
             }
             {

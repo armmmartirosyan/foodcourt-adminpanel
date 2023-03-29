@@ -15,6 +15,24 @@ import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
 
+const drawData = [
+    {
+        path: ['image'],
+        label: 'Изображение',
+        disabled: false,
+    },
+    {
+        path: ['name'],
+        label: 'Название',
+        disabled: false,
+    },
+    {
+        path: ['imageSelect'],
+        label: 'Выберите изображение',
+        disabled: false,
+    },
+];
+
 function SingleCategory() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -30,24 +48,6 @@ function SingleCategory() {
        name: '',
        image: {},
     });
-
-    const drawData = [
-        {
-            path: ['image'],
-            label: 'Image',
-            disabled: false,
-        },
-        {
-            path: ['name'],
-            label: 'Name',
-            disabled: false,
-        },
-        {
-            path: ['imageSelect'],
-            label: 'Select Image',
-            disabled: false,
-        },
-    ];
 
     useEffect(() => {
         if(params.slugName){
@@ -94,17 +94,17 @@ function SingleCategory() {
 
     const handleAddCategory = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.name),
+            Validator.validString(values.name, 'Недопустимый заголовок'),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
 
         if(invalidVal){
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
         if (!values.image.type) {
-            toast.error("Select image!");
+            toast.error("Выберите изображение");
             return;
         }
 
@@ -122,24 +122,24 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Category added successfully');
+        toast.success('Категория успешно добавлена');
         navigate('/categories');
     }, [values]);
 
     const handleUpdateCategory = useCallback(async () => {
         const validateValues = [
-            values.name ? Validator.validString(values.name) : true,
+            values.name ? Validator.validString(values.name, 'Недопустимый заголовок') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
 
         if(invalidVal){
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.name && !values.image.type) {
-            toast.error("Either fill name field, either select new image!");
+            toast.error("Либо заполните поле имени, либо выберите новое изображение");
             return;
         }
 
@@ -158,7 +158,7 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Category added successfully');
+        toast.success('Категория успешно обновлена');
         navigate('/categories');
     }, [values]);
 
@@ -171,7 +171,7 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Category deleted successfully.');
+        toast.success('Категория успешно удалена');
         navigate('/categories');
     }, []);
 
@@ -179,10 +179,10 @@ function SingleCategory() {
         <Wrapper
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetSingle}}
             uploadProcess={uploadProcess}
-            pageName={`category${category.name ? ' - ' + category.name : ''}`}
+            pageName={`категория${category.name ? ' - ' + category.name : ''}`}
         >
             <TopBar
-                pageName={`category${category.name ? ' - ' + category.name : ''}`}
+                pageName={`категория${category.name ? ' - ' + category.name : ''}`}
                 allowAdd={false}
             />
 
@@ -200,30 +200,30 @@ function SingleCategory() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(category) ? (
                         <button
                             className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
+                            disabled={admin && admin.role === 'админ'}
                             onClick={async (e) => {
                                 await handleDelete(e, category.id)
                             }}
                         >
-                            Delete
+                            Удалить
                         </button>
                     ) : null
                 }
                 <button
                     className="btn btn-primary"
-                    disabled={admin && admin.role === 'manager'}
+                    disabled={admin && admin.role === 'админ'}
                     onClick={
                         !_.isEmpty(category) ? handleUpdateCategory : handleAddCategory
                     }
                 >
                     {
-                        !_.isEmpty(category) ? 'Update' : 'Add'
+                        !_.isEmpty(category) ? 'Обнавить' : 'Добавить'
                     }
                 </button>
             </div>

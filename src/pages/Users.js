@@ -15,15 +15,15 @@ import Helper from "../helpers/Helper";
 const tableHeader = [
     {
         path:['firstName'],
-        label:'First Name',
+        label:'Имя',
     },
     {
         path:['lastName'],
-        label:'Last Name',
+        label:'Фамилия',
     },
     {
         path:['email'],
-        label:'Email',
+        label:'Электронная почта',
     },
 ];
 
@@ -76,10 +76,10 @@ function Users() {
     return (
         <Wrapper
             statuses={{statusGetAll}}
-            pageName='users'
+            pageName='пользователи'
         >
             <TopBar
-                pageName='users'
+                pageName='пользователи'
                 search={name}
                 searchChange={searchChange}
             />

@@ -13,11 +13,11 @@ const tableHeader = [
     },
     {
         path:['user', 'phoneNum'],
-        label:'User Phone Number',
+        label:'Номер телефона пользователя',
     },
     {
         path:['createdAt'],
-        label:'Date',
+        label:'Дата',
     },
 ];
 

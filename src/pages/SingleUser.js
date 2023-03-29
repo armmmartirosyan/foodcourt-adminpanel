@@ -19,27 +19,27 @@ function SingleUser() {
     const drawData = [
         {
             path: ['firstName'],
-            label: 'First name',
+            label: 'Имя',
             disabled: true,
         },
         {
             path: ['lastName'],
-            label: 'Last name',
+            label: 'Фамилия',
             disabled: true,
         },
         {
             path: ['email'],
-            label: 'Email',
+            label: 'Электронная почта',
             disabled: true,
         },
         {
             path: ['phoneNum'],
-            label: 'Phone',
+            label: 'Номер телефона',
             disabled: true,
         },
         {
             path: ['status'],
-            label: 'Status',
+            label: 'Положение',
             disabled: true,
         },
     ];
@@ -71,17 +71,17 @@ function SingleUser() {
             return;
         }
 
-        toast.success(`Change user status success.`);
+        toast.success(`Статус пользователя успешно изменен.`);
         navigate("/users");
     }, []);
 
     return (
         <Wrapper
             statuses={{statusGetSingle}}
-            pageName={`user ${user.firstName ? user.firstName : ''}`}
+            pageName={`пользовател ${user.firstName ? user.firstName : ''}`}
         >
             <TopBar
-                pageName={`user ${user.firstName ? user.firstName : ''}`}
+                pageName={`пользовател ${user.firstName ? user.firstName : ''}`}
                 allowAdd={false}
             />
             {
@@ -102,7 +102,7 @@ function SingleUser() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(user) && user.status !== 'blocked' ? (
@@ -112,7 +112,7 @@ function SingleUser() {
                                 await handleChangeUserStatus(e, user.id, 'blocked')
                             }}
                         >
-                            Block
+                            Блокировать
                         </button>
                     ) : (
                         <button
@@ -121,7 +121,7 @@ function SingleUser() {
                                 await handleChangeUserStatus(e, user.id, 'active')
                             }}
                         >
-                            Unlock
+                            Разблокировать
                         </button>
                     )
                 }

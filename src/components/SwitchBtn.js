@@ -6,53 +6,52 @@ function SwitchBtn(props) {
     return (
         <>
             {
-                order.status === 'pending' ? (
+                order.status === 'в ожидании' ? (
                     <button
                         className="btn btn-primary"
                         onClick={async () => {
-                            await modifyOrder('inProcess', order.id)
+                            await modifyOrder('в процессе', order.id)
                         }}
                     >
-                        In Process
+                        В процессе
                     </button>
                 ) : null
             }
             {
-                order.status === 'inProcess' ? (
+                order.status === 'в процессе' ? (
                     <button
                         className="btn btn-success"
                         onClick={async () => {
-                            await modifyOrder('ready', order.id)
+                            await modifyOrder('готовый', order.id)
                         }}
                     >
-                        Ready
+                        Готовый
                     </button>
                 ) : null
             }
             {
-                order.status === 'ready'
-                && (order.receiveType === 'cashOnDelivery'
-                    || order.receiveType === 'cardOnDelivery') ? (
+                order.status === 'готовый'
+                && (order?.payloadType?.typeName?.includes('доставк')) ? (
                     <button
                         className="btn btn-warning"
                         onClick={async () => {
-                            await modifyOrder('onTheWay', order.id)
+                            await modifyOrder('в пути', order.id)
                         }}
                     >
-                        On The Way
+                        В пути
                     </button>
                 ) : null
             }
             {
-                order.status === 'ready'
-                || order.status === 'onTheWay' ? (
+                order.status === 'готовый'
+                || order.status === 'в пути' ? (
                     <button
                         className="btn btn-secondary"
                         onClick={async () => {
-                            await modifyOrder('received', order.id)
+                            await modifyOrder('полученный', order.id)
                         }}
                     >
-                        Received
+                        Полученный
                     </button>
                 ) : null
             }

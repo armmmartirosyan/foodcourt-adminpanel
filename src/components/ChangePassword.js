@@ -11,52 +11,52 @@ function ChangePassword(props) {
                     type="text"
                     className="form-control"
                     id='token'
-                    placeholder='Token'
+                    placeholder='Ключ'
                     value={values.token}
                     onChange={(e) => {
                         handleChange(e.target.value, 'token')
                     }}
                 />
-                <label htmlFor='token'>Token</label>
+                <label htmlFor='token'>Ключ</label>
             </div>
             <div className="form-floating mb-3">
                 <input
                     type="password"
                     className="form-control"
                     id='password'
-                    placeholder='Password'
+                    placeholder='Пароль'
                     value={values.password}
                     onChange={(e) => {
                         handleChange(e.target.value, 'password')
                     }}
                 />
-                <label htmlFor='password'>Password</label>
+                <label htmlFor='password'>Пароль</label>
             </div>
             <div className="form-floating mb-3">
                 <input
                     type="password"
                     className="form-control"
                     id='confirmPassword'
-                    placeholder='Confirm password'
+                    placeholder='Подтвердите пароль'
                     value={values.confirmPassword}
                     onChange={(e) => {
                         handleChange(e.target.value, 'confirmPassword')
                     }}
                 />
-                <label htmlFor='confirmPassword'>Confirm password</label>
+                <label htmlFor='confirmPassword'>Подтвердите пароль</label>
             </div>
             <div className='btn-container'>
                 <button
                     className="btn btn-outline-danger"
                     onClick={backFunc}
                 >
-                    Cancel
+                    Отмена
                 </button>
                 <button
                     className="btn btn-primary"
                     onClick={forwardFunc}
                 >
-                    Change Password
+                    Изменить пароль
                 </button>
             </div>
         </>

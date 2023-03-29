@@ -4,14 +4,14 @@ import ProductsChart from "../components/ProductsChart";
 import Orders from "../components/Orders";
 import {useSelector} from "react-redux";
 
-function Home() {
+function OrdersPage() {
     const statusNotReadyOrders = useSelector(state => state.status.ordersNotReceivedListStatus);
     const statusModifyOrder = useSelector(state => state.status.ordersModifyStatus);
     const statusOrderStatistics = useSelector(state => state.status.ordersStatisticsStatus);
 
     return (
         <Wrapper
-            pageName='home'
+            pageName='заказы'
             statuses={{statusNotReadyOrders, statusModifyOrder, statusOrderStatistics}}
         >
             <ProductsChart/>
@@ -20,4 +20,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default OrdersPage;

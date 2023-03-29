@@ -69,3 +69,17 @@ export const deletePaymentTypeRequest = createAsyncThunk('payment/types/delete',
 
     return data;
 });
+
+export const allowBuyRequest = createAsyncThunk('payment/allow/buy', async (payload = {}, {rejectWithValue}) => {
+    const {allow} = payload;
+    let data;
+
+    try{
+        let newData = await Api.allowBuy(allow);
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});

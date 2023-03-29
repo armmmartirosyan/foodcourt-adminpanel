@@ -17,56 +17,56 @@ const tableHeader = [
     },
     {
         path:['product', 'imagePath'],
-        label:'Image',
+        label:'Изображение',
     },
     {
         path:['product', 'title'],
-        label:'Title',
+        label:'Название',
     },
     {
         path:['quantity'],
-        label:'Quantity',
+        label:'Количество',
     },
     {
         path:['product', 'price'],
-        label:'Price',
+        label:'Цена',
     },
 ];
 
 const drawData = [
     {
         path: ['message'],
-        label: 'Message',
+        label: 'Сообщение',
         disabled: true,
     },
     {
         path: ['address'],
-        label: 'Address',
+        label: 'Адрес',
         disabled: true,
     },
     {
         path: ['user', 'firstName'],
-        label: 'User Name',
+        label: 'Имя пользователя',
         disabled: true,
     },
     {
         path: ['user', 'phoneNum'],
-        label: 'User Phone Number',
+        label: 'Номер телефона пользователя',
         disabled: true,
     },
     {
-        path: ['receiveType'],
-        label: 'Receive Type',
+        path: ['paymentType', 'typeName'],
+        label: 'Тип получения',
         disabled: true,
     },
     {
         path: ['status'],
-        label: 'Status',
+        label: 'Положение дел',
         disabled: true,
     },
     {
         path: ['createdAt'],
-        label: 'Ordered at',
+        label: 'Заказал в',
         disabled: true,
     },
 ];
@@ -115,15 +115,15 @@ function SingleOrder() {
             return;
         }
 
-        navigate('/home');
+        navigate('/orders');
     }, []);
 
     return (
         <Wrapper
-            pageName={`order${params.id ? ` - ${params.id}` : ''}`}
+            pageName={`Заказ${params.id ? ` - ${params.id}` : ''}`}
             statuses={{statusSingleOrder}}
         >
-            <h6 className="title">Order Products</h6>
+            <h6 className="title">Заказанные продукты</h6>
             {
                 !_.isEmpty(order) ? (
                     <>
@@ -137,12 +137,12 @@ function SingleOrder() {
                             <input
                                 type='text'
                                 className="form-control"
-                                id='Total Price(AMD)'
-                                placeholder='Total Price(AMD)'
+                                id='Total Price(RUB)'
+                                placeholder='Итоговая цена(AMD)'
                                 disabled={true}
                                 value={totalPrice}
                             />
-                            <label htmlFor='Total Price(AMD)'>Total Price(AMD)</label>
+                            <label htmlFor='Total Price(RUB)'>Итоговая цена(RUB)</label>
                         </div>
 
                         <Single
@@ -162,7 +162,7 @@ function SingleOrder() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 <SwitchBtn
                     order={order}

@@ -15,15 +15,15 @@ import {allCategoriesListRequest} from "../store/actions/categories";
 const tableHeader = [
     {
         path: ['imagePath'],
-        label: 'Image',
+        label: 'Изображение',
     },
     {
         path: ['title'],
-        label: 'Title',
+        label: 'Название',
     },
     {
         path: ['price'],
-        label: 'Price',
+        label: 'Цена',
     },
 ];
 
@@ -95,12 +95,12 @@ function Offers() {
     return (
         <Wrapper
             statuses={{statusGetAll}}
-            pageName='offers'
+            pageName='предложения'
         >
             <TopBar
                 searchChange={searchChange}
                 search={title}
-                pageName='offers'
+                pageName='предложения'
                 allowAdd={true}
                 categories={categories}
                 onChangeCategory={onChangeCategory}

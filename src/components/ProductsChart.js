@@ -3,7 +3,7 @@ import _ from "lodash";
 import Select from "react-select";
 import {Line} from "react-chartjs-2";
 import {useDispatch, useSelector} from "react-redux";
-import {allProductsListRequest} from "../store/actions/products";
+import {allProductsRequest} from "../store/actions/products";
 import {ordersStatisticsRequest} from "../store/actions/orders";
 import {
     CategoryScale,
@@ -29,9 +29,9 @@ ChartJS.register(
 );
 
 const labels = [
-    'Jan', 'Feb', 'Mar', 'April',
-    'May', 'June', 'July', 'Aug',
-    'Sep', 'Oct', 'Nov', 'Dec'
+    'Янв', 'Фев', 'Мар', 'Апр',
+    'Май', 'Июн', 'Июл', 'Авг',
+    'Сен', 'Окт', 'Ноя', 'Дек'
 ];
 const options = {
     responsive: true,
@@ -41,7 +41,7 @@ const options = {
         },
         title: {
             display: true,
-            text: 'Products sales',
+            text: 'Продажа продуктов',
         },
     },
 };
@@ -61,14 +61,14 @@ function ProductsChart() {
 
     useEffect(() => {
         (async () => {
-            const data = await dispatch(allProductsListRequest());
+            const data = await dispatch(allProductsRequest());
 
             if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
                 return;
             }
 
-            const productData = data.payload.data.products;
+            const productData = data.payload.products;
 
             if(!_.isEmpty(productData)){
                 setProducts(productData.map(product => {
@@ -111,7 +111,7 @@ function ProductsChart() {
         labels,
         datasets: [
             {
-                label: tempProduct.label || 'Product Name',
+                label: tempProduct.label || 'Названия продуктов',
                 data: productOrders || [],
                 borderColor: 'rgb(58,73,148)',
                 backgroundColor: 'rgba(58,73,148, 0.5)',
@@ -130,6 +130,7 @@ function ProductsChart() {
                             className="multi-select"
                             classNamePrefix="chart"
                             onChange={onChangeProduct}
+                            placeholder='Продукт'
                         />
                     ) : null
                 }
@@ -141,6 +142,7 @@ function ProductsChart() {
                     className="multi-select"
                     classNamePrefix="chart"
                     onChange={onChangeYear}
+                    placeholder='Год'
                 />
             </div>
             <div className="chart__body">

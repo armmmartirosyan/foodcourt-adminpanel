@@ -26,7 +26,7 @@ function UpdateValues(props) {
                     type="text"
                     className="form-control"
                     id='name'
-                    disabled={value.name === 'Password'}
+                    disabled={value.name === 'Пароль'}
                     placeholder={value.name}
                     value={value.value}
                     onChange={(e) => {
@@ -42,14 +42,14 @@ function UpdateValues(props) {
                         backFunc()
                     }}
                 >
-                    Cancel
+                    Отмена
                 </button>
                 <button
                     className="btn btn-primary"
                     onClick={forwardFunc}
                 >
                     {
-                        value.name === 'Password' ? 'Get Key' : 'Modify'
+                        value.name === 'Пароль' ? 'Получить ключ' : 'Изменить'
                     }
                 </button>
             </div>

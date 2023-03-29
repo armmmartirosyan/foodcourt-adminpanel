@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import Wrapper from "../components/Wrapper";
 import {useDispatch, useSelector} from "react-redux";
-import { allProductsListRequest } from "../store/actions/products";
+import { productsListRequest } from "../store/actions/products";
 import _ from 'lodash';
 import {toast} from "react-toastify";
 import qs from 'query-string';
@@ -16,15 +16,15 @@ import Helper from "../helpers/Helper";
 const tableHeader = [
     {
         path:['imagePath'],
-        label:'Image',
+        label:'Изображение',
     },
     {
         path:['title'],
-        label:'Title',
+        label:'Название',
     },
     {
         path:['price'],
-        label:'Price',
+        label:'Цена',
     },
 ];
 
@@ -65,7 +65,7 @@ function Products() {
         const category = qs.parse(location.search).category;
 
         (async () => {
-            const data = await dispatch(allProductsListRequest({page, category, title: newTitle}));
+            const data = await dispatch(productsListRequest({page, category, title: newTitle}));
 
             if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
                 toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
@@ -111,12 +111,12 @@ function Products() {
     return (
         <Wrapper
             statuses={{statusGetAll, statusGetCategories}}
-            pageName='products'
+            pageName='продукты'
         >
             <TopBar
                 search={title}
                 searchChange={(val) => searchChange(val)}
-                pageName='products'
+                pageName='продукты'
                 categories={categories}
                 onChangeCategory={onChangeCategory}
                 allowAdd={true}

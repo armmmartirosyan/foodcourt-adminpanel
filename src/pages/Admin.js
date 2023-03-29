@@ -12,15 +12,15 @@ import Helper from "../helpers/Helper";
 const tableHeader = [
     {
         path: ['firstName'],
-        label: 'First Name',
+        label: 'Имя',
     },
     {
         path: ['lastName'],
-        label: 'Last Name',
+        label: 'Фамилия',
     },
     {
         path: ['email'],
-        label: 'Email',
+        label: 'Электронная почта',
     },
 ];
 
@@ -42,11 +42,11 @@ function Admin() {
     return (
         <Wrapper
             statuses={{statusAdminsList}}
-            pageName='admin'
+            pageName='админы'
         >
             <div className='d-flex justify-content-between'>
                 <TopBar
-                    pageName='admin'
+                    pageName='админы'
                     allowAdd={true}
                 />
             </div>

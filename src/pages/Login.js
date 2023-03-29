@@ -33,7 +33,7 @@ function Login() {
         ];
 
         if (validateValues.find((v) => v !== true)) {
-            toast.error('Invalid email or password');
+            toast.error('Неправильный адрес электронной почты или пароль');
             return;
         }
 
@@ -44,51 +44,51 @@ function Login() {
         }));
 
         if(data.error?.message && data.payload === 'Too many requests, please try again later.'){
-            toast.error('Too many requests, please try again later.');
+            toast.error('Пожалуйста, повторите попытку позже');
             return;
         }else if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
-        navigate('/home');
+        navigate('/orders');
         window.location.reload();
     }, [values]);
 
     useEffect(() => {
-        if (Account.getToken()) navigate('/home');
+        if (Account.getToken()) navigate('/orders');
     }, []);
 
     return (
         <WrapperLogIn
             statuses={[loginStatus]}
-            pageName='sign in'
+            pageName='войти'
         >
             <div className="form-floating mb-3">
                 <input
                     type="email"
                     className="form-control"
                     id="floatingInput"
-                    placeholder="Email"
+                    placeholder="Электронная почта"
                     value={values.email}
                     onChange={(ev) => {
                         handleChange(ev.target.value, 'email')
                     }}
                 />
-                <label htmlFor="floatingInput">Email address</label>
+                <label htmlFor="floatingInput">Электронная почта</label>
             </div>
             <div className="form-floating mb-4">
                 <input
                     type="password"
                     className="form-control"
                     id="floatingPassword"
-                    placeholder="Password"
+                    placeholder="Пароль"
                     value={values.password}
                     onChange={(ev) => {
                         handleChange(ev.target.value, 'password')
                     }}
                 />
-                <label htmlFor="floatingPassword">Password</label>
+                <label htmlFor="floatingPassword">Пароль</label>
             </div>
             <div className="d-flex align-items-center justify-content-between mb-4">
                 <div className="form-check">
@@ -101,7 +101,7 @@ function Login() {
                             handleChange(!values.remember, 'remember')
                         }}
                     />
-                    <label className="form-check-label" htmlFor="exampleCheck">Remember Me</label>
+                    <label className="form-check-label" htmlFor="exampleCheck">Запомнить меня</label>
                 </div>
             </div>
             <button
@@ -109,7 +109,7 @@ function Login() {
                 className="btn btn-primary py-3 w-100 mb-4"
                 onClick={handleSgnIn}
             >
-                Sign In
+                Войти
             </button>
             <button
                 className="btn btn-light py-1 w-100"
@@ -117,7 +117,7 @@ function Login() {
                     navigate(`/forgot-password`)
                 }}
             >
-                Forgot Password ?
+                Забыли пароль ?
             </button>
         </WrapperLogIn>
     );

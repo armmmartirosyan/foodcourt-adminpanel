@@ -1,22 +1,22 @@
 export default class Validator{
-    static validString = (str) => {
-        const reg = /^(?=.*[a-zA-Z]).+$/mg;
-        return !reg.test(str) ? "Invalid value (at least 2 letters)" : true;
+    static validString = (str, errMsg) => {
+        const reg = /^(?=.*[а-яА-Яa-zA-Z]).+$/mg;
+        return !reg.test(str) ? errMsg || "" : true;
     }
-    static validEmail = (email) => {
-        const reg = /^([\w\.-]{8,})@([a-z]{2,})\.([a-z]{2,6})$/i;
-        return !reg.test(email) ? "Invalid email" : true;
+    static validEmail = (email, errMsg) => {
+        const reg = /^([a-z\w\.-]{8,})@([a-z]{2,})\.([a-z]{2,6})$/i;
+        return !reg.test(email) ? errMsg || "" : true;
     }
-    static validPhoneNum = (phone) => {
+    static validPhoneNum = (phone, errMsg) => {
         const reg = /^\d{10,25}$/;
-        return !reg.test(phone) ? "Invalid phone number (10-25 numbers)" : true;
+        return !reg.test(phone) ? errMsg || "" : true;
     }
-    static validNumGreatOne = (num) => {
+    static validNumGreatOne = (num, errMsg) => {
         const reg = /^[1-9]\d*$/i;
-        return !reg.test(num) ? "Invalid value (enter only number great 1)" : true;
+        return !reg.test(num) ? errMsg || "" : true;
     }
-    static validEverySymbol = (symbol) => {
+    static validEverySymbol = (symbol, errMsg) => {
         const reg = /^.+$/;
-        return !reg.test(symbol) ? "Invalid value" : true;
+        return !reg.test(symbol) ? errMsg || "" : true;
     }
 }

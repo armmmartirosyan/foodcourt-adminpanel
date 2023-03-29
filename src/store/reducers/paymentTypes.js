@@ -13,4 +13,7 @@ export default createReducer(initialState, (builder) => {
         .addMatcher((action) => action.type.endsWith('payment/types/get/single/fulfilled'), (state, action) => {
             state.singlePaymentType = {...action.payload.singlePaymentType};
         })
+        .addMatcher((action) => action.type.endsWith('payment/allow/buy/fulfilled'), (state, action) => {
+            state.paymentTypes = [...action.payload.payments];
+        })
 })

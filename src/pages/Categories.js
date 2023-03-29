@@ -14,11 +14,11 @@ import Helper from "../helpers/Helper";
 const tableHeader = [
     {
         path:['imagePath'],
-        label:'Image',
+        label:'Изображение',
     },
     {
         path:['name'],
-        label:'Name',
+        label:'Название',
     },
 ];
 
@@ -57,12 +57,12 @@ function Categories() {
     return (
         <Wrapper
             statuses={{statusGetAll}}
-            pageName='categories'
+            pageName='категория'
         >
             <TopBar
                 search={searchName}
                 searchChange={searchChange}
-                pageName='categories'
+                pageName='категория'
                 allowAdd={true}
             />
             {

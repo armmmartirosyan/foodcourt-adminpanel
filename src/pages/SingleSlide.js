@@ -35,22 +35,22 @@ function SingleSlide() {
     const drawData = [
         {
             path: ['image'],
-            label: 'Image',
+            label: 'Изображение',
             disabled: false,
         },
         {
             path: ['title'],
-            label: 'Title',
+            label: 'Название',
             disabled: false,
         },
         {
             path: ['description'],
-            label: 'Description',
+            label: 'Описание',
             disabled: false,
         },
         {
             path: ['imageSelect'],
-            label: 'Select Image',
+            label: 'Выберите изображение',
             disabled: false,
         },
     ];
@@ -107,12 +107,12 @@ function SingleSlide() {
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.image.type) {
-            toast.error("Select image!");
+            toast.error("Выберите изображение");
             return;
         }
 
@@ -131,7 +131,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Slide added successfully.');
+        toast.success('Слайд успешно добавлен');
         navigate('/slides');
     }, [values]);
 
@@ -144,12 +144,12 @@ function SingleSlide() {
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.title && !values.description && !values.image.type) {
-            toast.error("Fill one of fields!");
+            toast.error("Заполните одно из полей");
             return;
         }
 
@@ -169,7 +169,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Slide updated successfully.');
+        toast.success('Слайд успешно обновлен');
         navigate('/slides');
     }, [values]);
 
@@ -182,7 +182,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Slide deleted successfully.');
+        toast.success('Слайд успешно удален');
         navigate('/slides');
     }, []);
 
@@ -211,30 +211,30 @@ function SingleSlide() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(slide) ? (
                         <button
                             className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
+                            disabled={admin && admin.role === 'админ'}
                             onClick={async (e) => {
                                 await handleDelete(e, slide.id)
                             }}
                         >
-                            Delete
+                            Удалить
                         </button>
                     ) : null
                 }
                 <button
                     className="btn btn-primary"
-                    disabled={admin && admin.role === 'manager'}
+                    disabled={admin && admin.role === 'админ'}
                     onClick={
                         !_.isEmpty(slide) ? handleUpdateSlide : handleAddSlide
                     }
                 >
                     {
-                        !_.isEmpty(slide) ? 'Update' : 'Add'
+                        !_.isEmpty(slide) ? 'Обнавить' : 'Добавить'
                     }
                 </button>
             </div>

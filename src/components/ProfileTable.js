@@ -8,12 +8,13 @@ import PropTypes from "prop-types";
 
 function ProfileTable(props) {
     const {data = [], admin, updateValues} = props;
-    const [branchTitle, setBranchTitle] = useState('All branches')
+    const [branchTitle, setBranchTitle] = useState('Все ветви')
     const dispatch = useDispatch();
     const excludeLabel = [
-        'Password',
-        'Role',
-        'Branch',
+        'Пароль',
+        'Роль',
+        'Ветвь',
+        'Номер телефона',
     ];
 
     useEffect(() => {
@@ -48,13 +49,16 @@ function ProfileTable(props) {
                                 <td>{item.label}</td>
                                 <td>
                                     {
-                                        item.label === 'Password' ? 'Forgot Password?' : null
+                                        item.label === 'Пароль' ? 'Забыли пароль?' : null
                                     }
                                     {
-                                        item.label === 'Role' ? _.capitalize(admin.role) : null
+                                        item.label === 'Роль' ? _.capitalize(admin.role) : null
                                     }
                                     {
-                                        item.label === 'Branch' ? branchTitle : null
+                                        item.label === 'Ветвь' ? branchTitle : null
+                                    }
+                                    {
+                                        item.label === 'Номер телефона' ? `+${admin[item.path]}` : null
                                     }
                                     {
                                         !excludeLabel.includes(item.label) ? admin[item.path] : null

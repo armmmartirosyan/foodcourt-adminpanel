@@ -11,7 +11,7 @@ const api = axios.create({
 });
 
 class Api {
-    //Orders
+    //OrdersPage
     static ordersStatistics(productId, year) {
         return api.get(`/orders?productId=${productId}&year=${year}`);
     }
@@ -29,8 +29,12 @@ class Api {
     }
 
     //Products
-    static getAllProductsList(page, title, category) {
+    static getProductsList(page, title, category) {
         return api.get(`/products/get`, {params: {page, title, category}});
+    }
+
+    static getAllProductsList() {
+        return api.get(`/products/get/all`);
     }
 
     static getSingleProduct(slugName) {
@@ -115,35 +119,8 @@ class Api {
         return api.delete(`/payment-types/${id}`);
     }
 
-    //News
-    static getAllNewsList(page, title) {
-        return api.get(`/news/get`, {params: {page, title}});
-    }
-
-    static getSingleNews(slugName) {
-        return api.get(`/news/get/${slugName}`);
-    }
-
-    static addNews(onUploadProgress, params) {
-        return api.post(`/news`, params, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress,
-        });
-    }
-
-    static updateNews(id, onUploadProgress, params) {
-        return api.put(`/news/${id}`, params, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress
-        });
-    }
-
-    static deleteNews(id) {
-        return api.delete(`/news/${id}`);
+    static allowBuy(allow) {
+        return api.put(`/payment-types/allow-pay`, {allow});
     }
 
     //Offers
@@ -295,6 +272,71 @@ class Api {
 
     static changeAdminPass(params) {
         return api.post(`/admin/change-pass`, {...params});
+    }
+
+    //Footer
+    static getFooter() {
+        return api.get(`/footer/get`);
+    }
+
+    static createFooter(params) {
+        return api.post(`/footer`, params);
+    }
+
+    static updateFooter(id, params) {
+        return api.put(`/footer/${id}`, params);
+    }
+
+    static getSingleFooterSocial(id) {
+        return api.get(`/footer/social/get/${id}`);
+    }
+
+    static addFooterSocial(onUploadProgress, params) {
+        return api.post(`/footer/social`, params, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress,
+        });
+    }
+
+    static updateFooterSocial(id, onUploadProgress, params) {
+        return api.put(`/footer/social/${id}`, params, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress,
+        });
+    }
+
+    static deleteFooterSocial(id) {
+        return api.delete(`/footer/social/${id}`);
+    }
+
+    //Comment
+    static getComments() {
+        return api.get(`/comment`);
+    }
+
+    static getSingleComment(id) {
+        return api.get(`/comment/${id}`);
+    }
+
+    static updateCommentStatus(id, status) {
+        return api.put(`/comment/${id}`, {status});
+    }
+
+    //About
+    static getAbout() {
+        return api.get(`/about/get`);
+    }
+
+    static createAbout(params) {
+        return api.post(`/about`, params);
+    }
+
+    static updateAbout(id, params) {
+        return api.put(`/about/${id}`, params);
     }
 }
 

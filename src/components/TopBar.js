@@ -28,7 +28,7 @@ function TopBar(props) {
                         <input
                             className="form-control border-0"
                             type="search"
-                            placeholder="Search"
+                            placeholder="Поиск по названию"
                             value={search}
                             onChange={(e) => searchChange(e.target.value)}
                         />
@@ -43,6 +43,7 @@ function TopBar(props) {
                         options={categories}
                         className="basic-select"
                         classNamePrefix="categories"
+                        placeholder='Категория'
                         onChange={onChangeCategory}
                         isClearable
                     />
@@ -52,12 +53,12 @@ function TopBar(props) {
                 allowAdd ? (
                     <button
                         className="btn btn-sm btn-primary"
-                        disabled={admin && admin.role === 'manager'}
+                        disabled={admin && admin.role === 'админ'}
                         onClick={() => {
                             navigate(`/${location.pathname.split('/')[1]}/add`)
                         }}
                     >
-                        {`${pageName === 'admin' ? 'Register' : 'Add'} ${pageName}`}
+                        {`${pageName === 'admin' ? 'Регистр' : 'Добавить'} ${pageName}`}
                     </button>
                 ) : null
             }

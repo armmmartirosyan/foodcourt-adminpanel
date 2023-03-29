@@ -1,12 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import Api from "../../Api";
 
-export const allProductsListRequest = createAsyncThunk('products/get/all', async (payload = {}, {rejectWithValue}) => {
+export const allProductsRequest = createAsyncThunk('products/get/all', async (payload = {}, {rejectWithValue}) => {
+    let data;
+
+    try{
+        let newData= await Api.getAllProductsList();
+        data = newData.data;
+    }catch (e) {
+        return rejectWithValue(e.response.data);
+    }
+
+    return data;
+});
+
+export const productsListRequest = createAsyncThunk('products/get/list', async (payload = {}, {rejectWithValue}) => {
     const {page, title, category} = payload;
     let data;
 
     try{
-        let newData= await Api.getAllProductsList(page, title, category);
+        let newData= await Api.getProductsList(page, title, category);
         data = newData.data;
     }catch (e) {
         return rejectWithValue(e.response.data);

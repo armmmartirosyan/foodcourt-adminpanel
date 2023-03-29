@@ -49,8 +49,8 @@ function Sidebar(props) {
         <div className="container-xxl position-relative bg-white d-flex p-0">
             <div className='sidebar pe-4 pb-3'>
                 <nav className="navbar bg-light navbar-light">
-                    <Link to="/home" className="navbar-brand mx-4 mb-3">
-                        <h3 className="text-primary">FoodCourt</h3>
+                    <Link to="/orders" className="navbar-brand mx-4 mb-3">
+                        <h3 className="text-primary">Шашлыков</h3>
                     </Link>
                     {
                         !_.isEmpty(admin) ? (
@@ -70,57 +70,63 @@ function Sidebar(props) {
                                         to="/profile"
                                         className="nav-item nav-link"
                                     >
-                                        Profile
+                                        Профиль
                                     </NavLink>
                                     <div
                                         className="nav-item nav-link"
                                         onClick={openCloseModal}
                                     >
-                                        Log Out
+                                        Выйти
                                     </div>
                                 </div>
                             </div>
                         ) : null
                     }
                     <div className="navbar-nav w-100">
-                        <NavLink to="/home" className="nav-item nav-link">
-                            Home
+                        <NavLink to="/orders" className="nav-item nav-link">
+                            Заказы
                         </NavLink>
                         {
-                            admin.role !== 'manager' ? (
+                            admin.role !== 'админ' ? (
                                 <>
                                     <NavLink to="/products" className="nav-item nav-link">
-                                        Products
+                                        Продукты
                                     </NavLink>
                                     <NavLink to="/categories" className="nav-item nav-link">
-                                        Categories
-                                    </NavLink>
-                                    <NavLink to="/news" className="nav-item nav-link">
-                                        News
+                                        Категории
                                     </NavLink>
                                     <NavLink to="/offers" className="nav-item nav-link">
-                                        Offers
+                                        Предложения
                                     </NavLink>
                                     <NavLink to="/slides" className="nav-item nav-link">
-                                        Slides
+                                        Слайды
                                     </NavLink>
                                     <NavLink to="/maps" className="nav-item nav-link">
-                                        Branches
+                                        Ветви
+                                    </NavLink>
+                                    <NavLink to="/about" className="nav-item nav-link">
+                                        О нас
+                                    </NavLink>
+                                    <NavLink to="/comments" className="nav-item nav-link">
+                                        Комментария
                                     </NavLink>
                                 </>
                             ) : null
                         }
                         {
-                            admin.role === 'admin' ? (
+                            admin.role === 'владелец' ? (
                                 <>
                                     <NavLink to="/users" className="nav-item nav-link">
-                                        Users
+                                        Пользователи
                                     </NavLink>
                                     <NavLink to="/admin" className="nav-item nav-link">
-                                        Admin
+                                        Админы
                                     </NavLink>
                                     <NavLink to="/payment-types" className="nav-item nav-link">
-                                        Payment types
+                                        Тип платежей
+                                    </NavLink>
+                                    <NavLink to="/footer" className="nav-item nav-link">
+                                        Нижний колонтитул
                                     </NavLink>
                                 </>
                             ) : null
@@ -142,20 +148,20 @@ function Sidebar(props) {
                         X
                     </div>
                     <h6 className="mb-4">
-                        Log Out ?
+                        Выйти ?
                     </h6>
                     <div className='btn-container'>
                         <button
                             className="btn btn-danger"
                             onClick={openCloseModal}
                         >
-                            Cancel
+                            Отмена
                         </button>
                         <button
                             className="btn btn-primary"
                             onClick={handleLogOut}
                         >
-                            Yes
+                            Да
                         </button>
                     </div>
                 </div>

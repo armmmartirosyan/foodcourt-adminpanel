@@ -3,6 +3,6 @@ export default class Helper{
         return str.replaceAll("\"", "");
     }
     static shortTxt = (str) => {
-        return `${str.length > 15 ? str.slice(0, 15) + '...' : str}`;
+        return `${str?.length > 15 ? str?.slice(0, 15) + '...' : str}`;
     }
 }

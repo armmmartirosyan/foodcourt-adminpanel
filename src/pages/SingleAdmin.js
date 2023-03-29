@@ -34,56 +34,56 @@ function SingleAdmin() {
         confirmPassword: '',
         phoneNum: '',
         status: '',
-        role: 'manager',
+        role: 'админ',
         branchId: 0,
     });
 
     const drawData = [
         {
             path: ['firstName'],
-            label: 'First name',
+            label: 'Имя',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['lastName'],
-            label: 'Last name',
+            label: 'Фамилия',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['email'],
-            label: 'Email',
+            label: 'Электронная почта',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['password'],
-            label: 'Password',
+            label: 'Пароль',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['confirmPassword'],
-            label: 'Confirm password',
+            label: 'Подтвердите пароль',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['phoneNum'],
-            label: 'Phone',
+            label: 'Номер телефона',
             disabled: !_.isEmpty(admin),
         },
         {
             path: ['role'],
-            label: 'Role',
+            label: 'Роль',
             disabled: !_.isEmpty(admin) && admin.status === 'deleted',
         },
         {
             path: ['branchId'],
-            label: 'Select branch',
+            label: 'Выберите ветвь',
             compValue: {...admin},
             array: [...branchesList],
             disabled: !_.isEmpty(admin) && admin.status === 'deleted',
         },
         {
             path: ['status'],
-            label: 'Status',
+            label: 'Положение',
             disabled: true,
         },
     ];
@@ -119,7 +119,7 @@ function SingleAdmin() {
             }
 
             setBranchesList([
-                {value: 0, label: 'All branches'},
+                {value: 0, label: 'Все ветви'},
                 ...data.payload.branches.map(branch => {
                     return {
                         value: branch.id,
@@ -139,20 +139,20 @@ function SingleAdmin() {
 
     const handleRegisterAdmin = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.firstName),
-            Validator.validString(values.lastName),
-            Validator.validEmail(values.email),
-            Validator.validPhoneNum(values.phoneNum.slice(1)),
+            Validator.validString(values.firstName, 'Недопустимое имя'),
+            Validator.validString(values.lastName, 'Неверная фамилия'),
+            Validator.validEmail(values.email, 'Неверный адрес электронной почты'),
+            Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона'),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
         if (values.confirmPassword !== values.password) {
-            toast.error("Invalid confirm password");
+            toast.error("Неверный пароль для подтверждения");
             return;
         }
 
@@ -172,29 +172,29 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Admin registered successfully');
+        toast.success('Админ успешно зарегистрирован');
         navigate('/admin');
     }, [values]);
 
     const handleModifyAdminAccount = useCallback(async () => {
         const validateValues = [
-            values.firstName ? Validator.validString(values.firstName) : true,
-            values.lastName ? Validator.validString(values.lastName) : true,
+            values.firstName ? Validator.validString(values.firstName, 'Недопустимое имя') : true,
+            values.lastName ? Validator.validString(values.lastName, 'Неверная фамилия') : true,
             values.email ? Validator.validEmail(values.email) : true,
-            values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1)) : true,
+            values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.firstName && !values.lastName
             && !values.email && !values.phoneNum
             && !values.role && _.isEmpty(values.branchId)) {
-            toast.error("Fill one of fields!");
+            toast.error("Заполните одно из полей");
             return;
         }
 
@@ -213,7 +213,7 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Admin modified successfully');
+        toast.success('Администратор успешно изменен');
         navigate('/admin');
     }, [values]);
 
@@ -226,17 +226,17 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Admin deleted successfully');
+        toast.success('Админ успешно удален');
         navigate('/admin');
     }, [admin]);
 
     return (
         <Wrapper
             statuses={{statusDelete, statusModify, statusRegister, statusBranchesList}}
-            pageName={`admin ${admin.firstName ? admin.firstName : ''}`}
+            pageName={`админ ${admin.firstName ? admin.firstName : ''}`}
         >
             <TopBar
-                pageName={`admin ${admin.firstName ? admin.firstName : ''}`}
+                pageName={`админ ${admin.firstName ? admin.firstName : ''}`}
                 allowAdd={false}
             />
             {
@@ -256,7 +256,7 @@ function SingleAdmin() {
                                     navigate(-1);
                                 }}
                             >
-                                Back
+                                Назад
                             </button>
                             {
                                 admin && admin.status !== 'deleted' ? (
@@ -266,7 +266,7 @@ function SingleAdmin() {
                                             await handleDelete(e, admin.id)
                                         }}
                                     >
-                                        Delete
+                                        Удалить
                                     </button>
                                 ) : null
                             }
@@ -279,7 +279,7 @@ function SingleAdmin() {
                                         }
                                     >
                                         {
-                                            !_.isEmpty(admin) ? 'Modify' : 'Register'
+                                            !_.isEmpty(admin) ? 'Обнавить' : 'Регистр'
                                         }
                                     </button>
                                 ) : null

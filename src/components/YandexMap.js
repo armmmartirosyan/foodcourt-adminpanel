@@ -26,7 +26,7 @@ function YandexMap(props) {
                     if (allowMapClick) onMapClick(e, 'map');
                 }}
                 state={{
-                    center: !_.isEmpty(center) ? center : [40.234325, 44.497457],
+                    center: !_.isEmpty(center) ? center : [55.755864, 37.617698],
                     zoom: 12,
                 }}
             >

@@ -19,37 +19,37 @@ import {useNavigate} from "react-router-dom";
 const data = [
     {
         path: 'firstName',
-        label: 'First Name',
+        label: 'Имя',
         edit: true,
     },
     {
         path: 'lastName',
-        label: 'Last Name',
+        label: 'Фамилия',
         edit: true,
     },
     {
         path: 'phoneNum',
-        label: 'Phone Number',
+        label: 'Номер телефона',
         edit: true,
     },
     {
         path: 'email',
-        label: 'Password',
+        label: 'Пароль',
         edit: true,
     },
     {
         path: 'email',
-        label: 'Email',
+        label: 'Электронная почта',
         edit: true,
     },
     {
         path: 'role',
-        label: 'Role',
+        label: 'Роль',
         edit: false,
     },
     {
         path: 'branchId',
-        label: 'Branch',
+        label: 'Ветвь',
         edit: false,
     },
 ];
@@ -101,18 +101,20 @@ function Profile() {
     const handleModifyAccount = useCallback(async () => {
         let validateValues = [];
 
-        if (value.key === 'firstName' || value.key === 'lastName') {
-            validateValues = [Validator.validString(value.value)];
+        if (value.key === 'firstName') {
+            validateValues = [Validator.validString(value.value, 'Недопустимое имя')];
+        }else if (value.key === 'lastName') {
+            validateValues = [Validator.validString(value.value, 'Неверная фамилия')];
         } else if (value.key === 'phoneNum') {
-            validateValues = [Validator.validPhoneNum(value.value)];
+            validateValues = [Validator.validPhoneNum(value.value, 'Неправильный номер телефона')];
         } else if (value.key === 'email') {
-            validateValues = [Validator.validEmail(value.value)];
+            validateValues = [Validator.validEmail(value.value, 'Неверный адрес электронной почты')];
         }
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
@@ -132,14 +134,14 @@ function Profile() {
         }
 
         updateValues();
-        toast.success('Account modified successfully.');
+        toast.success('Аккаунт успешно изменен');
     }, [value]);
 
     const handleGetKey = useCallback(async () => {
         const validateEmail = Validator.validEmail(value.value);
 
         if (validateEmail !== true) {
-            toast.error(`Invalid email`);
+            toast.error(`Неверный адрес электронной почты`);
             return;
         }
 
@@ -152,25 +154,25 @@ function Profile() {
 
         updateValues();
         setState('changePass');
-        toast.success('Key sent successfully.');
+        toast.success('Ключ успешно отправлен');
     }, [value, newValues]);
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validEverySymbol(newValues.token),
-            Validator.validEverySymbol(newValues.password),
-            Validator.validEverySymbol(newValues.confirmPassword),
+            Validator.validEverySymbol(newValues.token, 'Неправильный ключ'),
+            Validator.validEverySymbol(newValues.password, 'Неверный пароль'),
+            Validator.validEverySymbol(newValues.confirmPassword, 'Неверный пароль для подтверждения'),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (newValues.confirmPassword !== newValues.password) {
-            toast.error("Confirm password is wrong!");
+            toast.error("Неверный пароль для подтверждения");
             return
         }
 
@@ -192,16 +194,16 @@ function Profile() {
             password: '',
             confirmPassword: ''
         });
-        toast.success('Password changed successfully.');
+        toast.success('Пароль успешно изменен');
     }, [newValues]);
 
     return (
         <Wrapper
-            pageName={`profile ${!_.isEmpty(admin) ? `${admin.firstName}` : ''}`}
+            pageName={`Профиль ${!_.isEmpty(admin) ? `${admin.firstName}` : ''}`}
             statuses={{statusModify, getAdminStatus, getKeyStatus, changePassStatus}}
         >
             <div className="d-flex justify-content-between header">
-                <h6>{`Profile ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
+                <h6>{`Профиль ${!_.isEmpty(admin) ? admin.firstName : ''}`}</h6>
             </div>
             {
                 !_.isEmpty(admin) && !value.key && !state ? (
@@ -218,7 +220,7 @@ function Profile() {
                         value={value}
                         setValue={setValue}
                         backFunc={updateValues}
-                        forwardFunc={value.name === 'Password' ? handleGetKey : handleModifyAccount}
+                        forwardFunc={value.name === 'Пароль' ? handleGetKey : handleModifyAccount}
                     />
                 ) : null
             }

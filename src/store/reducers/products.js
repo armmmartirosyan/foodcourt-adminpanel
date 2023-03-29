@@ -8,7 +8,7 @@ const initialState = {
 
 export default createReducer(initialState, (builder) => {
     builder
-        .addMatcher((action) => action.type.endsWith('products/get/all/fulfilled'), (state, action) => {
+        .addMatcher((action) => action.type.endsWith('products/get/list/fulfilled'), (state, action) => {
             const data = action?.payload?.data || {};
 
             state.products = data.products || [];

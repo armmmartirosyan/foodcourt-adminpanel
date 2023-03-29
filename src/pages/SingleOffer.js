@@ -34,33 +34,33 @@ function SingleOffer() {
     const drawData = [
         {
             path: ['image'],
-            label: 'Image',
+            label: 'Изображение',
             disabled: false,
         },
         {
             path: ['title'],
-            label: 'Title',
+            label: 'Название',
             disabled: false,
         },
         {
             path: ['description'],
-            label: 'Description',
+            label: 'Описание',
             disabled: false,
         },
         {
             path: ['price'],
-            label: 'Price(AMD)',
+            label: 'Цена(RUB)',
             disabled: false,
         },
         {
             path: ['categories'],
-            label: 'Select Categories',
+            label: 'Выберите категории',
             array: [...categories],
             disabled: false,
         },
         {
             path: ['imageSelect'],
-            label: 'Select Image',
+            label: 'Выберите изображение',
             disabled: false,
         },
     ];
@@ -138,23 +138,23 @@ function SingleOffer() {
 
     const handleAddOffer = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.title),
-            Validator.validString(values.description),
-            Validator.validNumGreatOne(values.price),
+            Validator.validString(values.title, 'Недопустимый заголовок'),
+            Validator.validString(values.description, 'Неверное описание'),
+            Validator.validNumGreatOne(values.price, 'Неверная цена'),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
         if (_.isEmpty(values.categoryId)) {
-            toast.error(`Select category(at least 1 category!)`);
+            toast.error(`Выберите категорию (не менее 1 категории)`);
             return;
         }
         if (!values.image.type) {
-            toast.error("Select image!");
+            toast.error("Выберите изображение");
             return;
         }
 
@@ -175,27 +175,27 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Offer added successfully.');
+        toast.success('Предложение успешно добавлено');
         navigate('/offers');
     }, [values]);
 
     const handleUpdateOffer = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validString(values.title) : true,
-            values.description ? Validator.validString(values.description) : true,
-            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price) : true,
+            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
+            values.description ? Validator.validString(values.description, 'Неверное описание') : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, 'Неверная цена') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.title && !values.description
             && !values.price && !values.image.type) {
-            toast.error("Fill one of fields!");
+            toast.error("Заполните одно из полей");
             return;
         }
 
@@ -217,7 +217,7 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Offer updated successfully.');
+        toast.success('Предложение успешно обновлено');
         navigate('/offers');
     }, [values]);
 
@@ -230,7 +230,7 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Offer deleted successfully.');
+        toast.success('Предложение успешно удалено');
         navigate('/offers');
     }, []);
 
@@ -238,10 +238,10 @@ function SingleOffer() {
         <Wrapper
             statuses={{statusGetSingle, statusAdd, statusDelete, statusUpdate}}
             uploadProcess={uploadProcess}
-            pageName={`offer${offer.title ? ' - ' + offer.title : ''}`}
+            pageName={`предложение${offer.title ? ' - ' + offer.title : ''}`}
         >
             <TopBar
-                pageName={`offer${offer.title ? ' - ' + offer.title : ''}`}
+                pageName={`предложение${offer.title ? ' - ' + offer.title : ''}`}
                 allowAdd={false}
             />
 
@@ -259,30 +259,30 @@ function SingleOffer() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(offer) ? (
                         <button
                             className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
+                            disabled={admin && admin.role === 'админ'}
                             onClick={async (e) => {
                                 await handleDelete(e, offer.id)
                             }}
                         >
-                            Delete
+                            Удалить
                         </button>
                     ) : null
                 }
                 <button
                     className="btn btn-primary"
-                    disabled={admin && admin.role === 'manager'}
+                    disabled={admin && admin.role === 'админ'}
                     onClick={
                         !_.isEmpty(offer) ? handleUpdateOffer : handleAddOffer
                     }
                 >
                     {
-                        !_.isEmpty(offer) ? 'Update' : 'Add'
+                        !_.isEmpty(offer) ? 'Обнавить' : 'Добавить'
                     }
                 </button>
             </div>

@@ -28,16 +28,21 @@ function SinglePaymentType() {
     const [values, setValues] = useState({
         type: '',
         typeName: '',
+        allowUse: false,
     });
 
     const drawData = [
         {
             path:['type'],
-            label:'Payment type',
+            label:'Способ оплаты',
         },
         {
             path:['typeName'],
-            label:'Payment type name',
+            label:'Название типа платежа',
+        },
+        {
+            path:['allowUse'],
+            label:'Разрешить использование',
         },
     ];
 
@@ -55,7 +60,8 @@ function SinglePaymentType() {
                 setPaymentType({...tempPaymentType});
                 setValues({
                     ...values,
-                    ...tempPaymentType
+                    ...tempPaymentType,
+                    allowUse: tempPaymentType.allowUse === 't'
                 });
             })()
         }
@@ -70,20 +76,21 @@ function SinglePaymentType() {
 
     const handleAddPaymentType = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.type),
-            Validator.validString(values.typeName),
+            Validator.validString(values.type, 'Неверный тип платежа'),
+            Validator.validString(values.typeName, 'Неверное название типа платежа'),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
 
         if(invalidVal){
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         const data = await dispatch(addPaymentTypeRequest({
             type: values.type,
             typeName: values.typeName,
+            allowUse: values.allowUse,
         }));
 
         if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
@@ -91,25 +98,25 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Payment type added successfully');
+        toast.success('Тип платежа успешно добавлен');
         navigate('/payment-types');
     }, [values]);
 
     const handleUpdatePaymentType = useCallback(async () => {
         const validateValues = [
-            values.type ? Validator.validString(values.type) : true,
-            values.typeName ? Validator.validString(values.typeName) : true,
+            values.type ? Validator.validString(values.type, 'Неверный тип платежа') : true,
+            values.typeName ? Validator.validString(values.typeName, 'Неверное имя типа платежа') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
 
         if(invalidVal){
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.type && !values.typeName) {
-            toast.error("Fill one of fields.");
+            toast.error("Заполните одно из полей");
             return;
         }
 
@@ -117,6 +124,7 @@ function SinglePaymentType() {
             id: paymentType.id,
             type: values.type || undefined,
             typeName: values.typeName || undefined,
+            allowUse: values.allowUse,
         }));
 
         if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
@@ -124,7 +132,7 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Payment type updated successfully');
+        toast.success('Тип платежа успешно обновлен');
         navigate('/payment-types');
     }, [values]);
 
@@ -137,26 +145,30 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Payment type deleted successfully.');
+        toast.success('Тип платежа успешно удален');
         navigate('/payment-types');
     }, []);
 
     return (
         <Wrapper
             statuses={{statusAdd, statusDelete, statusUpdate, statusGetSingle}}
-            pageName={`payment type${paymentType.typeName ? ' - ' + paymentType.typeName : ''}`}
+            pageName={`способ оплаты${paymentType.typeName ? ' - ' + paymentType.typeName : ''}`}
         >
             <TopBar
-                pageName={`payment type${paymentType.typeName ? ' - ' + paymentType.typeName : ''}`}
+                pageName={`способ оплаты${paymentType.typeName ? ' - ' + paymentType.typeName : ''}`}
                 allowAdd={false}
             />
 
-            <Single
-                drawData={drawData}
-                obj={paymentType}
-                changeValues={handleChangeValues}
-                values={values}
-            />
+            {
+                statusGetSingle === 'success' ? (
+                    <Single
+                        drawData={drawData}
+                        obj={paymentType}
+                        changeValues={handleChangeValues}
+                        values={values}
+                    />
+                ) : null
+            }
 
             <div className='btn-container'>
                 <button
@@ -165,30 +177,30 @@ function SinglePaymentType() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(paymentType) ? (
                         <button
                             className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
+                            disabled={admin && admin.role === 'админ'}
                             onClick={async (e) => {
                                 await handleDelete(e, paymentType.id)
                             }}
                         >
-                            Delete
+                            Удалить
                         </button>
                     ) : null
                 }
                 <button
                     className="btn btn-primary"
-                    disabled={admin && admin.role === 'manager'}
+                    disabled={admin && admin.role === 'админ'}
                     onClick={
                         !_.isEmpty(paymentType) ? handleUpdatePaymentType : handleAddPaymentType
                     }
                 >
                     {
-                        !_.isEmpty(paymentType) ? 'Update' : 'Add'
+                        !_.isEmpty(paymentType) ? 'Обнавить' : 'Добавить'
                     }
                 </button>
             </div>

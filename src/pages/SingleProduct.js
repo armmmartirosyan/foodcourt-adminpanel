@@ -39,33 +39,33 @@ function SingleProduct() {
     const drawData = [
         {
             path: ['image'],
-            label: 'Image',
+            label: 'Изображение',
             disabled: false,
         },
         {
             path: ['title'],
-            label: 'Title',
+            label: 'Название',
             disabled: false,
         },
         {
             path: ['description'],
-            label: 'Description',
+            label: 'Описание',
             disabled: false,
         },
         {
             path: ['price'],
-            label: 'Price(AMD)',
+            label: 'Цена(RUB)',
             disabled: false,
         },
         {
             path: ['categories'],
-            label: 'Select Categories',
+            label: 'Выберите категории',
             array: [...categories],
             disabled: false,
         },
         {
             path: ['imageSelect'],
-            label: 'Select Image',
+            label: 'Выберите изображение',
             disabled: false,
         },
     ];
@@ -142,19 +142,19 @@ function SingleProduct() {
 
     const handleAddProduct = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.title),
-            Validator.validString(values.description),
-            Validator.validNumGreatOne(values.price),
+            Validator.validString(values.title, 'Недопустимый заголовок'),
+            Validator.validString(values.description, 'Неверное описание'),
+            Validator.validNumGreatOne(values.price, 'Неверная цена'),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
         if (!values.image.type) {
-            toast.error("Select image!");
+            toast.error("Выберите изображение");
             return;
         }
 
@@ -175,28 +175,28 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Product added successfully.');
+        toast.success('Продукт успешно добавлен');
         navigate('/products');
     }, [values]);
 
     const handleUpdateProduct = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validString(values.title) : true,
-            values.description ? Validator.validString(values.description) : true,
-            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price) : true,
+            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
+            values.description ? Validator.validString(values.description, 'Неверное описание') : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, 'Неверная цена') : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
 
         if (invalidVal) {
-            toast.error(`Invalid ${invalidVal}`);
+            toast.error(invalidVal);
             return;
         }
 
         if (!values.title && !values.categorySlug
             && !values.description && !values.price
             && !values.image.type) {
-            toast.error("Fill one of fields!");
+            toast.error("Заполните одно из полей");
             return;
         }
 
@@ -218,7 +218,7 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Product updated successfully.');
+        toast.success('Продукт успешно обновлен');
         navigate('/products');
     }, [values]);
 
@@ -231,7 +231,7 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Product deleted successfully.');
+        toast.success('Продукт успешно удален');
         navigate('/products');
     }, []);
 
@@ -239,10 +239,10 @@ function SingleProduct() {
         <Wrapper
             statuses={{statusDelete, statusGetSingle, statusAdd, statusUpdate}}
             uploadProcess={uploadProcess}
-            pageName={`product${product.title ? ' - ' + product.title : ''}`}
+            pageName={`продукт${product.title ? ' - ' + product.title : ''}`}
         >
             <TopBar
-                pageName={`product${product.title ? ' - ' + product.title : ''}`}
+                pageName={`продукт${product.title ? ' - ' + product.title : ''}`}
                 allowAdd={false}
             />
 
@@ -260,30 +260,30 @@ function SingleProduct() {
                         navigate(-1);
                     }}
                 >
-                    Back
+                    Назад
                 </button>
                 {
                     !_.isEmpty(product) ? (
                         <button
                             className="btn btn-danger"
-                            disabled={admin && admin.role === 'manager'}
+                            disabled={admin && admin.role === 'админ'}
                             onClick={async (e) => {
                                 await handleDelete(e, product.id)
                             }}
                         >
-                            Delete
+                            Удалить
                         </button>
                     ) : null
                 }
                 <button
                     className="btn btn-primary"
-                    disabled={admin && admin.role === 'manager'}
+                    disabled={admin && admin.role === 'админ'}
                     onClick={
                         !_.isEmpty(product) ? handleUpdateProduct : handleAddProduct
                     }
                 >
                     {
-                        !_.isEmpty(product) ? 'Update' : 'Add'
+                        !_.isEmpty(product) ? 'Обнавить' : 'Добавить'
                     }
                 </button>
             </div>

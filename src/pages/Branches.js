@@ -42,11 +42,11 @@ function Branches() {
 
     return (
         <Wrapper
-            pageName='branches'
+            pageName='ветви'
             statuses={{statusGetAll}}
         >
             <TopBar
-                pageName='branches'
+                pageName='ветви'
                 allowAdd={true}
             />
             <div className="container mb-3">

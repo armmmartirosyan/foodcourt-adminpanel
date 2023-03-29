@@ -12,7 +12,7 @@ import Helper from "../helpers/Helper";
 const tableHeader = [
     {
         path:['imagePath'],
-        label:'Image',
+        label:'Изображение',
     },
 ];
 
@@ -33,11 +33,11 @@ function Slides() {
 
     return (
         <Wrapper
-            pageName='slides'
+            pageName='слайды'
             statuses={{statusGetAll}}
         >
             <TopBar
-                pageName='slides'
+                pageName='слайды'
                 allowAdd={true}
             />
             {

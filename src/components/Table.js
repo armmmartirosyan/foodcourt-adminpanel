@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import TableCol from "./TableCol";
 import {useNavigate} from "react-router-dom";
+import _ from 'lodash';
 
 function Table(props) {
     const {tableHeader, list, path} = props;
@@ -22,30 +23,34 @@ function Table(props) {
                 </thead>
                 <tbody>
 
-                {list.map(tempItem => (
-                    <tr
-                        key={tempItem.id}
-                        className={classNames(
-                            'table-row', {
-                                process: tempItem.status === 'inProcess',
-                                ready: tempItem.status === 'ready',
-                                onWay: tempItem.status === 'onTheWay',
-                            })}
-                        onClick={() => {
-                            if(path) navigate(`/${path}/${tempItem.slugName || tempItem.id}`);
-                        }}
-                    >
-                        {
-                            tableHeader.map(headerCol => (
-                                <TableCol
-                                    key={headerCol.label}
-                                    headerCol={headerCol}
-                                    tempItem={tempItem}
-                                />
-                            ))
-                        }
-                    </tr>
-                ))}
+                {
+                    !_.isEmpty(list) ? (
+                        list.map(tempItem => (
+                            <tr
+                                key={tempItem.id}
+                                className={classNames(
+                                    'table-row', {
+                                        process: tempItem.status === 'в процессе',
+                                        ready: tempItem.status === 'готовый',
+                                        onWay: tempItem.status === 'в пути',
+                                    })}
+                                onClick={() => {
+                                    if(path) navigate(`/${path}/${tempItem.slugName || tempItem.id}`);
+                                }}
+                            >
+                                {
+                                    tableHeader.map(headerCol => (
+                                        <TableCol
+                                            key={headerCol.label}
+                                            headerCol={headerCol}
+                                            tempItem={tempItem}
+                                        />
+                                    ))
+                                }
+                            </tr>
+                        ))
+                    ) : null
+                }
                 </tbody>
             </table>
         </div>
