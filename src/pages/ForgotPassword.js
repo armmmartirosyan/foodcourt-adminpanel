@@ -9,6 +9,7 @@ import _ from "lodash";
 import Helper from "../helpers/Helper";
 import Account from "../helpers/Account";
 import ChangePassword from "../components/ChangePassword";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 function ForgotPassword() {
     const dispatch = useDispatch();
@@ -47,16 +48,16 @@ function ForgotPassword() {
             return;
         }
 
-        toast.success('Ключ успешно отправлен');
+        toast.success('Ключ отправлен');
         setState('changePass');
     }, [values]);
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validEmail(values.email, 'Неверный адрес электронной почты'),
-            Validator.validEverySymbol(values.token, 'Неправильный ключ'),
-            Validator.validEverySymbol(values.password, 'Неверный пароль'),
-            Validator.validEverySymbol(values.confirmPassword, 'Неверный пароль для подтверждения'),
+            Validator.validEmail(values.email, errorConfig.email),
+            Validator.validEverySymbol(values.token, errorConfig.token),
+            Validator.validEverySymbol(values.password, errorConfig.password),
+            Validator.validEverySymbol(values.confirmPassword, errorConfig.confirmPassword),
         ];
 
         const invalidValue = validateValues.find((v) => v !== true);
@@ -83,7 +84,7 @@ function ForgotPassword() {
             return;
         }
 
-        toast.success("Пароль успешно изменен");
+        toast.success("Пароль изменен");
         navigate('/');
     }, [values]);
 

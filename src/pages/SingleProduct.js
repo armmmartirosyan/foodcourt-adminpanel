@@ -15,6 +15,7 @@ import Validator from "../helpers/Validator";
 import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
+import {errorConfig} from '../helpers/ErrorConfig';
 
 function SingleProduct() {
     const dispatch = useDispatch();
@@ -142,9 +143,9 @@ function SingleProduct() {
 
     const handleAddProduct = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.title, 'Недопустимый заголовок'),
-            Validator.validString(values.description, 'Неверное описание'),
-            Validator.validNumGreatOne(values.price, 'Неверная цена'),
+            Validator.validString(values.title, errorConfig.email),
+            Validator.validString(values.description, errorConfig.description),
+            Validator.validNumGreatOne(values.price, errorConfig.price),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -175,15 +176,15 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Продукт успешно добавлен');
+        toast.success('Продукт добавлен');
         navigate('/products');
     }, [values]);
 
     const handleUpdateProduct = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
-            values.description ? Validator.validString(values.description, 'Неверное описание') : true,
-            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, 'Неверная цена') : true,
+            values.title ? Validator.validString(values.title, errorConfig.title) : true,
+            values.description ? Validator.validString(values.description, errorConfig.description) : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, errorConfig.price) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -218,7 +219,7 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Продукт успешно обновлен');
+        toast.success('Продукт обновлен');
         navigate('/products');
     }, [values]);
 
@@ -231,7 +232,7 @@ function SingleProduct() {
             return;
         }
 
-        toast.success('Продукт успешно удален');
+        toast.success('Продукт удален');
         navigate('/products');
     }, []);
 

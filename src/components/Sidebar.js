@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 function Sidebar(props) {
     const {pageName} = props;
     const profileRef = useRef(null);
-    const navigate = useNavigate();
     const admin = useSelector(state => state.admin.admin);
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [isOpenProfile, setIsOpenProfile] = useState(pageName === 'profile');
@@ -37,8 +36,7 @@ function Sidebar(props) {
     const handleLogOut = useCallback(() => {
         Account.deleteToken();
 
-        navigate('/');
-        window.location.reload();
+        window.location.href = "/";
     }, []);
 
     const openCloseProfile = useCallback(() => {

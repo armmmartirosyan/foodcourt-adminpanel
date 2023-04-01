@@ -14,6 +14,7 @@ import {
     singlePaymentTypeRequest,
     updatePaymentTypeRequest
 } from "../store/actions/paymentTypes";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 function SinglePaymentType() {
     const dispatch = useDispatch();
@@ -76,8 +77,8 @@ function SinglePaymentType() {
 
     const handleAddPaymentType = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.type, 'Неверный тип платежа'),
-            Validator.validString(values.typeName, 'Неверное название типа платежа'),
+            Validator.validString(values.type, errorConfig.paymentType),
+            Validator.validString(values.typeName, errorConfig.paymentTypeName),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -98,14 +99,14 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Тип платежа успешно добавлен');
+        toast.success('Тип платежа добавлен');
         navigate('/payment-types');
     }, [values]);
 
     const handleUpdatePaymentType = useCallback(async () => {
         const validateValues = [
-            values.type ? Validator.validString(values.type, 'Неверный тип платежа') : true,
-            values.typeName ? Validator.validString(values.typeName, 'Неверное имя типа платежа') : true,
+            values.type ? Validator.validString(values.type, errorConfig.paymentType) : true,
+            values.typeName ? Validator.validString(values.typeName, errorConfig.paymentTypeName) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -132,7 +133,7 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Тип платежа успешно обновлен');
+        toast.success('Тип платежа обновлен');
         navigate('/payment-types');
     }, [values]);
 
@@ -145,7 +146,7 @@ function SinglePaymentType() {
             return;
         }
 
-        toast.success('Тип платежа успешно удален');
+        toast.success('Тип платежа удален');
         navigate('/payment-types');
     }, []);
 

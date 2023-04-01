@@ -36,17 +36,15 @@ function Wrapper(props) {
     }, []);
 
     useEffect(() => {
-        if (_.isEmpty(admin)) {
-            (async () => {
-                const data = await dispatch(getAdminRequest());
+        (async () => {
+            const data = await dispatch(getAdminRequest());
 
-                if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
-                    Account.deleteToken();
-                    navigate('/');
-                }
-            })()
-        }
-    }, [admin]);
+            if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
+                Account.deleteToken();
+                window.location.href = "/";
+            }
+        })()
+    }, []);
 
     return (
         <div className='content'>

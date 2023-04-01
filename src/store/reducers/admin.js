@@ -22,6 +22,12 @@ export default createReducer(initialState, (builder) => {
         .addMatcher((action) => action.type.endsWith('admin/admin/fulfilled'), (state, action) => {
             state.admin = action.payload.admin;
         })
+        .addMatcher((action) => action.type.endsWith('admin/admin/rejected'), (state, action) => {
+            if(action?.payload?.status === 401){
+                Account.deleteToken();
+                window.location.href = "/";
+            }
+        })
         .addMatcher((action) => action.type.endsWith('admins/list/fulfilled'), (state, action) => {
             state.adminsList = action.payload.admins;
         })

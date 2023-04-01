@@ -15,6 +15,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {allBranchesListRequest} from "../store/actions/map";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 function SingleAdmin() {
     const navigate = useNavigate();
@@ -139,10 +140,10 @@ function SingleAdmin() {
 
     const handleRegisterAdmin = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.firstName, 'Недопустимое имя'),
-            Validator.validString(values.lastName, 'Неверная фамилия'),
-            Validator.validEmail(values.email, 'Неверный адрес электронной почты'),
-            Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона'),
+            Validator.validString(values.firstName, errorConfig.firstName),
+            Validator.validString(values.lastName, errorConfig.lastName),
+            Validator.validEmail(values.email, errorConfig.email),
+            Validator.validPhoneNum(values.phoneNum.slice(1), errorConfig.phoneNum),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -172,16 +173,16 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Админ успешно зарегистрирован');
+        toast.success('Админ зарегистрирован');
         navigate('/admin');
     }, [values]);
 
     const handleModifyAdminAccount = useCallback(async () => {
         const validateValues = [
-            values.firstName ? Validator.validString(values.firstName, 'Недопустимое имя') : true,
-            values.lastName ? Validator.validString(values.lastName, 'Неверная фамилия') : true,
-            values.email ? Validator.validEmail(values.email) : true,
-            values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона') : true,
+            values.firstName ? Validator.validString(values.firstName, errorConfig.firstName) : true,
+            values.lastName ? Validator.validString(values.lastName, errorConfig.lastName) : true,
+            values.email ? Validator.validEmail(values.email, errorConfig.email) : true,
+            values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1), errorConfig.phoneNum) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -213,7 +214,7 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Администратор успешно изменен');
+        toast.success('Админ изменен');
         navigate('/admin');
     }, [values]);
 
@@ -226,7 +227,7 @@ function SingleAdmin() {
             return;
         }
 
-        toast.success('Админ успешно удален');
+        toast.success('Админ удален');
         navigate('/admin');
     }, [admin]);
 

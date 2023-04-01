@@ -87,7 +87,7 @@ function SingleFooterSocial() {
         }
 
         navigate('/footer');
-        toast.success('Социальные сети успешно обновлены');
+        toast.success('Социальные сети обновлены');
     }, [social, values]);
 
     const handleAddSocial = useCallback(async () => {
@@ -106,7 +106,7 @@ function SingleFooterSocial() {
         }
 
         navigate('/footer');
-        toast.success('Социальные сети успешно добавлены');
+        toast.success('Социальные сети добавлены');
     }, [values]);
 
     const handleDeleteSocial = useCallback(async (e, id) => {
@@ -118,7 +118,7 @@ function SingleFooterSocial() {
         }
 
         navigate('/footer');
-        toast.success('Социальные сети успешно удалены');
+        toast.success('Социальные сети удалены');
     }, []);
 
     useEffect(() => {

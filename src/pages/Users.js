@@ -18,10 +18,6 @@ const tableHeader = [
         label:'Имя',
     },
     {
-        path:['lastName'],
-        label:'Фамилия',
-    },
-    {
         path:['email'],
         label:'Электронная почта',
     },

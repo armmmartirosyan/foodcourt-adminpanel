@@ -15,6 +15,7 @@ import UpdateValues from "../components/UpdateValues";
 import ChangePassword from "../components/ChangePassword";
 import Account from "../helpers/Account";
 import {useNavigate} from "react-router-dom";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 const data = [
     {
@@ -102,13 +103,13 @@ function Profile() {
         let validateValues = [];
 
         if (value.key === 'firstName') {
-            validateValues = [Validator.validString(value.value, 'Недопустимое имя')];
+            validateValues = [Validator.validString(value.value, errorConfig.firstName)];
         }else if (value.key === 'lastName') {
-            validateValues = [Validator.validString(value.value, 'Неверная фамилия')];
+            validateValues = [Validator.validString(value.value, errorConfig.lastName)];
         } else if (value.key === 'phoneNum') {
-            validateValues = [Validator.validPhoneNum(value.value, 'Неправильный номер телефона')];
+            validateValues = [Validator.validPhoneNum(value.value, errorConfig.phoneNum)];
         } else if (value.key === 'email') {
-            validateValues = [Validator.validEmail(value.value, 'Неверный адрес электронной почты')];
+            validateValues = [Validator.validEmail(value.value, errorConfig.email)];
         }
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -134,7 +135,7 @@ function Profile() {
         }
 
         updateValues();
-        toast.success('Аккаунт успешно изменен');
+        toast.success('Аккаунт изменен');
     }, [value]);
 
     const handleGetKey = useCallback(async () => {
@@ -154,14 +155,14 @@ function Profile() {
 
         updateValues();
         setState('changePass');
-        toast.success('Ключ успешно отправлен');
+        toast.success('Ключ отправлен');
     }, [value, newValues]);
 
     const handleChangePass = useCallback(async () => {
         const validateValues = [
-            Validator.validEverySymbol(newValues.token, 'Неправильный ключ'),
-            Validator.validEverySymbol(newValues.password, 'Неверный пароль'),
-            Validator.validEverySymbol(newValues.confirmPassword, 'Неверный пароль для подтверждения'),
+            Validator.validEverySymbol(newValues.token, errorConfig.token),
+            Validator.validEverySymbol(newValues.password, errorConfig.password),
+            Validator.validEverySymbol(newValues.confirmPassword, errorConfig.confirmPassword),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -194,7 +195,7 @@ function Profile() {
             password: '',
             confirmPassword: ''
         });
-        toast.success('Пароль успешно изменен');
+        toast.success('Пароль изменен');
     }, [newValues]);
 
     return (

@@ -14,6 +14,7 @@ import Validator from "../helpers/Validator";
 import Wrapper from "../components/Wrapper";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 const drawData = [
     {
@@ -94,7 +95,7 @@ function SingleCategory() {
 
     const handleAddCategory = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.name, 'Недопустимый заголовок'),
+            Validator.validString(values.name, errorConfig.title),
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -122,13 +123,13 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Категория успешно добавлена');
+        toast.success('Категория добавлена');
         navigate('/categories');
     }, [values]);
 
     const handleUpdateCategory = useCallback(async () => {
         const validateValues = [
-            values.name ? Validator.validString(values.name, 'Недопустимый заголовок') : true,
+            values.name ? Validator.validString(values.name, errorConfig.title) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v!==true);
@@ -158,7 +159,7 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Категория успешно обновлена');
+        toast.success('Категория обновлена');
         navigate('/categories');
     }, [values]);
 
@@ -171,7 +172,7 @@ function SingleCategory() {
             return;
         }
 
-        toast.success('Категория успешно удалена');
+        toast.success('Категория удалена');
         navigate('/categories');
     }, []);
 

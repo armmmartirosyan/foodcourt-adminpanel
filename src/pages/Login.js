@@ -43,16 +43,15 @@ function Login() {
             remember: values.remember,
         }));
 
-        if(data.error?.message && data.payload === 'Too many requests, please try again later.'){
+        if (data.error?.message && data.payload === 'Too many requests, please try again later.') {
             toast.error('Пожалуйста, повторите попытку позже');
             return;
-        }else if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
+        } else if (!_.isEmpty(data.payload) && (data.payload.status === 'error' || data.payload.status !== 'ok')) {
             toast.error(_.capitalize(Helper.clearAxiosError(data.payload.message)));
             return;
         }
 
-        navigate('/orders');
-        window.location.reload();
+        window.location.href = '/orders';
     }, [values]);
 
     useEffect(() => {

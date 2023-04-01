@@ -131,7 +131,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Слайд успешно добавлен');
+        toast.success('Слайд добавлен');
         navigate('/slides');
     }, [values]);
 
@@ -169,7 +169,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Слайд успешно обновлен');
+        toast.success('Слайд обновлен');
         navigate('/slides');
     }, [values]);
 
@@ -182,7 +182,7 @@ function SingleSlide() {
             return;
         }
 
-        toast.success('Слайд успешно удален');
+        toast.success('Слайд удален');
         navigate('/slides');
     }, []);
 

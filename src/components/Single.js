@@ -3,7 +3,7 @@ import SingleImage from "./SingleImage";
 import Select from "react-select";
 import momentWL from 'moment-with-locales-es6'
 import PhoneInput from "react-phone-number-input";
-import en from 'react-phone-number-input/locale/en'
+import ru from 'react-phone-number-input/locale/ru'
 import YandexMap from "./YandexMap";
 import ImagesList from "./ImagesList";
 import PropTypes from "prop-types";
@@ -183,8 +183,8 @@ function Single(props) {
                                         <label htmlFor={tempPath}>{item.label}</label>
                                         <PhoneInput
                                             international
-                                            defaultCountry="AM"
-                                            labels={en}
+                                            defaultCountry="RU"
+                                            labels={ru}
                                             id={tempPath}
                                             disabled={item.disabled}
                                             value={value}
@@ -207,9 +207,9 @@ function Single(props) {
                                                 changeValues(e.target.value, tempPath)
                                             }}
                                         >
-                                            <option value="manager">Manager</option>
-                                            <option value="admin manager">Admin Manager</option>
-                                            <option value="admin">Admin</option>
+                                            <option value="админ">админ</option>
+                                            <option value="супер админ">супер админ</option>
+                                            <option value="владелец">владелец</option>
                                         </select>
                                         <label htmlFor={tempPath}>{item.label}</label>
                                     </div>
@@ -244,8 +244,7 @@ function Single(props) {
                                             checked={value}
                                             disabled={item.disabled}
                                             onChange={(e) => {
-                                                console.log(values.allowUse);
-                                                changeValues(!values.allowUse, tempPath)
+                                                changeValues(!values[tempPath], tempPath)
                                             }}
                                         />
                                         <label className="form-check-label" htmlFor={tempPath}>

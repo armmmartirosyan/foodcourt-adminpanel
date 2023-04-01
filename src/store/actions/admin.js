@@ -39,7 +39,7 @@ export const getAdminRequest = createAsyncThunk('admin/admin', async (payload, {
 
         data = newData.data;
     } catch (e) {
-        return rejectWithValue(e.response.data);
+        return rejectWithValue({...e.response.data, status: e.response.status});
     }
 
     return data;

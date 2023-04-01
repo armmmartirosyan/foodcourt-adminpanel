@@ -16,5 +16,6 @@ export default createReducer(initialState, (builder) => {
         .addMatcher((action) => action.type.endsWith('/rejected'), (state, action) => {
             const key = _.camelCase(action.type.replace('/rejected', '/status'));
             state[key] = 'error';
+            if(action.payload.message==="Unauthorized") window.location.href = "/profile";
         })
 });

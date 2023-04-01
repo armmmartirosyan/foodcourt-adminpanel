@@ -9,6 +9,7 @@ import Wrapper from "../components/Wrapper";
 import {useNavigate, useParams} from "react-router-dom";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 function SingleBranch() {
     const dispatch = useDispatch();
@@ -110,11 +111,11 @@ function SingleBranch() {
 
     const handleAddBranch = useCallback(async () => {
         const validateValues = [
-            Validator.validPhoneNum(values.phoneNum.slice(1), 'Неправильный номер телефона'),
-            Validator.validString(values.title, 'Недопустимый заголовок'),
+            Validator.validPhoneNum(values.phoneNum.slice(1), errorConfig.phoneNum),
+            Validator.validString(values.title, errorConfig.title),
             Validator.validString(values.location, 'Неверный адрес'),
-            Validator.validString(values.country, 'Неверная страна'),
-            Validator.validString(values.city, 'Неверный город'),
+            Validator.validString(values.country, errorConfig.country),
+            Validator.validString(values.city, errorConfig.city),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -149,7 +150,7 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Филиал успешно добавлен');
+        toast.success('Филиал добавлен');
         navigate(`/maps`);
     }, [values]);
 
@@ -158,10 +159,10 @@ function SingleBranch() {
 
         const validateValues = [
             values.phoneNum ? Validator.validPhoneNum(values.phoneNum.slice(1)) : true,
-            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
+            values.title ? Validator.validString(values.title, errorConfig.title) : true,
             values.location ? Validator.validString(values.location, 'Неверный адрес') : true,
-            values.country ? Validator.validString(values.country, 'Неверная страна') : true,
-            values.city ? Validator.validString(values.city, 'Неверный город') : true,
+            values.country ? Validator.validString(values.country, errorConfig.country) : true,
+            values.city ? Validator.validString(values.city, errorConfig.city) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -202,7 +203,7 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Ветка успешно обновлена');
+        toast.success('Ветка обновлена');
         navigate(`/maps`);
     }, [values]);
 
@@ -214,7 +215,7 @@ function SingleBranch() {
             return;
         }
 
-        toast.success('Ветка успешно удалена');
+        toast.success('Ветка удалена');
         navigate(`/maps`);
     }, [values]);
 

@@ -10,6 +10,7 @@ import Wrapper from "../components/Wrapper";
 import {allCategoriesListRequest} from "../store/actions/categories";
 import TopBar from "../components/TopBar";
 import Single from "../components/Single";
+import {errorConfig} from "../helpers/ErrorConfig";
 
 function SingleOffer() {
     const params = useParams();
@@ -138,9 +139,9 @@ function SingleOffer() {
 
     const handleAddOffer = useCallback(async () => {
         const validateValues = [
-            Validator.validString(values.title, 'Недопустимый заголовок'),
-            Validator.validString(values.description, 'Неверное описание'),
-            Validator.validNumGreatOne(values.price, 'Неверная цена'),
+            Validator.validString(values.title, errorConfig.title),
+            Validator.validString(values.description, errorConfig.description),
+            Validator.validNumGreatOne(values.price, errorConfig.price),
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -175,15 +176,15 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Предложение успешно добавлено');
+        toast.success('Предложение добавлено');
         navigate('/offers');
     }, [values]);
 
     const handleUpdateOffer = useCallback(async () => {
         const validateValues = [
-            values.title ? Validator.validString(values.title, 'Недопустимый заголовок') : true,
-            values.description ? Validator.validString(values.description, 'Неверное описание') : true,
-            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, 'Неверная цена') : true,
+            values.title ? Validator.validString(values.title, errorConfig.title) : true,
+            values.description ? Validator.validString(values.description, errorConfig.description) : true,
+            values.price || values.price === 0 ? Validator.validNumGreatOne(values.price, errorConfig.price) : true,
         ];
 
         const invalidVal = validateValues.find((v) => v !== true);
@@ -217,7 +218,7 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Предложение успешно обновлено');
+        toast.success('Предложение обновлено');
         navigate('/offers');
     }, [values]);
 
@@ -230,7 +231,7 @@ function SingleOffer() {
             return;
         }
 
-        toast.success('Предложение успешно удалено');
+        toast.success('Предложение удалено');
         navigate('/offers');
     }, []);
 

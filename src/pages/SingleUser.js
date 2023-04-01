@@ -23,11 +23,6 @@ function SingleUser() {
             disabled: true,
         },
         {
-            path: ['lastName'],
-            label: 'Фамилия',
-            disabled: true,
-        },
-        {
             path: ['email'],
             label: 'Электронная почта',
             disabled: true,
@@ -71,7 +66,7 @@ function SingleUser() {
             return;
         }
 
-        toast.success(`Статус пользователя успешно изменен.`);
+        toast.success(`Статус пользователя изменен.`);
         navigate("/users");
     }, []);
 

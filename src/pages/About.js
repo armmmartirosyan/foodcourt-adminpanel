@@ -50,7 +50,7 @@ function About() {
             return;
         }
 
-        toast.success('Создано успешно');
+        toast.success('Создано');
     }, [values]);
 
     const handleUpdateAbout = useCallback(async () => {
@@ -65,7 +65,7 @@ function About() {
             return;
         }
 
-        toast.success('успешно обновлен');
+        toast.success('Успешно обновлено');
     }, [values, about]);
 
     useEffect(() => {

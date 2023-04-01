@@ -78,7 +78,7 @@ function Footer() {
             return;
         }
 
-        toast.success('Нижний колонтитул успешно обновлен');
+        toast.success('Нижний колонтитул обновлен');
     }, [values, footer]);
 
     useEffect(() => {
