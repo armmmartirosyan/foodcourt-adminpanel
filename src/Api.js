@@ -41,10 +41,6 @@ class Api {
         return api.get(`/products/get/${slugName}`);
     }
 
-    static getProductsByCat(categorySlug, params) {
-        return api.get(`/products/get/category/${categorySlug}`, params);
-    }
-
     static addProduct(onUploadProgress, params) {
         return api.post(`/products`, params, {
             headers: {
